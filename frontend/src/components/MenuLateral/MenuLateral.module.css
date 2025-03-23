@@ -1,0 +1,95 @@
+.MenuLateral {
+    width: 150px;
+    background-color: #343a40;
+    /* color: white; */
+    color: rgb(245, 10, 10);
+    height: 91.5vh;
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    transition: width 0.5s ease; 
+    }
+
+.MenuLateral .nav-link a {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    /* color: white; */
+    color: rgb(202, 18, 18);
+    text-decoration: none !important; /* Remover sublinhado */
+    transition: background-color 0.3s;
+}
+
+.MenuLateral .nav-link:hover a {
+    background-color: #FF6347;
+    text-decoration: none !important; /* Garante que não haja sublinhado ao passar o mouse */
+}
+
+
+.icon {
+    margin-right: 10px;
+}
+
+.icon:hover{
+    color: #FF6347;
+}
+
+.navItemCustom {
+    padding: 6px;
+  
+    /* color: white; */
+    color: rgb(228, 10, 10);
+    margin-right: 5px;
+}
+
+.navItemCustom a {
+    /* color: white; Estilizar o link dentro do NavItem */
+    color: rgb(240, 10, 10); /* Estilizar o link dentro do NavItem */
+    text-decoration: none;
+}
+.MenuLateral .navItemCustom a:hover{
+    color: #FF6347;
+}
+
+/* .navItemCustom a:hover {
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+    border-radius: 6px;
+    color: #ffeb3b; 
+    
+} */
+
+.MenuLateral a {
+     color: white; /*Altera a cor do texto para branco */
+    text-decoration: none; /* Remove o sublinhado */
+}
+
+.MenuLateral a:hover{
+    color: #FF6347;
+}
+
+/* Menu retraído */
+.MenuLateral.collapsed {
+    width: 55px; /* Define a largura do menu quando retraído */
+    padding: 0px; /* Ajuste o padding para o menu retraído */
+}
+
+
+/* Ajuste para os ícones e links no menu retraído */
+.MenuLateral.collapsed .nav-link a {
+    display: flex;
+    justify-content: center; /* Centraliza o ícone */
+    align-items: center;
+}
+
+.MenuLateral.collapsed .icon {
+    display: flex;
+    align-items: center;
+    font-size: 30px;
+    padding: 4px;
+    margin-right: 0; /* Remove o espaço ao lado do ícone */
+}
+
+.MenuLateral .nav-link:hover{
+    color: #FF6347; 
+}
+

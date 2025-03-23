@@ -1,0 +1,36 @@
+/* PainelEstudante.module.css */
+
+.painelestudante {
+    padding: 20px;
+    background-color: #f8f9fa;
+}
+
+.navTabs {
+    margin-bottom: 15px;
+}
+
+
+.navItem {
+    margin-right: 5px;
+}
+
+
+.navLink a {
+    color: #333;
+    /* background-color: #4988be; */
+    border-radius: 5px;
+    padding: 20px;
+    text-decoration: none;
+    transition: background-color 0.3s ease;
+}
+
+.navLink a:hover {
+    /* background-color: #97b2c7; */
+    color: #0a0a0a !important;
+    
+} 
+
+.activeTab {
+    background-color: #007bff;
+    color: #fff !important;
+}

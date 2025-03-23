@@ -1,0 +1,6 @@
+.board{
+    display: flex;
+    
+    /* background-color: #555; */
+    margin: 5px;
+}
