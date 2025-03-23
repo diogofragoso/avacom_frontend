@@ -16,8 +16,11 @@ function AppRoutes() {
           <Route path="Board" element={<Board />} />
           <Route path="Tarefas" element={<Tarefas />} />
           <Route path="Contador" element={<Contador />} />
-          <Route path="PainelEstudante" element={<PainelEstudante />} />
-          <Route path="RegistroEstudante" element={<RegistroEstudante />} />
+          <Route path="PainelEstudante" element={<PainelEstudante />}>
+            {/* Rota aninhada dentro de PainelEstudante */}
+            <Route path="RegistroEstudante" element={<RegistroEstudante />} />
+          </Route>
+          
         </Route>
 
         {/* Página Não Encontrada */}
