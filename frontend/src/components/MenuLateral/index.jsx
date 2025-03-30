@@ -1,7 +1,10 @@
 import { Nav, NavItem } from 'react-bootstrap';
 import { NavLink } from 'react-router-dom';
 import { FaHome, FaClipboardList, FaUser, FaCog, FaBars } from 'react-icons/fa';
+import { GiTeacher } from "react-icons/gi";
 import { FcBullish } from 'react-icons/fc';
+import { TbTargetArrow } from "react-icons/tb";
+import { PiStudentBold } from "react-icons/pi";
 import styles from './MenuLateral.module.css';
 import { useState } from 'react';
 
@@ -45,8 +48,20 @@ function MenuLateral() {
         </NavItem>
         <NavItem>
           <NavLink to="/PainelEstudante" className={({ isActive }) => (isActive ? styles.active : '')}>
-            <FaCog className={styles.icon} />
+            <PiStudentBold className={styles.icon} />
             {!isCollapsed && 'Estudante'}
+          </NavLink>
+        </NavItem>
+        <NavItem>
+          <NavLink to="/PainelCurso" className={({ isActive }) => (isActive ? styles.active : '')}>
+            <GiTeacher className={styles.icon} />
+            {!isCollapsed && 'Curso'}
+          </NavLink>
+        </NavItem>
+        <NavItem>
+          <NavLink to="/PainelUc"lassName={({ isActive }) => (isActive ? styles.active : '')}>
+            <TbTargetArrow className={styles.icon} />
+            {!isCollapsed && 'UC'}
           </NavLink>
         </NavItem>
         <NavItem>

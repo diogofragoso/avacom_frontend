@@ -31,7 +31,7 @@ const RegistroEstudante = () => {
 
   return (
     <Container className="mt-5">
-      <h2 className="mb-4">Cadastro de Alunos</h2>
+      <h2 className="mb-4">Cadastro de estudantes</h2>
 
       {/* Feedback para o usuário */}
       {feedback.message && (
@@ -89,7 +89,7 @@ const RegistroEstudante = () => {
           </Col>
         </FormGroup>
 
-        <Button variant="primary" type="submit">
+        <Button variant="dark" type="submit">
           Cadastrar
         </Button>
       </Form>

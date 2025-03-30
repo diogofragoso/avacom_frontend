@@ -5,6 +5,11 @@ import Tarefas from "./pages/Tarefas";
 import Contador from "./pages/Contador";
 import RegistroEstudante from "./pages/RegistroEstudante";
 import PainelEstudante from "./pages/PainelEstudante";
+import PainelCurso from "./pages/PainelCurso";
+import RegistroCurso from "./components/RegistroCurso";
+import EditarCurso from "./components/EditarCurso";
+import RegistroUc from "./components/RegistroUc";
+import PainelUc from "./pages/PainelUc";
 // import PageNotFound from "./pages/PageNotFound";
 
 function AppRoutes() {
@@ -19,6 +24,17 @@ function AppRoutes() {
           <Route path="PainelEstudante" element={<PainelEstudante />}>
             {/* Rota aninhada dentro de PainelEstudante */}
             <Route path="RegistroEstudante" element={<RegistroEstudante />} />
+          </Route>
+          
+          <Route path="PainelCurso" element={<PainelCurso />}>
+            {/* Rota aninhada dentro de PainelCurso */}
+            <Route path="RegistroCurso" element={<RegistroCurso />} />  
+            <Route path="EditarCurso" element={<EditarCurso />} />
+          </Route>
+
+          <Route path="PainelUc" element={<PainelUc />}>
+            {/* Rota aninhada dentro de PainelCurso */}
+            <Route path="RegistroUc" element={<RegistroUc />} />  
           </Route>
           
         </Route>

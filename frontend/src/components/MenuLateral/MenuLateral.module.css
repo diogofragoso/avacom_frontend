@@ -13,6 +13,8 @@
 .MenuLateral .nav-link a {
     display: flex;
     align-items: center;
+    justify-content: flex-start; /* Alinha o conteúdo à esquerda */
+    align-items: center;
     padding: 10px;
     /* color: white; */
     color: rgb(202, 18, 18);
