@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Container, Form, Button, Row, Col, FormGroup, FormLabel, FormControl, Alert } from 'react-bootstrap'; // Adicionado Alert para feedback
-import estudanteService from '../../services/estudanteService';
+import cursoService from '../../services/cursoService';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 const RegistroCurso = () => {
@@ -19,8 +19,8 @@ const RegistroCurso = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await estudanteService.createStudent(formData);
-      setFeedback({ type: 'Sucesso', message: 'Curso inserido com sucesso!' });
+      await cursoService.createCurso(formData);
+      setFeedback({ type: 'success', message: 'Curso inserido com sucesso!' });
       setFormData({ nome_curso: '', descricao_curso: '' }); // Limpa o formulário após o cadastro
     } catch (error) {
       console.error('Erro ao cadastrar o curso:', error);
