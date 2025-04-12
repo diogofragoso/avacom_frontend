@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Alert } from 'react-bootstrap';
 import cursoService from '../../services/cursoService';
 import CursoCard from '../../components/CursoCard';
+import { Nav, NavItem,   NavLink,Navbar } from 'react-bootstrap';
+import { NavLink as NavLink2 } from 'react-router-dom';
 
 
 const EditarCurso = () => {
@@ -34,7 +36,14 @@ const EditarCurso = () => {
       <Row>
         {cursos.map((curso) => (
           <Col key={curso.id_curso} md={4} className="mb-4">
-            <CursoCard titulo={curso.nome_curso} descricao={curso.descricao_curso} />
+            
+            <NavLink2 to="/PainelUc/RegistroUc" state={{ curso: curso
+
+             }} className="text-decoration-none">                      
+            <CursoCard titulo={curso.nome_curso} descricao={curso.descricao_curso} />                                
+            </NavLink2>
+           
+
           </Col>
         ))}
       </Row>

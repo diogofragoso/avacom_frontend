@@ -1,13 +1,19 @@
 import React, { useState } from 'react';
 import { Container, Form, Button, Row, Col, FormGroup, FormLabel, FormControl, Alert,Card } from 'react-bootstrap'; // Adicionado Alert para feedback
-import estudanteService from '../../services/estudanteService';
+import ucService from '../../services/ucService'; //importando o serviço UcService
 import 'bootstrap/dist/css/bootstrap.min.css';
 import ReactLogo from '../../assets/react.svg';
+import { useLocation } from 'react-router-dom';
 
 const RegistrarUc = () => {
+  const location = useLocation(); // Obtemos a localização atual
+  const { nome_curso, id_curso } = location.state.curso; // Extraímos o nome do curso e o id_curso_fk do estado passado
+
   const [formData, setFormData] = useState({
     nome_uc: '',
-    id_curso_fk: ''
+    numero_uc: '',
+   // id_curso_fk : id_curso_fk, // id_curso_fk deve ser passado como prop
+    id_curso_fk : id_curso, // id_curso_fk deve ser passado como prop
   });
 
   const [feedback, setFeedback] = useState({ type: '', message: '' }); // Estado para feedback
@@ -20,9 +26,12 @@ const RegistrarUc = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await estudanteService.createStudent(formData);
-      setFeedback({ type: 'Sucesso', message: 'UC inserida com sucesso!' });
-      setFormData({ nome_curso: '', descricao_curso: '' }); // Limpa o formulário após o cadastro
+      await ucService.createUcs(formData);
+      console.log("Enviando dados para o servidor:", formData); // Log dos dados enviados
+      
+
+      setFeedback({ type: 'success', message: 'UC inserida com sucesso!' });
+      setFormData({ nome_curso: '', descricao_curso: '', id_curso_fk: id_curso }); // Limpa o formulário após o cadastro
     } catch (error) {
       console.error('Erro ao cadastrar uc:', error);
       setFeedback({ type: 'danger', message: 'Erro ao cadastrar uc: ' + error.message });
@@ -31,7 +40,7 @@ const RegistrarUc = () => {
 
   return (
     <Container className="mt-5">
-      <h2 className="mb-4">Cadastro de UC</h2>
+      <h2 className="mb-4">Cadastro de UCs  -  {nome_curso} </h2>
 
       {/* Feedback para o usuário */}
       {feedback.message && (
@@ -64,67 +73,32 @@ const RegistrarUc = () => {
         {/* Pensei em inserir cards para representar os cursos */}
         <FormGroup as={Row} className="mb-3">
           <FormLabel column sm={2}>
-            Nome do Curso
+            Número da UC
           </FormLabel>
           <Col sm={10}>
-            <FormControl
-              list='cursos'
-              placeholder='Selecione o curso'
-              name="id_curso_fk"
-              type="text"
-              value={formData.id_curso_fk}
+            <FormControl              
+              placeholder='Defina o número da UC'
+              name="numero_uc"
+              type="number"
+              min="1"
+              value={formData.numero_uc}
               onChange={handleChange}
               required
             />
-            <datalist id='cursos'>
-              <option value='Técnico em redes' />
-              <option value='Técnico em informática' />
-              <option value='3' />
-              <option value='4' />
-            </datalist>
+           
 
           </Col>
         </FormGroup>
 
-        {/* Pensei em inserir cards para representar os cursos */}
-          <FormGroup as={Row} className="mb-3">
-            <FormLabel column sm={2}>
-              <Card style={{ width: '12rem' }}>
-                <Card.Img variant="top" src={ReactLogo} alt="React Logo" />
-                <Card.Body>
-                  <Card.Title>Técnico em Redes</Card.Title>
-                  <Card.Text>
-                    Adicione uma descrição breve sobre o curso aqui.
-                  </Card.Text>
-                </Card.Body>
-              </Card>
-            </FormLabel>
-          {/* Pensei em inserir cards para representar os cursos */}
-       
-            <FormLabel column sm={2}>
-              <Card style={{ width: '12rem' }}>
-                <Card.Img variant="top" src={ReactLogo} alt="React Logo" />
-                <Card.Body>
-                  <Card.Title>Técnico em infor.</Card.Title>
-                  <Card.Text>
-                    Adicione uma descrição breve sobre o curso aqui.
-                  </Card.Text>
-                </Card.Body>
-              </Card>
-            </FormLabel>
-          </FormGroup>
+        
          
 
 
 
 
 
-
-
-
-
         <Button variant="dark" type="submit">
-          Cadastrar2
+          Cadastrar
         </Button>
       </Form>
     </Container>
