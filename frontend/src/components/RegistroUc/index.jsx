@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Container, Form, Button, Row, Col, FormGroup, FormLabel, FormControl, Alert,Card } from 'react-bootstrap'; // Adicionado Alert para feedback
 import ucService from '../../services/ucService'; //importando o serviço UcService
 import 'bootstrap/dist/css/bootstrap.min.css';
-import ReactLogo from '../../assets/react.svg';
+import ListarUcs from '../../components/ListarUcs'; // Importando o componente ListarUcs
 import { useLocation } from 'react-router-dom';
 
 const RegistrarUc = () => {
@@ -37,6 +37,8 @@ const RegistrarUc = () => {
       setFeedback({ type: 'danger', message: 'Erro ao cadastrar uc: ' + error.message });
     }
   };
+
+  
 
   return (
     <Container className="mt-5">
@@ -88,19 +90,17 @@ const RegistrarUc = () => {
            
 
           </Col>
-        </FormGroup>
-
-        
+        </FormGroup>     
          
-
-
-
-
 
         <Button variant="dark" type="submit">
           Cadastrar
         </Button>
       </Form>
+
+       <ListarUcs id_curso={id_curso} /> {/* Passando o id_curso para o componente ListarUcs */}
+
+
     </Container>
   );
 };
