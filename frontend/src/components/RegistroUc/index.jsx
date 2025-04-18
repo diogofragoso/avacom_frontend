@@ -1,22 +1,49 @@
-import React, { useState } from 'react';
-import { Container, Form, Button, Row, Col, FormGroup, FormLabel, FormControl, Alert,Card } from 'react-bootstrap'; // Adicionado Alert para feedback
-import ucService from '../../services/ucService'; //importando o serviço UcService
+import React, { useState, useEffect } from 'react';
+import { Container, Form, Button, Row, Col, FormGroup, FormLabel, FormControl, Alert } from 'react-bootstrap';
+import ucService from '../../services/ucService';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import ListarUcs from '../../components/ListarUcs'; // Importando o componente ListarUcs
 import { useLocation } from 'react-router-dom';
+import {motion} from 'framer-motion';
+import ListarUcs from '../../components/ListarUcs';
+import { Spinner } from 'react-bootstrap';
+
 
 const RegistrarUc = () => {
-  const location = useLocation(); // Obtemos a localização atual
-  const { nome_curso, id_curso } = location.state.curso; // Extraímos o nome do curso e o id_curso_fk do estado passado
+  
+
+  
+  const location = useLocation();
+  const { nome_curso, id_curso } = location.state.curso;
+  const [loading, setLoading] = useState(true);
+
 
   const [formData, setFormData] = useState({
     nome_uc: '',
     numero_uc: '',
-   // id_curso_fk : id_curso_fk, // id_curso_fk deve ser passado como prop
-    id_curso_fk : id_curso, // id_curso_fk deve ser passado como prop
+    id_curso_fk: id_curso,
   });
 
-  const [feedback, setFeedback] = useState({ type: '', message: '' }); // Estado para feedback
+  const [ucs, setUcs] = useState([]);
+  const [feedback, setFeedback] = useState({ type: '', message: '' });
+
+  const carregarUcs = async () => {
+    try {
+      setLoading(true);
+      const data = await ucService.getUcs();
+      const filtradas = data.filter((uc) => uc.id_curso_fk === id_curso);
+      setUcs(filtradas);
+    } catch (error) {
+      console.error('Erro ao buscar UCs:', error);
+      setFeedback({ type: 'danger', message: 'Erro ao buscar UCs: ' + error.message });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Carregar UCs ao carregar o componente
+  useEffect(() => {
+   carregarUcs();      
+  }, [id_curso]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -27,24 +54,26 @@ const RegistrarUc = () => {
     e.preventDefault();
     try {
       await ucService.createUcs(formData);
-      console.log("Enviando dados para o servidor:", formData); // Log dos dados enviados
-      
-
       setFeedback({ type: 'success', message: 'UC inserida com sucesso!' });
-      setFormData({ nome_curso: '', descricao_curso: '', id_curso_fk: id_curso }); // Limpa o formulário após o cadastro
+      setFormData({ nome_uc: '', numero_uc: '', id_curso_fk: id_curso });
+      await carregarUcs(); // Atualiza a lista após o cadastro
+
+      // Atualiza a lista após o cadastro
+      // const data = await ucService.getUcs();
+      // const filtradas = data.filter((uc) => uc.id_curso_fk === id_curso);
+      // setUcs(filtradas);
+
     } catch (error) {
-      console.error('Erro ao cadastrar uc:', error);
-      setFeedback({ type: 'danger', message: 'Erro ao cadastrar uc: ' + error.message });
+      console.error('Erro ao cadastrar UC:', error);
+      setFeedback({ type: 'danger', message: 'Erro ao cadastrar UC: ' + error.message });
     }
   };
 
-  
-
   return (
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }}>
     <Container className="mt-5">
-      <h2 className="mb-4">Cadastro de UCs  -  {nome_curso} </h2>
+      <h2 className="mb-4">Cadastro de UCs - {nome_curso}</h2>
 
-      {/* Feedback para o usuário */}
       {feedback.message && (
         <Alert variant={feedback.type} onClose={() => setFeedback({ type: '', message: '' })} dismissible>
           {feedback.message}
@@ -52,12 +81,8 @@ const RegistrarUc = () => {
       )}
 
       <Form onSubmit={handleSubmit}>
-        <FormGroup as={Row} className="mb-3">    
-
-
-          <FormLabel column sm={2}>
-            Unidade Curricular
-          </FormLabel>
+        <FormGroup as={Row} className="mb-3">
+          <FormLabel column sm={2}>Unidade Curricular</FormLabel>
           <Col sm={10}>
             <FormControl
               type="text"
@@ -70,38 +95,37 @@ const RegistrarUc = () => {
           </Col>
         </FormGroup>
 
-
-
-        {/* Pensei em inserir cards para representar os cursos */}
         <FormGroup as={Row} className="mb-3">
-          <FormLabel column sm={2}>
-            Número da UC
-          </FormLabel>
+          <FormLabel column sm={2}>Número da UC</FormLabel>
           <Col sm={10}>
-            <FormControl              
-              placeholder='Defina o número da UC'
-              name="numero_uc"
+            <FormControl
               type="number"
-              min="1"
+              name="numero_uc"
+              placeholder="Defina o número da UC"
               value={formData.numero_uc}
               onChange={handleChange}
+              min="1"
               required
             />
-           
-
           </Col>
-        </FormGroup>     
-         
+        </FormGroup>
 
-        <Button variant="dark" type="submit">
-          Cadastrar
-        </Button>
+        <Button variant="dark" type="submit">Cadastrar</Button>
       </Form>
 
-       <ListarUcs id_curso={id_curso} /> {/* Passando o id_curso para o componente ListarUcs */}
+
+      {loading ? (
+        <div className="d-flex justify-content-center mt-5">
+          <Spinner animation="border" variant="dark" />
+        </div>
+      ) : (
+        <></>
+      )}
+      <ListarUcs ucs={ucs} feedback={feedback} setFeedback={setFeedback} onDeleteSuccess={carregarUcs} />
 
 
     </Container>
+  </motion.div>
   );
 };
 

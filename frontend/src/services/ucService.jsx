@@ -1,8 +1,14 @@
 import axios from 'axios';
 
-const API_INSERIR = 'http://localhost:3000/api/ucs/ucs';
-const API_LISTAR = 'http://localhost:3000/api/ucs/listarucs';
-// const API_LISTAR = '/api/cursos/listarcursos';
+const API_BASE_URL = 'http://localhost:3000/api/ucs';
+const API_INSERIR = `${API_BASE_URL}/ucs`;
+const API_LISTAR = `${API_BASE_URL}/listarucs`;
+// const API_LISTAR = 'http://localhost:3000/api/ucs/listarucs';
+const API_DELETAR_UC = (id) => `${API_BASE_URL}/deletaruc?id=${id}`;
+
+
+
+
 
 const ucService = {
   createUcs: async (data) => {
@@ -24,6 +30,20 @@ const ucService = {
       throw error;
     }
   },
+
+  deleteUc: async (id) => {
+    try {
+      const response = await axios.delete(API_DELETAR_UC(id), {
+        headers: { 'Content-Type': 'application/json' },
+      });
+      return response.data; // Retorna a resposta da API
+    } catch (error) {
+      throw new Error('Erro ao excluir a UC: ' + error.message);
+    }
+  },
+
+
+
 };
 
 
