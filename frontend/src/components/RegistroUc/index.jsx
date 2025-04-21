@@ -121,7 +121,11 @@ const RegistrarUc = () => {
       ) : (
         <></>
       )}
-      <ListarUcs ucs={ucs} feedback={feedback} setFeedback={setFeedback} onDeleteSuccess={carregarUcs} />
+      <ListarUcs 
+      ucs={ucs} feedback={feedback} 
+      setFeedback={setFeedback} 
+      onDeleteSuccess={carregarUcs} 
+      onEditSuccess={carregarUcs}/>
 
 
     </Container>

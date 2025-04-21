@@ -4,7 +4,9 @@ const API_BASE_URL = 'http://localhost:3000/api/ucs';
 const API_INSERIR = `${API_BASE_URL}/ucs`;
 const API_LISTAR = `${API_BASE_URL}/listarucs`;
 // const API_LISTAR = 'http://localhost:3000/api/ucs/listarucs';
-const API_DELETAR_UC = (id) => `${API_BASE_URL}/deletaruc?id=${id}`;
+const API_DELETAR_UC = (id) => `${API_BASE_URL}/deletaruc/${id}`;
+const API_EDITAR_UC = (id) => `${API_BASE_URL}/editaruc/${id}`;
+
 
 
 
@@ -42,6 +44,17 @@ const ucService = {
     }
   },
 
+
+  updateUc: async (id, data) => {
+    try {
+      const response = await axios.put(API_EDITAR_UC(id), data, {
+        headers: { 'Content-Type': 'application/json' },
+      });
+      return response.data;
+    } catch (error) {
+      throw new Error('Erro ao editar a UC: ' + error.message);
+    }
+  },
 
 
 };
