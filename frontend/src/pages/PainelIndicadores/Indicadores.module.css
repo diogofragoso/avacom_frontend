@@ -1,0 +1,44 @@
+/* PainelEstudante.module.css */
+
+.painelindicadores {
+    padding: 20px;
+    background-color: #f8f9fa;
+}
+
+.navTabs {
+    margin-bottom: 15px;
+}
+
+
+.navItem {
+    margin-right: 5px;
+}
+
+
+.navLink a {
+    /* color: #333; */
+    color: #fff;
+    font-weight: bold;
+    /* background-color: #4988be; */
+    border-radius: 5px;
+    padding: 20px;
+    text-decoration: none;
+    transition: background-color 0.3s ease;
+}
+
+.navLink a:hover {
+      
+    /* background-color: #ff6347;     */
+    /* color: #FFF !important; */
+    color: #ff6347 !important;
+    padding: 20px;    
+    border-radius: 10px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+   
+    
+} 
+
+.activeTab {
+    background-color: #007bff;
+    color: #fff !important;
+}
