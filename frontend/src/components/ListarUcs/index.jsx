@@ -5,6 +5,7 @@ import ucService from '../../services/ucService';
 import { RiDeleteBin6Line } from "react-icons/ri";
 import { GrEdit } from "react-icons/gr";
 import { NavLink as NavLink2 } from 'react-router-dom'; // Importação corrigida
+import styles from './ListarUcs.module.css';
 
 const ListarUcs = ({ ucs, feedback, setFeedback, onDeleteSuccess, onEditSuccess }) => {
     const [editingUc, setEditingUc] = useState(null);
@@ -64,7 +65,7 @@ const ListarUcs = ({ ucs, feedback, setFeedback, onDeleteSuccess, onEditSuccess 
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.3 }}
                         >
-                            <Card style={{ width: '18rem' }}>
+                            <Card style={{ width: '18rem' }} className={styles.card}>
                                 <NavLink2
                                     to="/PainelIndicadores"
                                     state={{ uc }}
