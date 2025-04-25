@@ -4,8 +4,9 @@ import { Container, Row, Col, Card, Button, Modal, Form } from 'react-bootstrap'
 import indicadorService from '../../services/indicadorService';
 import { RiDeleteBin6Line } from "react-icons/ri";
 import { GrEdit } from "react-icons/gr";
+import ListarUcs from '../ListarUcs';
 
-const listarindicadores = ({ indicador, feedback, setFeedback, onDeleteSuccess, onEditSuccess }) => {
+const ListarIndicadores = ({ indicador, feedback, setFeedback, onDeleteSuccess, onEditSuccess }) => {
     const [editaIndicador, setEditarIndicador] = useState(null);
     const [numeroIndicador, setNumeroIndicador] = useState('');
     const [descricaoIndicador, setDescricaoIndicador] = useState('');
@@ -140,4 +141,4 @@ const listarindicadores = ({ indicador, feedback, setFeedback, onDeleteSuccess, 
     );
 };
 
-export default ListarUcs;
+export default ListarIndicadores;

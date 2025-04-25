@@ -11,7 +11,8 @@ import EditarCurso from "./components/EditarCurso";
 import RegistroUc from "./components/RegistroUc";
 import PainelUc from "./pages/PainelUc";
 import PainelIndicadores from "./pages/PainelIndicadores";
-// import PageNotFound from "./pages/PageNotFound";
+import ListarIndicadores from "./components/ListarIndicadores";
+
 
 function AppRoutes() {
   return (
@@ -37,10 +38,11 @@ function AppRoutes() {
             {/* Rota aninhada dentro de PainelCurso */}
             <Route path="RegistroUc" element={<RegistroUc />} />  
           </Route>
-          <Route path="PainelIndicadores" element={<PainelIndicadores />}>
-            {/* Rota aninhada dentro de PainelCurso */}
-            {/* <Route path="RegistroUc" element={<RegistroUc />} />   */}
+
+          <Route path="PainelIndicadores" element={<PainelIndicadores />}>          
+           <Route path="ListarIndicadores" element={<ListarIndicadores />} />  
           </Route>
+          
           
         </Route>
 

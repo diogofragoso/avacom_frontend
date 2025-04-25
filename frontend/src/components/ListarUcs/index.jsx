@@ -4,6 +4,7 @@ import { Container, Row, Col, Card, Button, Modal, Form } from 'react-bootstrap'
 import ucService from '../../services/ucService';
 import { RiDeleteBin6Line } from "react-icons/ri";
 import { GrEdit } from "react-icons/gr";
+import { NavLink as NavLink2 } from 'react-router-dom'; // Importação corrigida
 
 const ListarUcs = ({ ucs, feedback, setFeedback, onDeleteSuccess, onEditSuccess }) => {
     const [editingUc, setEditingUc] = useState(null);
@@ -11,13 +12,12 @@ const ListarUcs = ({ ucs, feedback, setFeedback, onDeleteSuccess, onEditSuccess 
     const [numeroUc, setNumeroUc] = useState('');
     const [showModal, setShowModal] = useState(false);
 
-    // Função para excluir UC
     const handleDelete = async (id_uc) => {
         if (window.confirm('Tem certeza que deseja excluir esta UC?')) {
             try {
                 await ucService.deleteUc(id_uc);
                 setFeedback({ type: 'success', message: 'UC excluída com sucesso!' });
-                onDeleteSuccess(); // Atualiza a lista no componente pai
+                onDeleteSuccess();
             } catch (error) {
                 console.error(error);
                 setFeedback({ type: 'danger', message: 'Erro ao excluir a UC.' });
@@ -25,42 +25,29 @@ const ListarUcs = ({ ucs, feedback, setFeedback, onDeleteSuccess, onEditSuccess 
         }
     };
 
-    // Função para iniciar a edição de uma UC
     const handleEdit = (uc) => {
-        setEditingUc(uc);  // Marca qual UC está sendo editada
+        setEditingUc(uc);
         setNomeUc(uc.nome_uc);
         setNumeroUc(uc.numero_uc);
-        setShowModal(true);  // Exibe o modal de edição
+        setShowModal(true);
     };
 
-    // Função para enviar os dados editados para o servidor
     const handleUpdateUc = async () => {
-        console.log("Dados enviados para update:", {
-            nome_uc: nomeUc,
-            numero_uc: numeroUc
-        });
-    
         try {
-            const response = await ucService.updateUc(editingUc.id_uc, { 
-                nome_uc: nomeUc, 
-                numero_uc: numeroUc 
+            const response = await ucService.updateUc(editingUc.id_uc, {
+                nome_uc: nomeUc,
+                numero_uc: numeroUc
             });
-    
-            console.log("Resposta da API:", response);
-    
             setFeedback({ type: 'success', message: 'UC editada com sucesso!' });
-            onEditSuccess(); // Atualiza a lista no componente pai
-            setShowModal(false); // Fecha o modal após salvar
+            onEditSuccess();
+            setShowModal(false);
         } catch (error) {
             console.error("Erro ao editar UC:", error);
-            console.error("Detalhes do erro:", error.response?.data || error.message);
-    
             const msg = error.response?.data?.error || 'Erro ao editar a UC.';
             setFeedback({ type: 'danger', message: msg });
         }
     };
 
-    // Fechar o modal sem salvar
     const handleCloseModal = () => {
         setShowModal(false);
     };
@@ -78,28 +65,36 @@ const ListarUcs = ({ ucs, feedback, setFeedback, onDeleteSuccess, onEditSuccess 
                             transition={{ duration: 0.3 }}
                         >
                             <Card style={{ width: '18rem' }}>
-                                <Card.Body>
-                                    <Card.Title>{uc.nome_uc}</Card.Title>
-                                    <Card.Text>UC: {uc.numero_uc}</Card.Text>
-                                    
-                                    <Button 
-                                        variant="primary" 
-                                        size="sm" 
-                                        title="Editar UC" 
-                                        onClick={() => handleEdit(uc)}  // Inicia a edição ao clicar no ícone
+                                <NavLink2
+                                    to="/PainelIndicadores"
+                                    state={{ uc }}
+                                    className="text-decoration-none text-dark"
+                                >
+                                    <Card.Body>
+                                        <Card.Title>{uc.nome_uc}</Card.Title>
+                                        <Card.Text>UC: {uc.numero_uc}</Card.Text>
+                                    </Card.Body>
+                                </NavLink2>
+
+                                <Card.Footer>
+                                    <Button
+                                        variant="primary"
+                                        size="sm"
+                                        title="Editar UC"
+                                        onClick={() => handleEdit(uc)}
                                     >
                                         <GrEdit />
                                     </Button>
                                     <Button
                                         className="ms-2"
                                         variant="danger"
-                                        size="sm"                                       
+                                        size="sm"
                                         title="Excluir UC"
                                         onClick={() => handleDelete(uc.id_uc)}
                                     >
                                         <RiDeleteBin6Line />
                                     </Button>
-                                </Card.Body>
+                                </Card.Footer>
                             </Card>
                         </motion.div>
                     </Col>
@@ -130,7 +125,7 @@ const ListarUcs = ({ ucs, feedback, setFeedback, onDeleteSuccess, onEditSuccess 
                                 onChange={(e) => setNumeroUc(e.target.value)}
                                 placeholder="Digite o número da UC"
                             />
-                        </Form.Group>                        
+                        </Form.Group>
                         <Button variant="primary" onClick={handleUpdateUc}>Salvar Alterações</Button>
                         <Button variant="secondary" className="ms-2" onClick={handleCloseModal}>Cancelar</Button>
                     </Form>

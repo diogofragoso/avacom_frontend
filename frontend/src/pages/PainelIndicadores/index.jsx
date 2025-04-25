@@ -24,7 +24,7 @@ function PainelIndicadores() {
         </NavItem>
         <NavItem>    
                   <NavLink className={styles.navLink}>
-                    <NavLink2 to="#">                      
+                    <NavLink2 to="ListarIndicadores">                      
                      Editar
                     </NavLink2>
                     </NavLink>         
@@ -32,6 +32,7 @@ function PainelIndicadores() {
                      
           </Nav>
         </Navbar>
+        
 
           
           
