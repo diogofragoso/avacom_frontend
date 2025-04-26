@@ -3,28 +3,12 @@ import styles from './Indicadores.module.css';
 import { Outlet, useLocation } from 'react-router-dom';
 import { NavLink as NavLink2 } from 'react-router-dom';
 import { Nav, NavItem, NavLink, Navbar } from 'react-bootstrap';
-import indicadorService from '../../services/indicadorService'; // import seu service de indicadores
+import ListarIndicadores from '../../components/ListarIndicadores'; // <<< importa aqui
+// import indicadorService from '../../services/indicadorService'; // ainda deixa para uso futuro
 
 function PainelIndicadores() {
   const location = useLocation();
-  const { uc } = location.state || {}; // pega o uc enviado
-  const [indicadores, setIndicadores] = useState([]);
-
-  useEffect(() => {
-    if (uc) {
-      buscarIndicadores();
-    }
-  }, [uc]);
-
-  const buscarIndicadores = async () => {
-    try {
-      const response = await indicadorService.getIndicadoresPorUc(uc.id_uc); // passando id_uc diretamente
-      console.log('Indicadores recebidos:', response); // <-- Teste aqui
-      setIndicadores(response); // ajusta conforme a resposta da sua API
-    } catch (error) {
-      console.error('Erro ao buscar indicadores:', error);
-    }
-  };
+  const { uc } = location.state || {};
 
   return (
     <div className={styles.indicadores}>
@@ -49,15 +33,7 @@ function PainelIndicadores() {
             {uc ? (
               <>
                 <h2>Indicadores da UC: {uc.nome_uc}</h2>
-                {indicadores.length > 0 ? (
-                  indicadores.map((indicador) => (
-                    <div key={indicador.id_indicador} className="mb-3">
-                      <strong>{indicador.numero_indicador}</strong> - {indicador.descricao_indicador}
-                    </div>
-                  ))
-                ) : (
-                  <p>Nenhum indicador encontrado para esta UC.</p>
-                )}
+                <ListarIndicadores id_uc={uc.id_uc} /> {/* <<< usa seu componente aqui */}
               </>
             ) : (
               <p>Selecione uma UC para visualizar os indicadores.</p>
