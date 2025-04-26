@@ -1,8 +1,8 @@
 import axios from 'axios';
 
-const API_BASE_URL = 'http://localhost:3000/api/ucs';
+const API_BASE_URL = 'http://localhost:3000/api/indicadores';
 const API_INSERIR = `${API_BASE_URL}/inseririndicador`;
-const API_LISTAR = `${API_BASE_URL}/listarindicador`;
+const API_LISTAR = `${API_BASE_URL}`;
 const API_DELETAR_INDICADOR = (id) => `${API_BASE_URL}/deletarindicador/${id}`;
 const API_EDITAR_INDICADOR = (id) => `${API_BASE_URL}/editarindicador/${id}`;
 
@@ -19,15 +19,16 @@ const indicadorService = {
       throw error;
     }
   },
-
-  getIndicadores: async () => {
-    try {
-      const response = await axios.get(API_LISTAR);
-      return response.data;
-    } catch (error) {
-      throw error;
-    }
-  },
+  
+    getIndicadoresPorUc: async (id_uc) => {
+      try {
+        // Passando o id_uc diretamente na URL (rota dinâmica)
+        const response = await axios.get(`${API_LISTAR}/${id_uc}`); // A URL correta será /api/indicadores/1
+        return response.data; // Retorna os dados da resposta
+      } catch (error) {
+        throw new Error('Erro ao buscar indicadores: ' + error.message);
+      }
+    },
 
   deleteIndicador: async (id) => {
     try {
