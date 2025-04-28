@@ -22,7 +22,7 @@ function PainelIndicadores() {
             <Nav tabs>
               <NavItem>
                 <NavLink className={styles.navLink}>
-                  <NavLink2 to="#">Cursos</NavLink2>
+                  <NavLink2 to="/PainelCurso">Cursos</NavLink2>
                 </NavLink>
               </NavItem>
               <NavItem>

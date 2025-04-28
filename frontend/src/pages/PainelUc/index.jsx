@@ -1,11 +1,15 @@
 import React, { useState } from 'react';
 import styles from './PainelUc.module.css';
-import { Outlet } from 'react-router-dom';
+import { Outlet, useLocation } from 'react-router-dom';
 import { NavLink as NavLink2 } from 'react-router-dom';
+
 
 import { Nav, NavItem,   NavLink,Navbar } from 'react-bootstrap';
 
 function PainelUc() {
+  const location = useLocation();
+  const { curso } = location.state || {};  // Garantir que uc e curso serão obtidos corretamente, se passados
+
  
 
   return (
@@ -17,18 +21,18 @@ function PainelUc() {
       <Nav tabs>
         <NavItem>    
                   <NavLink className={styles.navLink}>
-                    <NavLink2 to="RegistroUc">                      
+                    <NavLink2 to="/PainelCurso/EditarCurso">                      
+                     Cursos
+                    </NavLink2>
+                    </NavLink>         
+        </NavItem>
+        {/* <NavItem>    
+                  <NavLink className={styles.navLink}>
+                    <NavLink2 to="">                      
                      Cadastrar
                     </NavLink2>
                     </NavLink>         
-        </NavItem>
-        <NavItem>    
-                  <NavLink className={styles.navLink}>
-                    <NavLink2 to="Contador">                      
-                     Editar
-                    </NavLink2>
-                    </NavLink>         
-        </NavItem>
+        </NavItem> */}
                      
           </Nav>
         </Navbar>

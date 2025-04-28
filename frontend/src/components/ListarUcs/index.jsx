@@ -13,6 +13,7 @@ const ListarUcs = ({ ucs, feedback, setFeedback, onDeleteSuccess, onEditSuccess,
     const [nomeUc, setNomeUc] = useState('');
     const [numeroUc, setNumeroUc] = useState('');
     const [showModal, setShowModal] = useState(false);
+    
 
     const handleDelete = async (id_uc) => {
         if (window.confirm('Tem certeza que deseja excluir esta UC?')) {
