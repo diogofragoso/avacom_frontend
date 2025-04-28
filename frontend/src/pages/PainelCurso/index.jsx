@@ -122,11 +122,12 @@ function PainelCurso() {
                   required
                 />
               </Col>
-            </FormGroup>
+            </FormGroup>        
 
-            <Button variant="dark" type="submit" className="mt-2">
-              Cadastrar
-            </Button>
+
+            <Button variant="dark" type="submit" className="mt-2 me-2 ">Cadastrar</Button>
+            <Button variant="secondary" onClick={handleCloseModal} className="mt-2">Cancelar</Button>
+           
           </Form>
         </Modal.Body>
       </Modal>
