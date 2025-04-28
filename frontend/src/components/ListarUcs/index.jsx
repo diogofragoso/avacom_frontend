@@ -1,3 +1,4 @@
+// Componente ListarUcs
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Container, Row, Col, Card, Button, Modal, Form } from 'react-bootstrap';
@@ -7,7 +8,7 @@ import { GrEdit } from "react-icons/gr";
 import { NavLink as NavLink2 } from 'react-router-dom'; // Importação corrigida
 import styles from './ListarUcs.module.css';
 
-const ListarUcs = ({ ucs, feedback, setFeedback, onDeleteSuccess, onEditSuccess }) => {
+const ListarUcs = ({ ucs, feedback, setFeedback, onDeleteSuccess, onEditSuccess, curso }) => {
     const [editingUc, setEditingUc] = useState(null);
     const [nomeUc, setNomeUc] = useState('');
     const [numeroUc, setNumeroUc] = useState('');
@@ -68,7 +69,7 @@ const ListarUcs = ({ ucs, feedback, setFeedback, onDeleteSuccess, onEditSuccess 
                             <Card style={{ width: '18rem' }} className={styles.card}>
                                 <NavLink2
                                     to="/PainelIndicadores"
-                                    state={{ uc }}
+                                    state={{ uc, curso }}  // Passando o estado de 'curso' junto com a UC
                                     className="text-decoration-none text-dark"
                                 >
                                     <Card.Body>
