@@ -208,7 +208,7 @@ const ListarIndicadores = ({ id_uc }) => {
                             </Form.Group>
 
                             <Modal.Footer>
-                                <Button variant="primary" type="submit">
+                                <Button variant="dark" type="submit">
                                     Cadastrar
                                 </Button>
                                 <Button variant="secondary" onClick={() => setShowModalAdd(false)}>
@@ -253,7 +253,7 @@ const ListarIndicadores = ({ id_uc }) => {
                             </Form.Group>
 
                             <Modal.Footer>
-                                <Button variant="primary" type="submit">
+                                <Button variant="dark" type="submit">
                                     Salvar
                                 </Button>
                                 <Button variant="secondary" onClick={() => setShowModalEdit(false)}>

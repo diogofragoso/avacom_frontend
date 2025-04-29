@@ -12,6 +12,8 @@ import RegistroUc from "./components/RegistroUc";
 import PainelUc from "./pages/PainelUc";
 import PainelIndicadores from "./pages/PainelIndicadores";
 import ListarIndicadores from "./components/ListarIndicadores";
+import CardAvaliativa from "./components/CardAvaliativa";
+import PainelAvaliativa from "./pages/PainelAvaliativa";
 
 
 function AppRoutes() {
@@ -42,6 +44,13 @@ function AppRoutes() {
           <Route path="PainelIndicadores" element={<PainelIndicadores />}>          
            <Route path="ListarIndicadores" element={<ListarIndicadores />} />  
           </Route>
+
+          <Route path="PainelAvaliativa" element={<PainelAvaliativa />}>          
+           <Route path="CardAvaliativa" element={<CardAvaliativa />} />  
+          </Route>
+
+
+
           
           
         </Route>
