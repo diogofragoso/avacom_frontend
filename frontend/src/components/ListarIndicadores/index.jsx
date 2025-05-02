@@ -4,6 +4,7 @@ import { Container, Row, Col, Card, Button, Modal, Form, Spinner, Alert } from '
 import indicadorService from '../../services/indicadorService';
 import { RiDeleteBin6Line } from "react-icons/ri";
 import { GrEdit } from "react-icons/gr";
+import styles from './ListarIndicadores.module.css';
 
 const ListarIndicadores = ({ id_uc }) => {
     const [indicadores, setIndicadores] = useState([]);
@@ -18,16 +19,12 @@ const ListarIndicadores = ({ id_uc }) => {
     const [feedback, setFeedback] = useState({ type: '', message: '' });
 
     useEffect(() => {
-        if (id_uc) {
-            buscarIndicadores();
-        }
+        if (id_uc) buscarIndicadores();
     }, [id_uc]);
 
     useEffect(() => {
         if (feedback.message) {
-            const timer = setTimeout(() => {
-                setFeedback({ type: '', message: '' });
-            }, 2000);
+            const timer = setTimeout(() => setFeedback({ type: '', message: '' }), 2000);
             return () => clearTimeout(timer);
         }
     }, [feedback]);
@@ -69,7 +66,7 @@ const ListarIndicadores = ({ id_uc }) => {
         e.preventDefault();
         try {
             await indicadorService.updateIndicador(indicadorSelecionado.id_indicador, {
-                numero_indicador: numeroIndicador,
+                numero_indicador: Number(numeroIndicador),
                 descricao_indicador: descricaoIndicador
             });
             buscarIndicadores();
@@ -85,7 +82,7 @@ const ListarIndicadores = ({ id_uc }) => {
         e.preventDefault();
         try {
             await indicadorService.createIndicador({
-                numero_indicador: novoNumeroIndicador,
+                numero_indicador: Number(novoNumeroIndicador),
                 descricao_indicador: novaDescricaoIndicador,
                 id_uc_fk: id_uc
             });
@@ -102,62 +99,51 @@ const ListarIndicadores = ({ id_uc }) => {
 
     return (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }}>
-            <Container className="mt-5 position-relative">
-
+            <Container fluid className="mt-5 position-relative">
                 <h2 className="mb-4">Indicadores</h2>
 
                 <Button variant="dark" className="mb-4" onClick={() => setShowModalAdd(true)}>
                     Adicionar Indicador
                 </Button>
 
-                {/* Área de Feedback */}
-                <div className="position-relative">
-                    {feedback.message && (
-                        <div style={{
-                            position: 'absolute',
-                            top: '-60px',
-                            left: 0,
-                            right: 0,
-                            display: 'flex',
-                            justifyContent: 'center',
-                            zIndex: 1000
-                        }}>
-                            <Alert
-                                variant={feedback.type === 'success' ? 'success' : 'danger'}
-                                className="text-center"
-                                style={{ width: '50%', opacity: 0.95 }}
-                            >
-                                {feedback.message}
-                            </Alert>
-                        </div>
-                    )}
-                </div>
+                {feedback.message && (
+                    <div className="position-absolute w-100 d-flex justify-content-center" style={{ top: '-60px', zIndex: 1000 }}>
+                        <Alert variant={feedback.type} className="text-center w-50" style={{ opacity: 0.95 }}>
+                            {feedback.message}
+                        </Alert>
+                    </div>
+                )}
 
-                {/* Lista de Indicadores */}
                 <Row>
                     {loading ? (
                         <div className="d-flex justify-content-center mt-5">
                             <Spinner animation="border" variant="dark" />
                         </div>
                     ) : indicadores.length > 0 ? (
-                        indicadores.map((indicador) => (
+                        indicadores.map(indicador => (
                             <Col key={indicador.id_indicador} md={4} className="mb-4">
-                                <motion.div
-                                    initial={{ opacity: 0, y: 20 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    transition={{ duration: 0.3 }}
-                                >
+                                <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}>
                                     <Card style={{ width: '18rem' }}>
                                         <Card.Body>
                                             <Card.Title>{indicador.numero_indicador}</Card.Title>
                                             <Card.Text>{indicador.descricao_indicador}</Card.Text>
                                         </Card.Body>
                                         <Card.Footer className="d-flex justify-content-start">
-
-                                            <Button variant="primary" size="sm" onClick={() => handleEdit(indicador)}>
+                                            <Button
+                                                variant="primary"
+                                                size="sm"
+                                                onClick={() => handleEdit(indicador)}
+                                                aria-label="Editar indicador"
+                                            >
                                                 <GrEdit />
                                             </Button>
-                                            <Button variant="danger" size="sm" className="ms-2" onClick={() => handleDelete(indicador.id_indicador)}>
+                                            <Button
+                                                variant="danger"
+                                                size="sm"
+                                                className="ms-2"
+                                                onClick={() => handleDelete(indicador.id_indicador)}
+                                                aria-label="Excluir indicador"
+                                            >
                                                 <RiDeleteBin6Line />
                                             </Button>
                                         </Card.Footer>
@@ -166,11 +152,13 @@ const ListarIndicadores = ({ id_uc }) => {
                             </Col>
                         ))
                     ) : (
-                        <p>Nenhum indicador encontrado.</p>
+                        <Col>
+                            <p className="text-muted mt-3">Nenhum indicador encontrado.</p>
+                        </Col>
                     )}
                 </Row>
 
-                {/* Modal de Adicionar Indicador */}
+                {/* Modal Adicionar */}
                 <Modal show={showModalAdd} onHide={() => setShowModalAdd(false)}>
                     <Modal.Header closeButton>
                         <Modal.Title>Adicionar Novo Indicador</Modal.Title>
@@ -178,48 +166,38 @@ const ListarIndicadores = ({ id_uc }) => {
                     <Modal.Body>
                         <Form onSubmit={handleCreate}>
                             <Form.Group as={Row} className="mb-3">
-                                <Form.Label column sm={4}>Número do Indicador</Form.Label>
+                                <Form.Label column sm={4}>Número</Form.Label>
                                 <Col sm={8}>
                                     <Form.Control
                                         type="number"
-                                        name="numero_indicador"
-                                        placeholder="Número"
-                                        min="1"
-                                        step="1"
                                         value={novoNumeroIndicador}
                                         onChange={(e) => setNovoNumeroIndicador(e.target.value)}
+                                        min="1"
+                                        step="1"
                                         required
                                     />
                                 </Col>
                             </Form.Group>
-
                             <Form.Group as={Row} className="mb-3">
                                 <Form.Label column sm={4}>Descrição</Form.Label>
                                 <Col sm={8}>
                                     <Form.Control
                                         type="text"
-                                        name="descricao_indicador"
-                                        placeholder="Descrição do Indicador"
                                         value={novaDescricaoIndicador}
                                         onChange={(e) => setNovaDescricaoIndicador(e.target.value)}
                                         required
                                     />
                                 </Col>
                             </Form.Group>
-
                             <Modal.Footer>
-                                <Button variant="dark" type="submit">
-                                    Cadastrar
-                                </Button>
-                                <Button variant="secondary" onClick={() => setShowModalAdd(false)}>
-                                    Cancelar
-                                </Button>
+                                <Button variant="dark" type="submit">Cadastrar</Button>
+                                <Button variant="secondary" onClick={() => setShowModalAdd(false)}>Cancelar</Button>
                             </Modal.Footer>
                         </Form>
                     </Modal.Body>
                 </Modal>
 
-                {/* Modal de Editar Indicador */}
+                {/* Modal Editar */}
                 <Modal show={showModalEdit} onHide={() => setShowModalEdit(false)}>
                     <Modal.Header closeButton>
                         <Modal.Title>Editar Indicador</Modal.Title>
@@ -227,19 +205,18 @@ const ListarIndicadores = ({ id_uc }) => {
                     <Modal.Body>
                         <Form onSubmit={handleUpdate}>
                             <Form.Group as={Row} className="mb-3">
-                                <Form.Label column sm={4}>Número do Indicador</Form.Label>
+                                <Form.Label column sm={4}>Número</Form.Label>
                                 <Col sm={8}>
                                     <Form.Control
                                         type="number"
-                                        min="1"
-                                        step="1"
                                         value={numeroIndicador}
                                         onChange={(e) => setNumeroIndicador(e.target.value)}
+                                        min="1"
+                                        step="1"
                                         required
                                     />
                                 </Col>
                             </Form.Group>
-
                             <Form.Group as={Row} className="mb-3">
                                 <Form.Label column sm={4}>Descrição</Form.Label>
                                 <Col sm={8}>
@@ -251,14 +228,9 @@ const ListarIndicadores = ({ id_uc }) => {
                                     />
                                 </Col>
                             </Form.Group>
-
                             <Modal.Footer>
-                                <Button variant="dark" type="submit">
-                                    Salvar
-                                </Button>
-                                <Button variant="secondary" onClick={() => setShowModalEdit(false)}>
-                                    Cancelar
-                                </Button>
+                                <Button variant="dark" type="submit">Salvar</Button>
+                                <Button variant="secondary" onClick={() => setShowModalEdit(false)}>Cancelar</Button>
                             </Modal.Footer>
                         </Form>
                     </Modal.Body>

@@ -1,15 +1,33 @@
 .home {
+    height: 100vh;
+
+  }
+  
+  .menuLateralCol {
+    transition: all 0.3s ease-in-out;
+  }
+  
+  .contentCol {
+    padding: 1px;
+    background-color: #fff;
+  }
+  
+  .contentWrapper {
     width: 100%;
-    padding: 0;
-    margin: 0;      
-    display: flex;
-    align-items: center;
-    flex-direction: column;
-}
-
-/* Aumentando a especificidade */
-.home div {
-    padding: 0;
+    height: 100%;
+    overflow: hidden;
+  }
+  
+  /* Quando o menu estiver colapsado */
+  .MenuLateral.collapsed {
+    width: 50px; /* Ajuste de largura para quando estiver colapsado */
+  }
+  
+  /* Quando o menu estiver expandido */
+  .MenuLateral {
+    width: 200px; /* Largura normal do menu */
+  }
+  
+  .container {
     margin: 0;
-
-}
+  } 

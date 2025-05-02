@@ -80,7 +80,7 @@ useEffect(() => {
 
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }}>
-      <Container className="mt-5 position-relative">
+      <Container fluid className="mt-5 position-relative">
 
         <h2 className="mb-4">Cadastro de UCs - {nome_curso}</h2>
 

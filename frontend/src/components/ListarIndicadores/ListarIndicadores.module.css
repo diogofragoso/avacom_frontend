@@ -1,0 +1,19 @@
+.feedback-alert-container {
+    position: absolute;
+    top: -60px;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: center;
+    z-index: 1000;
+  }
+  
+  .feedback-alert {
+    width: 50%;
+    opacity: 0.95;
+  }
+  
+  .card-custom {
+    width: 18rem;
+  }
+  

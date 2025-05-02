@@ -1,12 +1,15 @@
 .MenuLateral {
-    width: 150px;
+    width: 170px;
+    
+    max-width: 170px; /* Define a largura máxima do menu lateral */
+    /* width: auto; */
     background-color: #343a40;
     /* color: white; */
     color: rgb(245, 10, 10);
     height: 91.5vh;
     display: flex;
     flex-direction: column;
-    padding: 20px;
+    padding: 0px 5px 0px 5px;
     transition: width 0.5s ease; 
     }
 
@@ -95,3 +98,9 @@
     color: #FF6347; 
 }
 
+.toggleButton{
+    margin: 0px;
+    padding: 0px;
+    background-color: #343a40;
+    color: #FF6347;
+}

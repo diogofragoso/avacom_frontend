@@ -4,7 +4,7 @@ import { Outlet } from 'react-router-dom';
 import { NavLink as NavLink2 } from 'react-router-dom';
 import EditarCurso from '../../components/EditarCurso';
 import cursoService from '../../services/cursoService';
-import { Nav, NavItem, NavLink, Navbar, Button, Modal, Form, Row, Col, FormGroup, FormLabel, FormControl, Alert } from 'react-bootstrap';
+import { Nav, NavItem, NavLink, Navbar, Button, Modal, Form, Row, Col, FormGroup, FormLabel, FormControl, Alert, Container } from 'react-bootstrap';
 
 function PainelCurso() {
   const [cursos, setCursos] = useState([]);
@@ -53,9 +53,11 @@ function PainelCurso() {
   };
 
   return (
+   
     <div className={styles.painelcurso}>
       <div className="row">
-        <Navbar bg="dark" data-bs-theme="dark" expand="lg" className="bg-body-tertiary">
+        <Container fluid>
+        <Navbar bg="dark" data-bs-theme="dark" expand="lg" className="bg-body-tertiary navbar-custom">
           <Nav tabs>
             <NavItem>
               <NavLink className={styles.navLink}>
@@ -69,12 +71,15 @@ function PainelCurso() {
             </NavItem>
           </Nav>
         </Navbar>
+        </Container>
 
         <div className="mt-3 mb-3">
           <Button variant="dark" onClick={handleOpenModal}>
             + Novo Curso
           </Button>
         </div>
+
+   
 
         {/* Passa os cursos para o componente de edição */}
         <EditarCurso cursos={cursos} />
@@ -131,6 +136,7 @@ function PainelCurso() {
           </Form>
         </Modal.Body>
       </Modal>
+
     </div>
   );
 }

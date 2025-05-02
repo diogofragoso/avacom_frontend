@@ -3,8 +3,7 @@ import styles from './PainelUc.module.css';
 import { Outlet, useLocation } from 'react-router-dom';
 import { NavLink as NavLink2 } from 'react-router-dom';
 
-
-import { Nav, NavItem,   NavLink,Navbar } from 'react-bootstrap';
+import { Container, Nav, NavItem,   NavLink,Navbar } from 'react-bootstrap';
 
 function PainelUc() {
   const location = useLocation();
@@ -13,6 +12,7 @@ function PainelUc() {
  
 
   return (
+    <Container fluid className='px-0'>
       <div className={styles.paineluc}>
 
     <div>
@@ -49,6 +49,7 @@ function PainelUc() {
           </div>
             
       </div>
+    </Container>
         
     
   );

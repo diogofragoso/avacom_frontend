@@ -1,5 +1,4 @@
 import React from 'react';
-import styles from './PainelAvaliativa.module.css'; // Atualizado para PainelAvaliativa.module.css
 import { Outlet, useLocation } from 'react-router-dom';
 import { NavLink as NavLink2 } from 'react-router-dom';
 import styles from '../../styles/painel.module.css'; // Importando o CSS do componente PainelAvaliativa

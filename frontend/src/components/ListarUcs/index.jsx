@@ -56,10 +56,10 @@ const ListarUcs = ({ ucs, feedback, setFeedback, onDeleteSuccess, onEditSuccess,
     };
 
     return (
-        <Container className="mt-5">
+        <Container fluid className="mt-5">
             <h2 className="mb-4">Unidades Curriculares</h2>
 
-            <Row>
+            <Row className="g-4">
                 {ucs.map((uc) => (
                     <Col key={uc.id_uc} md={4} className="mb-4">
                         <motion.div
@@ -67,7 +67,7 @@ const ListarUcs = ({ ucs, feedback, setFeedback, onDeleteSuccess, onEditSuccess,
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.3 }}
                         >
-                            <Card style={{ width: '18rem' }} className={styles.card}>
+                           <Card className={`${styles.customCard} w-100`}>
                                 <NavLink2
                                     to="/PainelIndicadores"
                                     state={{ uc, curso }}  // Passando o estado de 'curso' junto com a UC
