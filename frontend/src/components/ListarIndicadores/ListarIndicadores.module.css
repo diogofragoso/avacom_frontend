@@ -1,19 +1,39 @@
 .feedback-alert-container {
-    position: absolute;
-    top: -60px;
-    left: 0;
-    right: 0;
-    display: flex;
-    justify-content: center;
-    z-index: 1000;
-  }
-  
-  .feedback-alert {
-    width: 50%;
-    opacity: 0.95;
-  }
-  
-  .card-custom {
-    width: 18rem;
-  }
-  
+  position: absolute;
+  top: -60px;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  z-index: 1050; /* Um valor mais alto que os outros componentes */
+  width: 100%; /* Certifique-se de que ocupa a largura toda */
+}
+
+.feedback-alert {
+  width: 50%;
+  opacity: 0.95;
+}
+
+.customCard {
+  padding: 10px;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  background-color: #f2f2f2;
+  transition: background-color 0.3s ease;
+  height: 100%;
+}
+
+.card:hover {
+  background-color: #e0e0e0; /* Cor de fundo ao passar o mouse */
+}
+
+.card h2 {
+  margin: 0;
+  font-size: 24px;
+  color: #333;
+}
+
+.card p {
+  font-size: 16px;
+  color: #666;
+}

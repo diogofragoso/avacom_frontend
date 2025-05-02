@@ -2,6 +2,10 @@
     height: 100vh;
 
   }
+  body, .home {
+    margin: 0;
+    padding: 0;
+  }
   
   .menuLateralCol {
     transition: all 0.3s ease-in-out;
@@ -25,9 +29,28 @@
   
   /* Quando o menu estiver expandido */
   .MenuLateral {
+    display: flex;
+    justify-content: center;
+    margin: 0;
     width: 200px; /* Largura normal do menu */
   }
   
   .container {
     margin: 0;
   } 
+
+  .navegacao {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1px;
+
+  }
+
+  .container,
+.row {
+  padding-left: 0;
+  padding-right: 0;
+  margin-left: 0;
+  margin-right: 0;
+}

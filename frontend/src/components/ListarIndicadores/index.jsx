@@ -106,9 +106,10 @@ const ListarIndicadores = ({ id_uc }) => {
                     Adicionar Indicador
                 </Button>
 
+                {/* Feedback - Mensagens de Sucesso/Erro */}
                 {feedback.message && (
-                    <div className="position-absolute w-100 d-flex justify-content-center" style={{ top: '-60px', zIndex: 1000 }}>
-                        <Alert variant={feedback.type} className="text-center w-50" style={{ opacity: 0.95 }}>
+                    <div className={styles.feedbackAlertContainer}>
+                        <Alert variant={feedback.type} className={styles.feedbackAlert}>
                             {feedback.message}
                         </Alert>
                     </div>
@@ -123,7 +124,7 @@ const ListarIndicadores = ({ id_uc }) => {
                         indicadores.map(indicador => (
                             <Col key={indicador.id_indicador} md={4} className="mb-4">
                                 <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}>
-                                    <Card style={{ width: '18rem' }}>
+                                    <Card className={styles.customCard}>
                                         <Card.Body>
                                             <Card.Title>{indicador.numero_indicador}</Card.Title>
                                             <Card.Text>{indicador.descricao_indicador}</Card.Text>

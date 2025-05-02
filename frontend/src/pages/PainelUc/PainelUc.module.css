@@ -32,15 +32,14 @@
       
     /* background-color: #ff6347;     */
     /* color: #FFF !important; */
-    color: #ff6347 !important;
-    padding: 10px;    
-    border-radius: 10px;
-    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+    color: #ff6347 !important;       
+    border-radius: 4px;
+    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.2);
    
     
 } 
 
 .activeTab {
-    background-color: #007bff;
+    background-color: #ff6347;
     color: #fff !important;
 }

@@ -21,7 +21,7 @@ function Home() {
             <Container fluid className={styles.container}>
                 {/* Header */}
                 <Row>
-                    <Col>
+                    <Col className={styles.navegacao}>
                         <HeaderComponent />
                     </Col>
                 </Row>
