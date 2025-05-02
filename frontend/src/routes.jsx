@@ -12,7 +12,7 @@ import RegistroUc from "./components/RegistroUc";
 import PainelUc from "./pages/PainelUc";
 import PainelIndicadores from "./pages/PainelIndicadores";
 import ListarIndicadores from "./components/ListarIndicadores";
-import CardAvaliativa from "./components/CardAvaliativa";
+import ListarAvaliativa from "./components/ListarAvaliativa";
 import PainelAvaliativa from "./pages/PainelAvaliativa";
 
 
@@ -46,7 +46,7 @@ function AppRoutes() {
           </Route>
 
           <Route path="PainelAvaliativa" element={<PainelAvaliativa />}>          
-           <Route path="CardAvaliativa" element={<CardAvaliativa />} />  
+           <Route path="ListarAvaliativa" element={<ListarAvaliativa />} />  
           </Route>
 
 
