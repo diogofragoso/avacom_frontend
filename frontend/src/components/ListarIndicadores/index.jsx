@@ -5,6 +5,7 @@ import indicadorService from '../../services/indicadorService';
 import { RiDeleteBin6Line } from "react-icons/ri";
 import { GrEdit } from "react-icons/gr";
 import styles from './ListarIndicadores.module.css';
+import { useNavigate } from 'react-router-dom';
 
 const ListarIndicadores = ({ id_uc }) => {
     const [indicadores, setIndicadores] = useState([]);
@@ -17,6 +18,19 @@ const ListarIndicadores = ({ id_uc }) => {
     const [novaDescricaoIndicador, setNovaDescricaoIndicador] = useState('');
     const [loading, setLoading] = useState(true);
     const [feedback, setFeedback] = useState({ type: '', message: '' });
+    const navigate = useNavigate();
+
+
+
+const handleCardClick = (indicador) => {
+    navigate('/PainelAvaliativa', { 
+        state: { 
+            uc: id_uc,
+            indicador: indicador.id_indicador, // Passando o ID do indicador
+             } });
+};
+
+    
 
     useEffect(() => {
         if (id_uc) buscarIndicadores();
@@ -124,7 +138,13 @@ const ListarIndicadores = ({ id_uc }) => {
                         indicadores.map(indicador => (
                             <Col key={indicador.id_indicador} md={4} className="mb-4">
                                 <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}>
-                                    <Card className={styles.customCard}>
+
+
+                                    <Card
+                                        className={styles.customCard}
+                                        onClick={() => handleCardClick(indicador)}
+                                        style={{ cursor: 'pointer' }}
+                                    >
                                         <Card.Body>
                                             <Card.Title>{indicador.numero_indicador}</Card.Title>
                                             <Card.Text>{indicador.descricao_indicador}</Card.Text>
@@ -133,8 +153,10 @@ const ListarIndicadores = ({ id_uc }) => {
                                             <Button
                                                 variant="primary"
                                                 size="sm"
-                                                onClick={() => handleEdit(indicador)}
-                                                aria-label="Editar indicador"
+                                                onClick={(e) => {
+                                                    e.stopPropagation(); // Impede o clique de propagar para o card
+                                                    handleEdit(indicador);
+                                                }}
                                             >
                                                 <GrEdit />
                                             </Button>
@@ -142,13 +164,20 @@ const ListarIndicadores = ({ id_uc }) => {
                                                 variant="danger"
                                                 size="sm"
                                                 className="ms-2"
-                                                onClick={() => handleDelete(indicador.id_indicador)}
-                                                aria-label="Excluir indicador"
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    handleDelete(indicador.id_indicador);
+                                                }}
                                             >
                                                 <RiDeleteBin6Line />
                                             </Button>
                                         </Card.Footer>
                                     </Card>
+
+
+
+
+
                                 </motion.div>
                             </Col>
                         ))

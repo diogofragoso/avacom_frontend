@@ -1,6 +1,5 @@
 import axios from 'axios';
-
-const API_BASE_URL = 'http://localhost:3000/api/avaliativas';
+const API_BASE_URL = 'http://localhost:3000/api/atividadeavaliativa';
 const API_INSERIR = `${API_BASE_URL}/inseriravaliativa`;
 const API_LISTAR = `${API_BASE_URL}`;
 const API_DELETAR = (id) => `${API_BASE_URL}/deletaravaliativa/${id}`;
@@ -18,15 +17,14 @@ const avaliativaService = {
     }
   },
 
-  getAvaliativasPorUc: async (id_uc) => {
+  getAvaliativasPorIndicador: async (id_indicador) => {
     try {
-      const response = await axios.get(`${API_LISTAR}/${id_uc}`);
-      return response.data;
+        const response = await axios.get(`${API_LISTAR}/${id_indicador}`);       
+        return response.data;
     } catch (error) {
-      throw new Error('Erro ao buscar atividades avaliativas: ' + error.message);
+        throw new Error('Erro ao buscar atividades avaliativas: ' + error.message);
     }
-  },
-
+},
   deleteAvaliativa: async (id) => {
     try {
       const response = await axios.delete(API_DELETAR(id), {

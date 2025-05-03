@@ -6,7 +6,7 @@ import { RiDeleteBin6Line } from "react-icons/ri";
 import { GrEdit } from "react-icons/gr";
 import styles from './ListarAvaliativa.module.css';
 
-const ListarAvaliativa = ({ id_uc }) => {
+const ListarAvaliativa = ({ id_indicador = null, id_uc, onDeleteSuccess, onEditSuccess }) => {
     const [avaliativas, setAvaliativas] = useState([]);
     const [showModalEdit, setShowModalEdit] = useState(false);
     const [showModalAdd, setShowModalAdd] = useState(false);
@@ -17,8 +17,13 @@ const ListarAvaliativa = ({ id_uc }) => {
     const [feedback, setFeedback] = useState({ type: '', message: '' });
 
     useEffect(() => {
-        if (id_uc) buscarAvaliativas();
-    }, [id_uc]);
+        if (id_indicador) buscarAvaliativas();
+    }, [id_indicador]);
+
+    useEffect(() => {
+        // Executa ao montar o componente
+        buscarAvaliativas();
+    }, []);
 
     useEffect(() => {
         if (feedback.message) {
@@ -28,9 +33,13 @@ const ListarAvaliativa = ({ id_uc }) => {
     }, [feedback]);
 
     const buscarAvaliativas = async () => {
+        // alert('Buscando avaliativas...');
+        // console.log('ID Indicador:', id_indicador);  // Adicionando log para verificar o ID do indicador
+        if (!id_indicador) return;
         try {
             setLoading(true);
-            const response = await avaliativaService.getAvaliativasPorUc(id_uc);
+            const response = await avaliativaService.getAvaliativasPorIndicador(id_indicador);
+            console.log(response);  // Adicionando log para verificar o que está sendo retornado
             setAvaliativas(response);
         } catch (error) {
             console.error('Erro ao buscar avaliativas:', error);
@@ -39,7 +48,6 @@ const ListarAvaliativa = ({ id_uc }) => {
             setLoading(false);
         }
     };
-
     const handleDelete = async (id) => {
         if (window.confirm('Tem certeza que deseja excluir esta atividade avaliativa?')) {
             try {

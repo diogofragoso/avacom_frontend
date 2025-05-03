@@ -1,22 +1,67 @@
 .customCard {
-    padding: 10px;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    background-color: #f2f2f2;
-    transition: background-color 0.3s ease;
-    height: 100%;
-  }
-    .card:hover {
-      background-color: #e0e0e0; /* Cor de fundo ao passar o mouse */
-    }
-  
-    .card h2 {
-      margin: 0;
-      font-size: 24px;
-      color: #333;
-    }
-  
-    .card p {
-      font-size: 16px;
-      color: #666;
-    }
+  padding: 15px;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  background-color: #f9f9f9;
+  transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.2s ease;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.customCard:hover {
+  background-color: #e0e0e0; /* Cor de fundo ao passar o mouse */
+  transform: translateY(-5px); /* Leve elevação ao passar o mouse */
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15); /* Mais sombra para dar destaque */
+}
+
+.card h2 {
+  margin: 0;
+  font-size: 20px;
+  color: #333;
+  font-weight: 600;
+  transition: color 0.3s ease;
+}
+
+.card p {
+  font-size: 16px;
+  color: #555;
+  margin-top: 10px;
+  line-height: 1.5;
+  transition: color 0.3s ease;
+}
+
+.card:hover h2 {
+  color: #007bff; /* Mudança na cor do título ao passar o mouse */
+}
+
+.card-footer {
+  display: flex;
+  justify-content: flex-start;
+  gap: 10px;
+}
+
+.card-footer button {
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.card-footer button:hover {
+  transform: scale(1.1); /* Efeito de zoom ao passar o mouse */
+}
+
+.feedbackAlertContainer {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  z-index: 10;
+  width: auto;
+}
+
+.feedbackAlert {
+  width: 300px;
+  font-size: 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}

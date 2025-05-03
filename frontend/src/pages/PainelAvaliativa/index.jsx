@@ -1,36 +1,39 @@
 import React from 'react';
-import { Outlet, useLocation } from 'react-router-dom';
-import { NavLink as NavLink2 } from 'react-router-dom';
-import styles from '../../styles/painel.module.css'; // Importando o CSS do componente PainelAvaliativa
-
-
-
-import { Nav, NavItem, NavLink, Navbar } from 'react-bootstrap';
+import { Outlet, useLocation, NavLink as NavLink2 } from 'react-router-dom';
+import styles from '../../styles/painel.module.css'; // CSS do componente
+import { Navbar, Nav } from 'react-bootstrap';
+import ListarAvaliativa from '../../components/ListarAvaliativa';
 
 function PainelAvaliativa() {
   const location = useLocation();
-  const { indicador } = location.state || {};  // Pegando o indicador passado pela navegação
+  const { indicador, uc } = location.state || {};  // Recebendo os dados via state
+
+  console.log("Indicador recebido:", indicador);
+  console.log("UC recebida:", uc);
 
   return (
     <div className={styles.painelavaliativa}>
       <div className="row">
-        <Navbar bg="dark" data-bs-theme="dark" expand="lg" className="bg-body-tertiary">
-          <Nav tabs>
-            <NavItem>
-              <NavLink className={styles.navLink}>
-                <NavLink2 to="/CardAvaliativa">
-                  Indicadores
-                </NavLink2>
-              </NavLink>
-            </NavItem>
+        <Navbar bg="dark" variant="dark" expand="lg">
+          <Navbar.Brand className="ms-3">Painel Avaliativa</Navbar.Brand>
+          <Nav className="me-auto ms-3">
+            <Nav.Link as={NavLink2} to="/CardAvaliativa" className={styles.navLink}>
+              Indicadores
+            </Nav.Link>
           </Nav>
         </Navbar>
 
-        <div>
-        
-          <Outlet /> {/* Aqui serão renderizadas as rotas filhas */}
+        <div className="p-4">
+          <ListarAvaliativa
+          id_indicador={indicador}          
+          uc={uc} // Passando o ID da UC  
+          setFeedback={() => {}} // Função de feedback vazia, substitua conforme necessário
+          onDeleteSuccess={() => {}} // Função de sucesso de exclusão vazia, substitua conforme necessário
+          onEditSuccess={() => {}} // Função de sucesso de edição vazia, substitua conforme necessário
+          />
 
 
+          <Outlet context={{ indicador, uc }} /> {/* Passa dados para rotas filhas, se necessário */}
         </div>
       </div>
     </div>
