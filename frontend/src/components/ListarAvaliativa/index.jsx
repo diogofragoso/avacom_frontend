@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Container, Row, Col, Card, Button, Modal, Form, Spinner, Alert } from 'react-bootstrap';
+import { Container, Row, Col, Button, Modal, Form, Spinner, Alert, Accordion } from 'react-bootstrap';
 import avaliativaService from '../../services/avaliativaService';
 import { RiDeleteBin6Line } from "react-icons/ri";
 import { GrEdit } from "react-icons/gr";
@@ -21,7 +21,6 @@ const ListarAvaliativa = ({ id_indicador = null, id_uc, onDeleteSuccess, onEditS
     }, [id_indicador]);
 
     useEffect(() => {
-        // Executa ao montar o componente
         buscarAvaliativas();
     }, []);
 
@@ -33,21 +32,18 @@ const ListarAvaliativa = ({ id_indicador = null, id_uc, onDeleteSuccess, onEditS
     }, [feedback]);
 
     const buscarAvaliativas = async () => {
-        // alert('Buscando avaliativas...');
-        // console.log('ID Indicador:', id_indicador);  // Adicionando log para verificar o ID do indicador
         if (!id_indicador) return;
         try {
             setLoading(true);
             const response = await avaliativaService.getAvaliativasPorIndicador(id_indicador);
-            console.log(response);  // Adicionando log para verificar o que está sendo retornado
             setAvaliativas(response);
         } catch (error) {
-            console.error('Erro ao buscar avaliativas:', error);
             setFeedback({ type: 'danger', message: 'Erro ao buscar atividades: ' + error.message });
         } finally {
             setLoading(false);
         }
     };
+
     const handleDelete = async (id) => {
         if (window.confirm('Tem certeza que deseja excluir esta atividade avaliativa?')) {
             try {
@@ -55,7 +51,6 @@ const ListarAvaliativa = ({ id_indicador = null, id_uc, onDeleteSuccess, onEditS
                 buscarAvaliativas();
                 setFeedback({ type: 'success', message: 'Atividade excluída com sucesso!' });
             } catch (error) {
-                console.error('Erro ao excluir atividade:', error);
                 setFeedback({ type: 'danger', message: 'Erro ao excluir atividade: ' + error.message });
             }
         }
@@ -75,7 +70,6 @@ const ListarAvaliativa = ({ id_indicador = null, id_uc, onDeleteSuccess, onEditS
             setShowModalEdit(false);
             setFeedback({ type: 'success', message: 'Atividade atualizada com sucesso!' });
         } catch (error) {
-            console.error('Erro ao atualizar atividade:', error);
             setFeedback({ type: 'danger', message: 'Erro ao atualizar: ' + error.message });
         }
     };
@@ -89,7 +83,6 @@ const ListarAvaliativa = ({ id_indicador = null, id_uc, onDeleteSuccess, onEditS
             setNovaDescricao('');
             setFeedback({ type: 'success', message: 'Atividade criada com sucesso!' });
         } catch (error) {
-            console.error('Erro ao criar atividade:', error);
             setFeedback({ type: 'danger', message: 'Erro ao criar atividade: ' + error.message });
         }
     };
@@ -111,36 +104,48 @@ const ListarAvaliativa = ({ id_indicador = null, id_uc, onDeleteSuccess, onEditS
                     </div>
                 )}
 
-                <Row>
-                    {loading ? (
-                        <div className="d-flex justify-content-center mt-5">
-                            <Spinner animation="border" variant="dark" />
-                        </div>
-                    ) : avaliativas.length > 0 ? (
-                        avaliativas.map(avaliativa => (
-                            <Col key={avaliativa.id} md={4} className="mb-4">
-                                <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}>
-                                    <Card className={styles.customCard}>
-                                        <Card.Body>
-                                            <Card.Title>ID UC: {avaliativa.id_uc_fk}</Card.Title>
-                                            <Card.Text>{avaliativa.descricao}</Card.Text>
-                                        </Card.Body>
-                                        <Card.Footer className="d-flex justify-content-start">
-                                            <Button variant="primary" size="sm" onClick={() => handleEdit(avaliativa)}>
-                                                <GrEdit />
-                                            </Button>
-                                            <Button variant="danger" size="sm" className="ms-2" onClick={() => handleDelete(avaliativa.id)}>
-                                                <RiDeleteBin6Line />
-                                            </Button>
-                                        </Card.Footer>
-                                    </Card>
-                                </motion.div>
-                            </Col>
-                        ))
-                    ) : (
-                        <Col><p className="text-muted mt-3">Nenhuma atividade encontrada.</p></Col>
-                    )}
-                </Row>
+                {loading ? (
+                    <div className="d-flex justify-content-center mt-5">
+                        <Spinner animation="border" variant="dark" />
+                    </div>
+                ) : avaliativas.length > 0 ? (
+                    <Accordion defaultActiveKey="0" alwaysOpen className="w-100">
+                        {avaliativas.map((avaliativa, index) => (
+                            <Accordion.Item
+                                key={avaliativa.id}
+                                eventKey={index.toString()}
+                                className={styles.customCard}
+                            >
+                                <Accordion.Header>
+                                    <strong>ID UC:</strong> {avaliativa.id_uc_fk}
+                                </Accordion.Header>
+                                <Accordion.Body>
+                                    <p>{avaliativa.descricao}</p>
+                                    <div className="d-flex justify-content-start mt-3">
+                                        <Button
+                                            variant="primary"
+                                            size="sm"
+                                            onClick={() => handleEdit(avaliativa)}
+                                        >
+                                            <GrEdit />
+                                        </Button>
+                                        <Button
+                                            variant="danger"
+                                            size="sm"
+                                            className="ms-2"
+                                            onClick={() => handleDelete(avaliativa.id)}
+                                        >
+                                            <RiDeleteBin6Line />
+                                        </Button>
+                                    </div>
+                                </Accordion.Body>
+                            </Accordion.Item>
+                        ))}
+                    </Accordion>
+                ) : (
+                    <p className="text-muted mt-3">Nenhuma atividade encontrada.</p>
+                )}
+
 
                 {/* Modal Adicionar */}
                 <Modal show={showModalAdd} onHide={() => setShowModalAdd(false)}>
@@ -189,7 +194,6 @@ const ListarAvaliativa = ({ id_indicador = null, id_uc, onDeleteSuccess, onEditS
                         </Form>
                     </Modal.Body>
                 </Modal>
-
             </Container>
         </motion.div>
     );
