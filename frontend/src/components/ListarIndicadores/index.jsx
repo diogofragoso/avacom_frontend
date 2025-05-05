@@ -7,7 +7,7 @@ import { GrEdit } from "react-icons/gr";
 import styles from './ListarIndicadores.module.css';
 import { useNavigate } from 'react-router-dom';
 
-const ListarIndicadores = ({ id_uc }) => {
+const ListarIndicadores = ({ id_uc, uc_nome_uc }) => {
     const [indicadores, setIndicadores] = useState([]);
     const [showModalEdit, setShowModalEdit] = useState(false);
     const [showModalAdd, setShowModalAdd] = useState(false);
@@ -27,6 +27,8 @@ const handleCardClick = (indicador) => {
         state: { 
             uc: id_uc,
             indicador: indicador.id_indicador, // Passando o ID do indicador
+            nome_indicador: indicador.descricao_indicador, // Passando a descrição do indicador
+            nome_uc: uc_nome_uc // Passando o nome da UC
              } });
 };
 

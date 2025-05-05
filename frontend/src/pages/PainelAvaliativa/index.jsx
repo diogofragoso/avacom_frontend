@@ -26,7 +26,7 @@ function PainelAvaliativa() {
         <div className="p-4">
           <ListarAvaliativa
           id_indicador={indicador}          
-          uc={uc} // Passando o ID da UC  
+          uc={uc} // Passando o ID da UC 
           setFeedback={() => {}} // Função de feedback vazia, substitua conforme necessário
           onDeleteSuccess={() => {}} // Função de sucesso de exclusão vazia, substitua conforme necessário
           onEditSuccess={() => {}} // Função de sucesso de edição vazia, substitua conforme necessário

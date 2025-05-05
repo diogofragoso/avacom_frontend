@@ -4,6 +4,7 @@ import { Container, Row, Col, Button, Modal, Form, Spinner, Alert, Accordion } f
 import avaliativaService from '../../services/avaliativaService';
 import { RiDeleteBin6Line } from "react-icons/ri";
 import { GrEdit } from "react-icons/gr";
+import { useLocation } from 'react-router-dom'; // Importação corrigida
 import styles from './ListarAvaliativa.module.css';
 
 const ListarAvaliativa = ({ id_indicador = null, id_uc, onDeleteSuccess, onEditSuccess }) => {
@@ -16,13 +17,18 @@ const ListarAvaliativa = ({ id_indicador = null, id_uc, onDeleteSuccess, onEditS
     const [loading, setLoading] = useState(true);
     const [feedback, setFeedback] = useState({ type: '', message: '' });
 
+    const location = useLocation();
+    const { nome_uc, nome_indicador } = location.state || {};  // Recebendo os dados via state
+
+
+
     useEffect(() => {
         if (id_indicador) buscarAvaliativas();
     }, [id_indicador]);
 
-    useEffect(() => {
-        buscarAvaliativas();
-    }, []);
+    // useEffect(() => {
+    //     buscarAvaliativas();
+    // }, []);
 
     useEffect(() => {
         if (feedback.message) {
@@ -36,6 +42,7 @@ const ListarAvaliativa = ({ id_indicador = null, id_uc, onDeleteSuccess, onEditS
         try {
             setLoading(true);
             const response = await avaliativaService.getAvaliativasPorIndicador(id_indicador);
+            alert("Avaliativas: " + JSON.stringify(response));
             setAvaliativas(response);
         } catch (error) {
             setFeedback({ type: 'danger', message: 'Erro ao buscar atividades: ' + error.message });
@@ -112,15 +119,22 @@ const ListarAvaliativa = ({ id_indicador = null, id_uc, onDeleteSuccess, onEditS
                     <Accordion defaultActiveKey="0" alwaysOpen className="w-100">
                         {avaliativas.map((avaliativa, index) => (
                             <Accordion.Item
-                                key={avaliativa.id}
+                                key={avaliativa.id_avaliativa}
                                 eventKey={index.toString()}
                                 className={styles.customCard}
                             >
                                 <Accordion.Header>
-                                    <strong>ID UC:</strong> {avaliativa.id_uc_fk}
+                                    <p>
+                                        <strong>ID:</strong> {avaliativa.id_indicador_fk}{' '}
+                                        <strong>UC:</strong> {nome_uc}{' '}
+                                        <strong>Indicador:</strong> {nome_indicador}
+                                    </p>
+
+
+
                                 </Accordion.Header>
                                 <Accordion.Body>
-                                    <p>{avaliativa.descricao}</p>
+                                    <p>{avaliativa.descricao_avaliativa}</p>
                                     <div className="d-flex justify-content-start mt-3">
                                         <Button
                                             variant="primary"
@@ -133,7 +147,7 @@ const ListarAvaliativa = ({ id_indicador = null, id_uc, onDeleteSuccess, onEditS
                                             variant="danger"
                                             size="sm"
                                             className="ms-2"
-                                            onClick={() => handleDelete(avaliativa.id)}
+                                            onClick={() => handleDelete(avaliativa.id_avaliativa)}
                                         >
                                             <RiDeleteBin6Line />
                                         </Button>

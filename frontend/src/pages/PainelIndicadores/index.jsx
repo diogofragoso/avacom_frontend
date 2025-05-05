@@ -48,7 +48,11 @@ function PainelIndicadores() {
             {uc ? (
               <>
                 <h2>Indicadores da UC: {uc.nome_uc}</h2>
-                <ListarIndicadores id_uc={uc.id_uc} /> 
+                <ListarIndicadores             
+                id_uc={uc.id_uc}
+                uc_nome_uc={uc.nome_uc} // Passando o nome da UC para o componente
+                
+                /> 
               </>
             ) : (
               <p>Selecione uma UC para visualizar os indicadores.</p>
