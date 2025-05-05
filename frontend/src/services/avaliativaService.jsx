@@ -13,9 +13,16 @@ const avaliativaService = {
       });
       return response.data;
     } catch (error) {
-      throw new Error('Erro ao criar atividade avaliativa: ' + error.message);
+      if (error.response) {
+        // O erro foi respondido pelo servidor
+        throw new Error(`Erro ao criar atividade avaliativa: ${error.response.status} - ${error.response.data.message}`);
+      } else {
+        // O erro ocorreu antes de chegar ao servidor
+        throw new Error('Erro ao criar atividade avaliativa: ' + error.message);
+      }
     }
   },
+  
 
   getAvaliativasPorIndicador: async (id_indicador) => {
     try {

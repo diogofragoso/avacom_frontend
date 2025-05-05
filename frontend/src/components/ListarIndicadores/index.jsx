@@ -25,7 +25,7 @@ const ListarIndicadores = ({ id_uc, uc_nome_uc }) => {
 const handleCardClick = (indicador) => {
     navigate('/PainelAvaliativa', { 
         state: { 
-            uc: id_uc,
+            uc_id_uc: id_uc,
             indicador: indicador.id_indicador, // Passando o ID do indicador
             nome_indicador: indicador.descricao_indicador, // Passando a descrição do indicador
             nome_uc: uc_nome_uc // Passando o nome da UC

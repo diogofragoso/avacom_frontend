@@ -7,7 +7,7 @@ import { GrEdit } from "react-icons/gr";
 import { useLocation } from 'react-router-dom'; // Importação corrigida
 import styles from './ListarAvaliativa.module.css';
 
-const ListarAvaliativa = ({ id_indicador = null, id_uc, onDeleteSuccess, onEditSuccess }) => {
+const ListarAvaliativa = ({ id_indicador = null,  onDeleteSuccess, onEditSuccess }) => {
     const [avaliativas, setAvaliativas] = useState([]);
     const [showModalEdit, setShowModalEdit] = useState(false);
     const [showModalAdd, setShowModalAdd] = useState(false);
@@ -18,7 +18,8 @@ const ListarAvaliativa = ({ id_indicador = null, id_uc, onDeleteSuccess, onEditS
     const [feedback, setFeedback] = useState({ type: '', message: '' });
 
     const location = useLocation();
-    const { nome_uc, nome_indicador } = location.state || {};  // Recebendo os dados via state
+    const { nome_uc, nome_indicador,indicador } = location.state || {};  // Recebendo os dados via state
+
 
 
 
@@ -41,9 +42,8 @@ const ListarAvaliativa = ({ id_indicador = null, id_uc, onDeleteSuccess, onEditS
         if (!id_indicador) return;
         try {
             setLoading(true);
-            const response = await avaliativaService.getAvaliativasPorIndicador(id_indicador);
-            alert("Avaliativas: " + JSON.stringify(response));
-            setAvaliativas(response);
+            const response = await avaliativaService.getAvaliativasPorIndicador(id_indicador);            
+            setAvaliativas(response);           
         } catch (error) {
             setFeedback({ type: 'danger', message: 'Erro ao buscar atividades: ' + error.message });
         } finally {
@@ -84,13 +84,14 @@ const ListarAvaliativa = ({ id_indicador = null, id_uc, onDeleteSuccess, onEditS
     const handleCreate = async (e) => {
         e.preventDefault();
         try {
-            await avaliativaService.createAvaliativa({ descricao: novaDescricao, id_uc_fk: id_uc });
+            await avaliativaService.createAvaliativa({ descricao: novaDescricao, id_indicador_fk: id_indicador });
             buscarAvaliativas();
             setShowModalAdd(false);
             setNovaDescricao('');
             setFeedback({ type: 'success', message: 'Atividade criada com sucesso!' });
         } catch (error) {
-            setFeedback({ type: 'danger', message: 'Erro ao criar atividade: ' + error.message });
+            alert("ID IndicadoR: " + id_indicador );
+            setFeedback({ type: 'danger', message: 'Erro ao criar atividade: ' + error.message + novaDescricao +  ' ' + id_indicador });
         }
     };
 
@@ -116,7 +117,7 @@ const ListarAvaliativa = ({ id_indicador = null, id_uc, onDeleteSuccess, onEditS
                         <Spinner animation="border" variant="dark" />
                     </div>
                 ) : avaliativas.length > 0 ? (
-                    <Accordion defaultActiveKey="0" alwaysOpen className="w-100">
+                    <Accordion  alwaysOpen className="w-100">
                         {avaliativas.map((avaliativa, index) => (
                             <Accordion.Item
                                 key={avaliativa.id_avaliativa}
@@ -178,7 +179,7 @@ const ListarAvaliativa = ({ id_indicador = null, id_uc, onDeleteSuccess, onEditS
                                 />
                             </Form.Group>
                             <Modal.Footer>
-                                <Button variant="dark" type="submit">Cadastrar</Button>
+                                <Button variant="dark" type="submit">Salvar</Button>
                                 <Button variant="secondary" onClick={() => setShowModalAdd(false)}>Cancelar</Button>
                             </Modal.Footer>
                         </Form>
