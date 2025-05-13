@@ -14,6 +14,7 @@ import PainelIndicadores from "./pages/PainelIndicadores";
 import ListarIndicadores from "./components/ListarIndicadores";
 import ListarAvaliativa from "./components/ListarAvaliativa";
 import PainelAvaliativa from "./pages/PainelAvaliativa";
+import Login from "./components/Login";
 
 
 function AppRoutes() {
@@ -49,6 +50,7 @@ function AppRoutes() {
            <Route path="ListarAvaliativa" element={<ListarAvaliativa />} />  
           </Route>
 
+          <Route path="/Login" element={<Login />} />
 
 
           
