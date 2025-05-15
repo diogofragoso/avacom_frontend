@@ -8,6 +8,7 @@ import { PiStudentBold } from "react-icons/pi";
 import styles from './MenuLateral.module.css';
 import { useState } from 'react';
 
+
 function MenuLateral() {
   const [isCollapsed, setIsCollapsed] = useState(false);
 
