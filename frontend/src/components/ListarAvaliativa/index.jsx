@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Container, Row, Col, Button, Modal, Form, Spinner, Alert, Accordion } from 'react-bootstrap';
+import {
+    Container, Row, Col, Button, Modal, Form, Spinner, Alert, Accordion
+} from 'react-bootstrap';
 import avaliativaService from '../../services/avaliativaService';
 import { RiDeleteBin6Line } from "react-icons/ri";
 import { GrEdit } from "react-icons/gr";
-import { useLocation } from 'react-router-dom'; // Importação corrigida
+import { useLocation } from 'react-router-dom';
 import styles from './ListarAvaliativa.module.css';
 
-const ListarAvaliativa = ({ id_indicador = null,  onDeleteSuccess, onEditSuccess }) => {
+const ListarAvaliativa = ({ id_indicador = null }) => {
     const [avaliativas, setAvaliativas] = useState([]);
     const [showModalEdit, setShowModalEdit] = useState(false);
     const [showModalAdd, setShowModalAdd] = useState(false);
@@ -16,20 +18,19 @@ const ListarAvaliativa = ({ id_indicador = null,  onDeleteSuccess, onEditSuccess
     const [novaDescricao, setNovaDescricao] = useState('');
     const [loading, setLoading] = useState(true);
     const [feedback, setFeedback] = useState({ type: '', message: '' });
+    const [loadingIA, setLoadingIA] = useState(false);
+    const [respostaIA, setRespostaIA] = useState('');
+
+
+    const [showConfirmModal, setShowConfirmModal] = useState(false);
+    const [avaliativaParaExcluir, setAvaliativaParaExcluir] = useState(null);
 
     const location = useLocation();
-    const { nome_uc, nome_indicador,indicador } = location.state || {};  // Recebendo os dados via state
-
-
-
+    const { nome_uc, nome_indicador, indicador } = location.state || {};
 
     useEffect(() => {
         if (id_indicador) buscarAvaliativas();
     }, [id_indicador]);
-
-    // useEffect(() => {
-    //     buscarAvaliativas();
-    // }, []);
 
     useEffect(() => {
         if (feedback.message) {
@@ -42,8 +43,8 @@ const ListarAvaliativa = ({ id_indicador = null,  onDeleteSuccess, onEditSuccess
         if (!id_indicador) return;
         try {
             setLoading(true);
-            const response = await avaliativaService.getAvaliativasPorIndicador(id_indicador);            
-            setAvaliativas(response);           
+            const response = await avaliativaService.getAvaliativasPorIndicador(id_indicador);
+            setAvaliativas(response);
         } catch (error) {
             setFeedback({ type: 'danger', message: 'Erro ao buscar atividades: ' + error.message });
         } finally {
@@ -51,28 +52,38 @@ const ListarAvaliativa = ({ id_indicador = null,  onDeleteSuccess, onEditSuccess
         }
     };
 
-    const handleDelete = async (id) => {
-        if (window.confirm('Tem certeza que deseja excluir esta atividade avaliativa?')) {
-            try {
-                await avaliativaService.deleteAvaliativa(id);
-                buscarAvaliativas();
-                setFeedback({ type: 'success', message: 'Atividade excluída com sucesso!' });
-            } catch (error) {
-                setFeedback({ type: 'danger', message: 'Erro ao excluir atividade: ' + error.message });
-            }
+    const handleDelete = (id) => {
+        setAvaliativaParaExcluir(id);
+        setShowConfirmModal(true);
+    };
+
+    const confirmarExclusao = async () => {
+        try {
+            await avaliativaService.deleteAvaliativa(avaliativaParaExcluir);
+            buscarAvaliativas();
+            setFeedback({ type: 'success', message: 'Atividade excluída com sucesso!' });
+        } catch (error) {
+            setFeedback({ type: 'danger', message: 'Erro ao excluir atividade: ' + error.message });
+        } finally {
+            setShowConfirmModal(false);
+            setAvaliativaParaExcluir(null);
         }
     };
 
     const handleEdit = (avaliativa) => {
         setAvaliativaSelecionada(avaliativa);
-        setDescricao(avaliativa.descricao);
+        setDescricao(avaliativa.descricao_avaliativa);
         setShowModalEdit(true);
     };
 
     const handleUpdate = async (e) => {
         e.preventDefault();
         try {
-            await avaliativaService.updateAvaliativa(avaliativaSelecionada.id, { descricao });
+            await avaliativaService.updateAvaliativa(avaliativaSelecionada.id_avaliativa, {
+                id_avaliativa: avaliativaSelecionada.id_avaliativa,
+                descricao: descricao,
+                id_indicador_fk: id_indicador
+            });
             buscarAvaliativas();
             setShowModalEdit(false);
             setFeedback({ type: 'success', message: 'Atividade atualizada com sucesso!' });
@@ -84,14 +95,16 @@ const ListarAvaliativa = ({ id_indicador = null,  onDeleteSuccess, onEditSuccess
     const handleCreate = async (e) => {
         e.preventDefault();
         try {
-            await avaliativaService.createAvaliativa({ descricao: novaDescricao, id_indicador_fk: id_indicador });
+            await avaliativaService.createAvaliativa({
+                descricao: novaDescricao,
+                id_indicador_fk: id_indicador
+            });
             buscarAvaliativas();
             setShowModalAdd(false);
             setNovaDescricao('');
             setFeedback({ type: 'success', message: 'Atividade criada com sucesso!' });
         } catch (error) {
-            alert("ID IndicadoR: " + id_indicador );
-            setFeedback({ type: 'danger', message: 'Erro ao criar atividade: ' + error.message + novaDescricao +  ' ' + id_indicador });
+            setFeedback({ type: 'danger', message: 'Erro ao criar atividade: ' + error.message });
         }
     };
 
@@ -117,7 +130,7 @@ const ListarAvaliativa = ({ id_indicador = null,  onDeleteSuccess, onEditSuccess
                         <Spinner animation="border" variant="dark" />
                     </div>
                 ) : avaliativas.length > 0 ? (
-                    <Accordion  alwaysOpen className="w-100">
+                    <Accordion alwaysOpen className="w-100">
                         {avaliativas.map((avaliativa, index) => (
                             <Accordion.Item
                                 key={avaliativa.id_avaliativa}
@@ -125,14 +138,7 @@ const ListarAvaliativa = ({ id_indicador = null,  onDeleteSuccess, onEditSuccess
                                 className={styles.customCard}
                             >
                                 <Accordion.Header>
-                                    <p>
-                                        <strong>ID:</strong> {avaliativa.id_indicador_fk}{' '}
-                                        <strong>UC:</strong> {nome_uc}{' '}
-                                        <strong>Indicador:</strong> {nome_indicador}
-                                    </p>
-
-
-
+                                    <p>Atividade avaliativa opção: {index + 1}</p>
                                 </Accordion.Header>
                                 <Accordion.Body>
                                     <p>{avaliativa.descricao_avaliativa}</p>
@@ -161,7 +167,6 @@ const ListarAvaliativa = ({ id_indicador = null,  onDeleteSuccess, onEditSuccess
                     <p className="text-muted mt-3">Nenhuma atividade encontrada.</p>
                 )}
 
-
                 {/* Modal Adicionar */}
                 <Modal show={showModalAdd} onHide={() => setShowModalAdd(false)}>
                     <Modal.Header closeButton>
@@ -172,13 +177,37 @@ const ListarAvaliativa = ({ id_indicador = null,  onDeleteSuccess, onEditSuccess
                             <Form.Group className="mb-3">
                                 <Form.Label>Descrição</Form.Label>
                                 <Form.Control
-                                    type="text"
+                                    as="textarea"
+                                    rows={10}
+                                    placeholder="Digite a descrição da atividade"
+                                    // type="text"
                                     value={novaDescricao}
                                     onChange={(e) => setNovaDescricao(e.target.value)}
                                     required
+                                    style={{ resize: 'vertical' }}
                                 />
                             </Form.Group>
                             <Modal.Footer>
+                                <Button
+                                    variant="info"                                  
+                                    disabled={loadingIA || !novaDescricao.trim()}
+                                    onClick={async () => {
+                                        try {
+                                            setLoadingIA(true);
+                                            const resposta = await avaliativaService.gerarTextoIA(`Por favor, me ajude a escrever uma atividade avaliativa baseada neste texto: ${novaDescricao}`);
+                                            setRespostaIA(resposta);
+                                            setNovaDescricao(resposta);
+                                        } catch (error) {
+                                            alert('Erro ao gerar texto da IA: ' + error.message);
+                                        } finally {
+                                            setLoadingIA(false);
+                                        }
+                                    }}
+                                >
+                                    {loadingIA ? 'Gerando...' : 'Gerar Texto IA'}
+                                    {loadingIA && <Spinner animation="border" size="sm" className="ms-2" />}
+                                </Button>
+
                                 <Button variant="dark" type="submit">Salvar</Button>
                                 <Button variant="secondary" onClick={() => setShowModalAdd(false)}>Cancelar</Button>
                             </Modal.Footer>
@@ -196,10 +225,13 @@ const ListarAvaliativa = ({ id_indicador = null,  onDeleteSuccess, onEditSuccess
                             <Form.Group className="mb-3">
                                 <Form.Label>Descrição</Form.Label>
                                 <Form.Control
-                                    type="text"
+                                    as="textarea"
+                                    rows={10}
+                                    placeholder="Digite a descrição da atividade"
                                     value={descricao}
                                     onChange={(e) => setDescricao(e.target.value)}
                                     required
+                                    style={{ resize: 'vertical' }}
                                 />
                             </Form.Group>
                             <Modal.Footer>
@@ -208,6 +240,31 @@ const ListarAvaliativa = ({ id_indicador = null,  onDeleteSuccess, onEditSuccess
                             </Modal.Footer>
                         </Form>
                     </Modal.Body>
+                </Modal>
+
+                {/* Modal Confirmação Exclusão */}
+                <Modal show={showConfirmModal} onHide={() => setShowConfirmModal(false)} centered>
+                    <motion.div
+                        initial={{ opacity: 0, scale: 0.8 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0.8 }}
+                        transition={{ duration: 0.3, ease: "easeInOut" }}
+                    >
+                        <Modal.Header closeButton>
+                            <Modal.Title>Confirmar Exclusão</Modal.Title>
+                        </Modal.Header>
+                        <Modal.Body>
+                            Tem certeza que deseja excluir esta atividade avaliativa?
+                        </Modal.Body>
+                        <Modal.Footer>
+                            <Button variant="secondary" onClick={() => setShowConfirmModal(false)}>
+                                Cancelar
+                            </Button>
+                            <Button variant="danger" onClick={confirmarExclusao}>
+                                Excluir
+                            </Button>
+                        </Modal.Footer>
+                    </motion.div>
                 </Modal>
             </Container>
         </motion.div>
