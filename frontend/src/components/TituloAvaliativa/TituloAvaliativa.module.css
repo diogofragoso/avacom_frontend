@@ -1,0 +1,32 @@
+.card {
+  width: 100%;
+  max-width: 1000px;
+  margin: 10px auto;
+  padding: 16px 24px;
+  border-radius: 10px;
+  background-color: #343a40;
+  color: #e0e0e0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.item {
+  font-size: 0.95rem;
+  color: #b0bec5;
+}
+
+.title {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #90caf9;
+}
+
+.highlight {
+  font-weight: 600;
+  color: #e3f2fd;
+}

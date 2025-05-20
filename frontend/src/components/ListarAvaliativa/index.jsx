@@ -6,8 +6,11 @@ import {
 import avaliativaService from '../../services/avaliativaService';
 import { RiDeleteBin6Line } from "react-icons/ri";
 import { GrEdit } from "react-icons/gr";
+import { MdAddCircle } from "react-icons/md";
 import { useLocation } from 'react-router-dom';
+import TituloAvaliativa from '../TituloAvaliativa';
 import styles from './ListarAvaliativa.module.css';
+
 
 const ListarAvaliativa = ({ id_indicador = null }) => {
     const [avaliativas, setAvaliativas] = useState([]);
@@ -110,11 +113,20 @@ const ListarAvaliativa = ({ id_indicador = null }) => {
 
     return (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }}>
-            <Container fluid className="mt-5 position-relative">
-                <h2 className="mb-4">Atividades Avaliativas</h2>
+            <Container fluid className="mt-1 position-relative">              
+
+                 <TituloAvaliativa
+                    nome_uc={nome_uc}                   
+                    nome_indicador={nome_indicador}
+                    avaliativas={avaliativas}
+                />
+              
+
 
                 <Button variant="dark" className="mb-4" onClick={() => setShowModalAdd(true)}>
-                    Adicionar Atividade
+                    Adicionar Atividade 
+                    <MdAddCircle 
+                    style={{ marginLeft: '5px' , fontSize: '30px', color: '#90caf9'}}/>
                 </Button>
 
                 {feedback.message && (

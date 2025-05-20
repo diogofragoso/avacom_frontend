@@ -1,3 +1,6 @@
+.body {
+  margin: 0px;
+}
 .customCard {
   padding: 15px;
   border-radius: 12px;
@@ -8,6 +11,7 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+ 
 }
 
 .customCard:hover {
