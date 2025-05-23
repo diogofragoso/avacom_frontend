@@ -1,0 +1,53 @@
+.containerCustom {
+  background-color: #1e1e2f; /* fundo escuro principal */
+  padding: 20px;
+  border-radius: 12px;
+  color: #f0f0f0; /* texto claro */
+}
+
+.title {
+  font-weight: 700;
+  color: #4ef0c7;
+}
+
+.card {
+  background-color: #2a2a40;
+  border: 1px solid #444;
+  border-radius: 12px;
+  transition: 0.3s;
+  color: #ffffff;
+}
+
+.card:hover {
+  transform: scale(1.02);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6);
+}
+
+.cardTitle {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.cartBody {
+  color: #f0f0f0;
+}
+
+.icon {
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.icon:hover {
+  transform: scale(1.2);
+}
+
+.badgeManha {
+  background-color: #ffc107;
+  color: #000;
+}
+
+.badgeTarde {
+  background-color: #adb5bd;
+  color: #000;
+}
+

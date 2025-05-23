@@ -16,6 +16,8 @@ import ListarAvaliativa from "./components/ListarAvaliativa";
 import PainelAvaliativa from "./pages/PainelAvaliativa";
 import InserirEstudanteCurso from "./components/InserirEstudanteCurso";
 import Login from "./components/Login";
+import PainelTurma from "./pages/PainelTurma";
+import ListarTurmas from "./components/ListarTurma";
 
 
 function AppRoutes() {
@@ -51,14 +53,11 @@ function AppRoutes() {
           <Route path="PainelAvaliativa" element={<PainelAvaliativa />}>          
            <Route path="ListarAvaliativa" element={<ListarAvaliativa />} />  
           </Route>
-            <Route path="PainelTurma" element={<PainelUc />}>
-            {/* Rota aninhada dentro de PainelCurso */}
-            {/* <Route path="ListarCurso" element={<ListarCurso />} />   */}
-          
-          </Route>
-
-
-
+            <Route path="PainelTurma" element={<PainelTurma />}>
+            {/* Rota aninhada dentro de PainelTurma */}
+            <Route path="ListarTurma" element={<ListarTurmas />} />
+            </Route>       
+              
 
           
           
