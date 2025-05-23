@@ -14,6 +14,7 @@ import PainelIndicadores from "./pages/PainelIndicadores";
 import ListarIndicadores from "./components/ListarIndicadores";
 import ListarAvaliativa from "./components/ListarAvaliativa";
 import PainelAvaliativa from "./pages/PainelAvaliativa";
+import InserirEstudanteCurso from "./components/InserirEstudanteCurso";
 import Login from "./components/Login";
 
 
@@ -40,6 +41,7 @@ function AppRoutes() {
           <Route path="PainelUc" element={<PainelUc />}>
             {/* Rota aninhada dentro de PainelCurso */}
             <Route path="RegistroUc" element={<RegistroUc />} />  
+            <Route path="InserirEstudanteCurso" element={<InserirEstudanteCurso />} />  
           </Route>
 
           <Route path="PainelIndicadores" element={<PainelIndicadores />}>          
@@ -49,13 +51,19 @@ function AppRoutes() {
           <Route path="PainelAvaliativa" element={<PainelAvaliativa />}>          
            <Route path="ListarAvaliativa" element={<ListarAvaliativa />} />  
           </Route>
+            <Route path="PainelTurma" element={<PainelUc />}>
+            {/* Rota aninhada dentro de PainelCurso */}
+            {/* <Route path="ListarCurso" element={<ListarCurso />} />   */}
+          
+          </Route>
 
-          <Route path="/Login" element={<Login />} />
+
 
 
           
           
         </Route>
+          <Route path="/Login" element={<Login />} />
 
         {/* Página Não Encontrada */}
         {/* <Route path="*" element={<PageNotFound />} /> */}

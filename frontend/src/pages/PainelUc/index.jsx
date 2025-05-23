@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import styles from './PainelUc.module.css';
 import { Outlet, useLocation } from 'react-router-dom';
 import { NavLink as NavLink2 } from 'react-router-dom';
+import InserirEstudanteCurso from '../../components/InserirEstudanteCurso';
 
 import { Container, Nav, NavItem,   NavLink,Navbar } from 'react-bootstrap';
 
@@ -26,13 +27,13 @@ function PainelUc() {
                     </NavLink2>
                     </NavLink>         
         </NavItem>
-        {/* <NavItem>    
+        <NavItem>    
                   <NavLink className={styles.navLink}>
-                    <NavLink2 to="">                      
-                     Cadastrar
+                    <NavLink2 to="InserirEstudanteCurso" state={{ curso }}>                      
+                     Estudante
                     </NavLink2>
                     </NavLink>         
-        </NavItem> */}
+        </NavItem>
                      
           </Nav>
         </Navbar>
