@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Tempo de geração: 21-Abr-2025 às 06:12
+-- Tempo de geração: 23-Maio-2025 às 21:28
 -- Versão do servidor: 10.4.27-MariaDB
 -- versão do PHP: 8.2.0
 
@@ -47,7 +47,9 @@ INSERT INTO `aluno` (`id_aluno`, `nome_aluno`, `email_aluno`, `senha_aluno`) VAL
 (7, 'Maria	', 'maria@gmail.com', '45646'),
 (8, 'Pedro Pedreira', 'pedreira@gmail.com', 'sasasj'),
 (9, 'Joana bananeira', 'joana@gmail.com', '1221'),
-(10, 'Ana', 'ana@gmail.com', '1234');
+(10, 'Ana', 'ana@gmail.com', '1234'),
+(11, 'Pedro Pedreira', 'diogofragoso@yahoo.com.br', 'senac'),
+(12, 'Pedro Pedreira', 'fragoso23rln@gmail.com', '1234');
 
 -- --------------------------------------------------------
 
@@ -56,7 +58,7 @@ INSERT INTO `aluno` (`id_aluno`, `nome_aluno`, `email_aluno`, `senha_aluno`) VAL
 --
 
 CREATE TABLE `atividade_avaliativa` (
-  `id_at_avaliativa` int(11) NOT NULL,
+  `id_avaliativa` int(11) NOT NULL,
   `descricao_avaliativa` varchar(100) NOT NULL,
   `id_indicador_fk` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -65,8 +67,12 @@ CREATE TABLE `atividade_avaliativa` (
 -- Extraindo dados da tabela `atividade_avaliativa`
 --
 
-INSERT INTO `atividade_avaliativa` (`id_at_avaliativa`, `descricao_avaliativa`, `id_indicador_fk`) VALUES
-(2, 'Realiza a instalação de sistemas operacionais', 2);
+INSERT INTO `atividade_avaliativa` (`id_avaliativa`, `descricao_avaliativa`, `id_indicador_fk`) VALUES
+(2, 'Realiza a instalação de sistemas operacionais', 2),
+(13, 'Nesta atividade os aluno realizaram uma atividade avaliativa usando os servidores do laboratório 21\n', 2),
+(15, 'Elabore uma atividade  avaliativa sobre configurar servidores linux ', 2),
+(17, 'Configura servidores ', 2),
+(18, 'Ajuste a funcao procv', 28);
 
 -- --------------------------------------------------------
 
@@ -123,7 +129,15 @@ CREATE TABLE `indicador` (
 
 INSERT INTO `indicador` (`id_indicador`, `numero_indicador`, `descricao_indicador`, `id_uc_fk`) VALUES
 (2, '1', 'Instala sistemas operacionais', 1),
-(3, '2', 'Configura sistemas operacionais', 1);
+(12, '3', 'Atendimentos ao paciente', 18),
+(14, '3', 'jhkhjkhjk', 1),
+(15, '1', 'Verificar IMC', 32),
+(17, '1', 'Seleciona o medicamento ', 27),
+(20, '1', 'ihuhu', 1),
+(25, '1', '90890898908', 2),
+(26, '10', 'iuguiggyu', 1),
+(27, '2', 'Configurar rede lan', 2),
+(28, '1', 'Usa a função ProcV', 41);
 
 -- --------------------------------------------------------
 
@@ -153,7 +167,9 @@ INSERT INTO `matricula` (`id_matricula`, `id_aluno_fk`, `id_curso_fk`, `id_turma
 
 CREATE TABLE `turma` (
   `id_turma` int(11) NOT NULL,
-  `descricao_turma` varchar(100) DEFAULT NULL,
+  `nome_turma` varchar(50) NOT NULL,
+  `perido_turma` varchar(10) NOT NULL,
+  `max_aluno_turma` int(11) NOT NULL,
   `data_inicio_turma` date NOT NULL,
   `id_curso_fk` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -162,8 +178,8 @@ CREATE TABLE `turma` (
 -- Extraindo dados da tabela `turma`
 --
 
-INSERT INTO `turma` (`id_turma`, `descricao_turma`, `data_inicio_turma`, `id_curso_fk`) VALUES
-(1, 'T1 - Técnico', '2024-11-11', 1);
+INSERT INTO `turma` (`id_turma`, `nome_turma`, `perido_turma`, `max_aluno_turma`, `data_inicio_turma`, `id_curso_fk`) VALUES
+(1, '', '', 0, '2024-11-11', 1);
 
 -- --------------------------------------------------------
 
@@ -185,12 +201,16 @@ CREATE TABLE `uc` (
 INSERT INTO `uc` (`id_uc`, `nome_uc`, `numero_uc`, `id_curso_fk`) VALUES
 (1, 'Manutenção de Hardware5', 1, 1),
 (2, 'Montagem', 2, 1),
-(5, 'Configurar WAN bbzao', 5, 1),
 (18, 'Atendimento ao cliente', 1, 13),
 (19, 'Primeiro socorros', 2, 13),
 (27, 'Aplicar injeção no bumbum', 4, 13),
 (28, 'Configurar firewall', 3, 1),
-(30, 'Configurar rede Lan', 10, 1);
+(30, 'Configurar rede Lan', 10, 1),
+(32, 'pesa paciente', 5, 13),
+(33, 'Configurar zabbix', 11, 1),
+(35, 'Configurar zabbix', 12, 1),
+(36, 'Configurar zabbix', 4, 1),
+(41, 'ProcV', 1, 12);
 
 --
 -- Índices para tabelas despejadas
@@ -206,7 +226,7 @@ ALTER TABLE `aluno`
 -- Índices para tabela `atividade_avaliativa`
 --
 ALTER TABLE `atividade_avaliativa`
-  ADD PRIMARY KEY (`id_at_avaliativa`),
+  ADD PRIMARY KEY (`id_avaliativa`),
   ADD KEY `id_indicador_fk` (`id_indicador_fk`);
 
 --
@@ -262,13 +282,13 @@ ALTER TABLE `uc`
 -- AUTO_INCREMENT de tabela `aluno`
 --
 ALTER TABLE `aluno`
-  MODIFY `id_aluno` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `id_aluno` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- AUTO_INCREMENT de tabela `atividade_avaliativa`
 --
 ALTER TABLE `atividade_avaliativa`
-  MODIFY `id_at_avaliativa` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id_avaliativa` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
 
 --
 -- AUTO_INCREMENT de tabela `avaliacao`
@@ -286,7 +306,7 @@ ALTER TABLE `curso`
 -- AUTO_INCREMENT de tabela `indicador`
 --
 ALTER TABLE `indicador`
-  MODIFY `id_indicador` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id_indicador` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=29;
 
 --
 -- AUTO_INCREMENT de tabela `matricula`
@@ -304,7 +324,7 @@ ALTER TABLE `turma`
 -- AUTO_INCREMENT de tabela `uc`
 --
 ALTER TABLE `uc`
-  MODIFY `id_uc` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=32;
+  MODIFY `id_uc` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=42;
 
 --
 -- Restrições para despejos de tabelas
@@ -322,7 +342,7 @@ ALTER TABLE `atividade_avaliativa`
 ALTER TABLE `avaliacao`
   ADD CONSTRAINT `avaliacao_ibfk_1` FOREIGN KEY (`id_aluno_fk`) REFERENCES `aluno` (`id_aluno`),
   ADD CONSTRAINT `avaliacao_ibfk_2` FOREIGN KEY (`id_turma_fk`) REFERENCES `turma` (`id_turma`),
-  ADD CONSTRAINT `id_at_avaliativa_fk` FOREIGN KEY (`id_at_avaliativa_fk`) REFERENCES `atividade_avaliativa` (`id_at_avaliativa`);
+  ADD CONSTRAINT `id_at_avaliativa_fk` FOREIGN KEY (`id_at_avaliativa_fk`) REFERENCES `atividade_avaliativa` (`id_avaliativa`);
 
 --
 -- Limitadores para a tabela `indicador`
