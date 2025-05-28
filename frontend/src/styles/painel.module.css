@@ -1,8 +1,9 @@
 /* PainelEstudante.module.css */
 
-.painel {
-    padding: 20px;
+.painel  {    
+    padding: 0px;
     background-color: #f8f9fa;
+    border-radius: 50px;
 }
 
 .navTabs {
@@ -10,7 +11,7 @@
 }
 
 
-.navItem {
+.navItem {    
     margin-right: 5px;
 }
 
@@ -41,4 +42,11 @@
 .activeTab {
     background-color: #007bff;
     color: #fff !important;
+}
+
+
+
+body, html {
+    margin: 0 !important;
+    padding: 0;
 }
