@@ -2,6 +2,7 @@
 
 .painel  {    
     padding: 0px;
+    padding-left: 12px;
     background-color: #f8f9fa;
     border-radius: 50px;
 }
