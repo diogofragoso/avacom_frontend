@@ -17,7 +17,7 @@ function NavPainel({ navegacao, curso }) {
     <Container fluid className="px-0">
       <div className={styles.painel}>
         <div className="row">
-          <Navbar bg="dark" data-bs-theme="dark" expand="lg" className={styles.painel.navLink}>
+          <Navbar  expand="lg" className={styles.painel.navLink}>
             <Nav tabs>
               <NavItem>
                 <NavLink className={styles.navLink}>
