@@ -6,6 +6,7 @@ import { FcBullish } from 'react-icons/fc';
 import { TbTargetArrow } from "react-icons/tb";
 import { GrDashboard,GrGroup } from "react-icons/gr";
 import { PiStudentBold } from "react-icons/pi";
+import NavPainel from '../../components/NavPainel'
 import styles from './MenuLateral.module.css';
 import { useState } from 'react';
 
@@ -64,7 +65,7 @@ function MenuLateral() {
           
         </NavItem>
         <NavItem>
-          <NavLink to="/Tarefas" className={({ isActive }) => (isActive ? styles.active : '')}>
+          <NavLink to="/PainelDashBoard" className={({ isActive }) => (isActive ? styles.active : '')}>
             <GrDashboard className={styles.icon} />
             {!isCollapsed && 'Dashboard'}
           </NavLink>

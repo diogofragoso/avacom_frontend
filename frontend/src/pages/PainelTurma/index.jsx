@@ -18,7 +18,7 @@ function PainelTurma() {
 
     <div>
         <div className='row'>
-        <Navbar bg="dark" data-bs-theme="dark" expand="lg" className="bg-body-tertiary">
+        <Navbar bg="dark" data-bs-theme="dark" expand="lg" className="bg-body-tertiary ">
       <Nav tabs>
         <NavItem>    
                   <NavLink className={styles.navLink}>
