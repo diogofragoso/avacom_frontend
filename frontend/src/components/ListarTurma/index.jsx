@@ -3,183 +3,247 @@ import { FaEdit, FaTrash, FaChalkboardTeacher } from 'react-icons/fa';
 import styles from './ListarTurma.module.css';
 import { useState, useEffect } from 'react';
 import cursoService from '../../services/cursoService';
-import { NavLink as NavLink2 } from 'react-router-dom'; // Importação corrigida
-import { useLocation } from 'react-router-dom'; // Importação corrigida
-
-const turmas = [
-    {
-        nome: 'Turma A - Manhã',
-        curso: 'Matemática Básica',
-        turno: 'Manhã',
-        dataInicio: '14/02/2024',
-        ocupacaoAtual: 25,
-        ocupacaoMax: 30
-    },
-    {
-        nome: 'Turma B - Tarde',
-        curso: 'Matemática Básica',
-        turno: 'Tarde',
-        dataInicio: '15/02/2024',
-        ocupacaoAtual: 28,
-        ocupacaoMax: 30
-    },
-    {
-        nome: 'Turma A - Manhã',
-        curso: 'História do Brasil',
-        turno: 'Manhã',
-        dataInicio: '19/02/2024',
-        ocupacaoAtual: 30,
-        ocupacaoMax: 35
-    }
-];
+import { getTurmas, inserirTurma } from '../../services/turmaService';
 
 export default function ListarTurmas() {
-    const [showModal, setShowModal] = useState(false);
-    const [formData, setFormData] = useState({
-        nome: '',
-        curso: '',
-        periodo: 'Manhã',
-        maximoAlunos: ''
-    });
-    const [cursos, setCursos] = useState([]);
+  const [showModal, setShowModal] = useState(false);
+  const [formData, setFormData] = useState({
+    nome_turma: '',
+    id_curso_fk: '',
+    periodo_turma: 'Manhã',
+    max_aluno_turma: '',
+    data_inicio_turma: ''
+  });
+  const [cursos, setCursos] = useState([]);
+  const [turmas, setTurmas] = useState([]);
 
-    useEffect(() => {
-        const fetchCursos = async () => {
-            try {
-                const data = await cursoService.getCursos();
-                setCursos(data); // certifique-se de que o retorno é um array de objetos com { id, nome }
-            } catch (error) {
-                console.error('Erro ao carregar cursos:', error);
-            }
-        };
+  useEffect(() => {
+    async function fetchCursos() {
+      try {
+        const data = await cursoService.getCursos();
+        setCursos(data);
+      } catch (error) {
+        console.error('Erro ao carregar cursos:', error);
+      }
+    }
+    fetchCursos();
+  }, []);
 
-        fetchCursos();
-    }, []);
+  useEffect(() => {
+    async function fetchTurmas() {
+      try {
+        const dados = await getTurmas();
+        const turmasFormatadas = dados.map(t => ({
+          id: t.id_turma,
+          nome_turma: t.nome_turma,
+          id_curso_fk: t.id_curso_fk,
+          periodo_turma: t.periodo_turma,
+          max_aluno_turma: t.max_aluno_turma,
+          data_inicio_turma: new Date(t.data_inicio_turma).toLocaleDateString('pt-BR'),
+          ocupacaoAtual: 0,  // Ajuste depois para buscar ocupação real
+          ocupacaoMax: t.max_aluno_turma
+        }));
+        setTurmas(turmasFormatadas);
+      } catch (error) {
+        console.error('Erro ao carregar turmas:', error);
+      }
+    }
+    fetchTurmas();
+  }, []);
 
+  const handleShow = () => setShowModal(true);
+  const handleClose = () => setShowModal(false);
 
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
 
+  const handleSalvar = async () => {
+    const { nome_turma, id_curso_fk, periodo_turma, max_aluno_turma, data_inicio_turma } = formData;
 
-    const handleShow = () => setShowModal(true);
-    const handleClose = () => setShowModal(false);
+    const maxAlunos = parseInt(max_aluno_turma, 10);
+    const idCurso = parseInt(id_curso_fk, 10);
 
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        setFormData(prev => ({ ...prev, [name]: value }));
-    };
+    if (
+      !nome_turma.trim() ||
+      !id_curso_fk ||
+      !periodo_turma ||
+      !max_aluno_turma ||
+      !data_inicio_turma ||
+      isNaN(maxAlunos) || maxAlunos <= 0 ||
+      isNaN(idCurso) || idCurso <= 0
+    ) {
+      alert('Preencha todos os campos obrigatórios corretamente.');
+      return;
+    }
 
-    const handleSalvar = () => {
-        console.log('Nova turma criada:', formData);
-        handleClose();
-    };
+    try {
+      const novaTurma = {
+        nome_turma: nome_turma.trim(),
+        periodo_turma,
+        max_aluno_turma: maxAlunos,
+        data_inicio_turma, // 'YYYY-MM-DD' vindo do input date
+        id_curso_fk: idCurso
+      };
 
-    return (
-        <div className={`container mt-4 ${styles.containerCustom}`}>
-            <div className="d-flex justify-content-between align-items-center mb-4">
-                <h2 className={styles.title}><FaChalkboardTeacher className="me-2" /> Gerenciar Turmas</h2>
-                <Button variant="success" onClick={handleShow}>+ Nova Turma</Button>
+      const turmaCriada = await inserirTurma(novaTurma);
+
+      setTurmas(prev => [
+        ...prev,
+        {
+          id: turmaCriada.id_turma,
+          ...novaTurma,
+          data_inicio_turma: new Date(turmaCriada.data_inicio_turma).toLocaleDateString('pt-BR'),
+          ocupacaoAtual: 0,
+          ocupacaoMax: maxAlunos
+        }
+      ]);
+
+      setFormData({
+        nome_turma: '',
+        id_curso_fk: '',
+        periodo_turma: 'Manhã',
+        max_aluno_turma: '',
+        data_inicio_turma: ''
+      });
+
+      handleClose();
+    } catch (error) {
+      console.error('Erro ao salvar turma:', error);
+      alert('Erro ao salvar turma.');
+    }
+  };
+
+  return (
+    <div className={`container mt-4 ${styles.containerCustom}`}>
+      <div className="d-flex justify-content-between align-items-center mb-4">
+        <h2 className={styles.title}><FaChalkboardTeacher className="me-2" /> Gerenciar Turmas</h2>
+        <Button variant="success" onClick={handleShow}>+ Nova Turma</Button>
+      </div>
+
+      <div className="row">
+        {turmas.map((turma) => {
+          const cursoObj = cursos.find(c => c.id_curso === turma.id_curso_fk);
+          const nomeCurso = cursoObj ? cursoObj.nome_curso : 'Curso não informado';
+          const ocupacaoPercentual = turma.ocupacaoMax > 0 ? (turma.ocupacaoAtual / turma.ocupacaoMax) * 100 : 0;
+
+          return (
+            <div key={turma.id} className="col-md-4 mb-4">
+              <Card className={styles.card}>
+                <Card.Body>
+                  <Card.Title className={styles.cardTitle}>
+                    {turma.nome_turma}
+                    <div>
+                      <FaEdit className={`${styles.icon} text-success me-2`} />
+                      <FaTrash className={`${styles.icon} text-danger`} />
+                    </div>
+                  </Card.Title>
+                  <Card.Subtitle className="mb-2">
+                    📘 {nomeCurso}
+                  </Card.Subtitle>
+                  <div className="mb-2">
+                    ⏰ <Badge bg={turma.periodo_turma === 'Manhã' ? 'warning' : 'secondary'} text="dark">
+                      {turma.periodo_turma}
+                    </Badge>
+                    <span className="ms-2">📅 {turma.data_inicio_turma}</span>
+                  </div>
+                  <div>
+                    Ocupação: <strong>{turma.ocupacaoAtual}/{turma.ocupacaoMax} alunos</strong>
+                    <ProgressBar now={ocupacaoPercentual} className="mt-1" />
+                  </div>
+                </Card.Body>
+              </Card>
             </div>
+          );
+        })}
+      </div>
 
-            <div className="row">
-                {turmas.map((turma, index) => {
-                    const ocupacaoPercentual = (turma.ocupacaoAtual / turma.ocupacaoMax) * 100;
-                    return (
-                        <div key={index} className="col-md-4 mb-4">
-                            <Card className={styles.card}>
-                                <Card.Body>
-                                    <Card.Title className={styles.cardTitle}>
-                                        {turma.nome}
-                                        <div>
-                                            <FaEdit className={`${styles.icon} text-success me-2`} />
-                                            <FaTrash className={`${styles.icon} text-danger`} />
-                                        </div>
-                                    </Card.Title>
-                                    <Card.Subtitle className="mb-2">
-                                        📘 {turma.curso}
-                                    </Card.Subtitle>
-                                    <div className="mb-2">
-                                        ⏰ <Badge bg={turma.turno === 'Manhã' ? 'warning' : 'secondary'} text="dark">
-                                            {turma.turno}
-                                        </Badge>
-                                        <span className="ms-2">📅 {turma.dataInicio}</span>
-                                    </div>
-                                    <div>
-                                        Ocupação: <strong>{turma.ocupacaoAtual}/{turma.ocupacaoMax} alunos</strong>
-                                        <ProgressBar now={ocupacaoPercentual} className="mt-1" />
-                                    </div>
-                                </Card.Body>
-                            </Card>
-                        </div>
-                    );
-                })}
-            </div>
+      {/* Modal Nova Turma */}
+      <Modal show={showModal} onHide={handleClose} centered backdrop="static" contentClassName={styles.modalDark}>
+        <Modal.Header closeButton>
+          <Modal.Title>Criar Nova Turma</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Form>
+            <Form.Group className="mb-3">
+              <Form.Label>Nome da Turma *</Form.Label>
+              <Form.Control
+                type="text"
+                name="nome_turma"
+                placeholder="Ex: Turma A - Manhã"
+                value={formData.nome_turma}
+                onChange={handleChange}
+                required
+              />
+            </Form.Group>
 
-            {/* Modal Nova Turma */}
-            <Modal show={showModal} onHide={handleClose} centered backdrop="static" contentClassName={styles.modalDark}>
-                <Modal.Header closeButton>
-                    <Modal.Title>Criar Nova Turma</Modal.Title>
-                </Modal.Header>
-                <Modal.Body>
-                    <Form>
-                        <Form.Group className="mb-3">
-                            <Form.Label>Nome da Turma *</Form.Label>
-                            <Form.Control
-                                type="text"
-                                name="nome"
-                                placeholder="Ex: Turma A - Manhã"
-                                value={formData.nome}
-                                onChange={handleChange}
-                                required
-                            />
-                        </Form.Group>
-                        <Form.Select name="curso" value={formData.curso} onChange={handleChange}>
-                            <option value="">Selecione um curso</option>                            
-                            {cursos.map((curso) => (
-                                <option key={curso.id} value={curso.nome_curso}>
-                                    {curso.nome_curso}
-                                    
-                                </option>
-                            ))}
-                        </Form.Select>
+            <Form.Group className="mb-3">
+              <Form.Label>Curso *</Form.Label>
+              <Form.Select
+                name="id_curso_fk"
+                value={formData.id_curso_fk}
+                onChange={handleChange}
+                required
+              >
+                <option value="">Selecione um curso</option>
+                {cursos.map((curso) => (
+                  <option key={curso.id_curso} value={curso.id_curso}>
+                    {curso.nome_curso}
+                  </option>
+                ))}
+              </Form.Select>
+            </Form.Group>
 
+            <Form.Group className="mb-3">
+              <Form.Label>Período *</Form.Label>
+              <Form.Select
+                name="periodo_turma"
+                value={formData.periodo_turma}
+                onChange={handleChange}
+                required
+              >
+                <option value="Manhã">Manhã</option>
+                <option value="Tarde">Tarde</option>
+                <option value="Noite">Noite</option>
+              </Form.Select>
+            </Form.Group>
 
-                        <Form.Group className="mb-3">
-                            <Form.Label>Período *</Form.Label>
-                            <Form.Select
-                                name="periodo"
-                                value={formData.periodo}
-                                onChange={handleChange}
-                                required
-                            >
-                                <option>Manhã</option>
-                                <option>Tarde</option>
-                                <option>Noite</option>
-                            </Form.Select>
-                        </Form.Group>
+            <Form.Group className="mb-3">
+              <Form.Label>Data de Início *</Form.Label>
+              <Form.Control
+                type="date"
+                name="data_inicio_turma"
+                value={formData.data_inicio_turma}
+                onChange={handleChange}
+                required
+              />
+            </Form.Group>
 
-                        <Form.Group>
-                            <Form.Label>Máximo de Alunos *</Form.Label>
-                            <Form.Control
-                                type="number"
-                                name="maximoAlunos"
-                                placeholder="Ex: 30"
-                                value={formData.maximoAlunos}
-                                onChange={handleChange}
-                                required
-                                min="1"
-                                max="40"
-                            />
-                        </Form.Group>
-                    </Form>
-                </Modal.Body>
-                <Modal.Footer>
-                    <Button variant="secondary" onClick={handleClose}>
-                        Cancelar
-                    </Button>
-                    <Button variant="success" onClick={handleSalvar}>
-                        Criar Turma
-                    </Button>
-                </Modal.Footer>
-            </Modal>
-        </div>
-    );
+            <Form.Group>
+              <Form.Label>Máximo de Alunos *</Form.Label>
+              <Form.Control
+                type="number"
+                name="max_aluno_turma"
+                placeholder="Ex: 30"
+                value={formData.max_aluno_turma}
+                onChange={handleChange}
+                required
+                min="1"
+                max="40"
+              />
+            </Form.Group>
+          </Form>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleClose}>
+            Cancelar
+          </Button>
+          <Button variant="success" onClick={handleSalvar}>
+            Criar Turma
+          </Button>
+        </Modal.Footer>
+      </Modal>
+    </div>
+  );
 }
