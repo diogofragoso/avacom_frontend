@@ -3,7 +3,7 @@ import { FaEdit, FaTrash, FaChalkboardTeacher } from 'react-icons/fa';
 import styles from './ListarTurma.module.css';
 import { useState, useEffect } from 'react';
 import cursoService from '../../services/cursoService';
-import { getTurmas, inserirTurma } from '../../services/turmaService';
+import { getTurmas, inserirTurma, deletarTurma } from '../../services/turmaService';
 
 export default function ListarTurmas() {
   const [showModal, setShowModal] = useState(false);
@@ -16,6 +16,11 @@ export default function ListarTurmas() {
   });
   const [cursos, setCursos] = useState([]);
   const [turmas, setTurmas] = useState([]);
+
+  // === Estado para modal de confirmação de deleção
+  const [showConfirmDelete, setShowConfirmDelete] = useState(false);
+  const [turmaParaDeletar, setTurmaParaDeletar] = useState(null);
+  const [loadingDelete, setLoadingDelete] = useState(false);
 
   useEffect(() => {
     async function fetchCursos() {
@@ -40,7 +45,7 @@ export default function ListarTurmas() {
           periodo_turma: t.periodo_turma,
           max_aluno_turma: t.max_aluno_turma,
           data_inicio_turma: new Date(t.data_inicio_turma).toLocaleDateString('pt-BR'),
-          ocupacaoAtual: 0,  // Ajuste depois para buscar ocupação real
+          ocupacaoAtual: 0,
           ocupacaoMax: t.max_aluno_turma
         }));
         setTurmas(turmasFormatadas);
@@ -61,19 +66,11 @@ export default function ListarTurmas() {
 
   const handleSalvar = async () => {
     const { nome_turma, id_curso_fk, periodo_turma, max_aluno_turma, data_inicio_turma } = formData;
-
     const maxAlunos = parseInt(max_aluno_turma, 10);
     const idCurso = parseInt(id_curso_fk, 10);
 
-    if (
-      !nome_turma.trim() ||
-      !id_curso_fk ||
-      !periodo_turma ||
-      !max_aluno_turma ||
-      !data_inicio_turma ||
-      isNaN(maxAlunos) || maxAlunos <= 0 ||
-      isNaN(idCurso) || idCurso <= 0
-    ) {
+    if (!nome_turma.trim() || !id_curso_fk || !periodo_turma || !max_aluno_turma || !data_inicio_turma ||
+        isNaN(maxAlunos) || maxAlunos <= 0 || isNaN(idCurso) || idCurso <= 0) {
       alert('Preencha todos os campos obrigatórios corretamente.');
       return;
     }
@@ -83,7 +80,7 @@ export default function ListarTurmas() {
         nome_turma: nome_turma.trim(),
         periodo_turma,
         max_aluno_turma: maxAlunos,
-        data_inicio_turma, // 'YYYY-MM-DD' vindo do input date
+        data_inicio_turma,
         id_curso_fk: idCurso
       };
 
@@ -115,6 +112,35 @@ export default function ListarTurmas() {
     }
   };
 
+  // === Abre modal de confirmação de deleção
+  const abrirModalConfirmarDelecao = (turma) => {
+    setTurmaParaDeletar(turma);
+    setShowConfirmDelete(true);
+  };
+
+  // === Fecha modal de confirmação
+  const fecharModalConfirmarDelecao = () => {
+    setShowConfirmDelete(false);
+    setTurmaParaDeletar(null);
+  };
+
+  // === Função que confirma a deleção da turma
+  const confirmarDelecao = async () => {
+    if (!turmaParaDeletar) return;
+
+    setLoadingDelete(true);
+    try {
+      await deletarTurma(turmaParaDeletar.id);
+      setTurmas(prev => prev.filter(t => t.id !== turmaParaDeletar.id));
+      fecharModalConfirmarDelecao();
+    } catch (error) {
+      console.error('Erro ao deletar turma:', error);
+      alert('Erro ao deletar turma.');
+    } finally {
+      setLoadingDelete(false);
+    }
+  };
+
   return (
     <div className={`container mt-4 ${styles.containerCustom}`}>
       <div className="d-flex justify-content-between align-items-center mb-4">
@@ -136,7 +162,12 @@ export default function ListarTurmas() {
                     {turma.nome_turma}
                     <div>
                       <FaEdit className={`${styles.icon} text-success me-2`} />
-                      <FaTrash className={`${styles.icon} text-danger`} />
+                      {/* === Aqui abre o modal ao invés de confirmar direto */}
+                      <FaTrash
+                        className={`${styles.icon} text-danger`}
+                        onClick={() => abrirModalConfirmarDelecao(turma)}
+                        style={{ cursor: 'pointer' }}
+                      />
                     </div>
                   </Card.Title>
                   <Card.Subtitle className="mb-2">
@@ -241,6 +272,26 @@ export default function ListarTurmas() {
           </Button>
           <Button variant="success" onClick={handleSalvar}>
             Criar Turma
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
+      {/* === Modal Confirmar Deleção */}
+      <Modal show={showConfirmDelete} onHide={fecharModalConfirmarDelecao} centered backdrop="static">
+        <Modal.Header closeButton>
+          <Modal.Title>Confirmar deleção</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          {turmaParaDeletar ? (
+            <p>Tem certeza que deseja deletar a turma <strong>{turmaParaDeletar.nome_turma}</strong>?</p>
+          ) : null}
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={fecharModalConfirmarDelecao} disabled={loadingDelete}>
+            Cancelar
+          </Button>
+          <Button variant="danger" onClick={confirmarDelecao} disabled={loadingDelete}>
+            {loadingDelete ? 'Deletando...' : 'Deletar'}
           </Button>
         </Modal.Footer>
       </Modal>
