@@ -3,10 +3,13 @@ import { FaEdit, FaTrash, FaChalkboardTeacher } from 'react-icons/fa';
 import styles from './ListarTurma.module.css';
 import { useState, useEffect } from 'react';
 import cursoService from '../../services/cursoService';
-import { getTurmas, inserirTurma, deletarTurma } from '../../services/turmaService';
+import { getTurmas, inserirTurma, editarTurma, deletarTurma } from '../../services/turmaService';
 
 export default function ListarTurmas() {
   const [showModal, setShowModal] = useState(false);
+  const [modoEdicao, setModoEdicao] = useState(false);
+  const [turmaEditando, setTurmaEditando] = useState(null);
+
   const [formData, setFormData] = useState({
     nome_turma: '',
     id_curso_fk: '',
@@ -14,10 +17,10 @@ export default function ListarTurmas() {
     max_aluno_turma: '',
     data_inicio_turma: ''
   });
+
   const [cursos, setCursos] = useState([]);
   const [turmas, setTurmas] = useState([]);
 
-  // === Estado para modal de confirmação de deleção
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
   const [turmaParaDeletar, setTurmaParaDeletar] = useState(null);
   const [loadingDelete, setLoadingDelete] = useState(false);
@@ -44,7 +47,7 @@ export default function ListarTurmas() {
           id_curso_fk: t.id_curso_fk,
           periodo_turma: t.periodo_turma,
           max_aluno_turma: t.max_aluno_turma,
-          data_inicio_turma: new Date(t.data_inicio_turma).toLocaleDateString('pt-BR'),
+          data_inicio_turma: new Date(t.data_inicio_turma).toISOString().split('T')[0], // yyyy-mm-dd
           ocupacaoAtual: 0,
           ocupacaoMax: t.max_aluno_turma
         }));
@@ -56,8 +59,23 @@ export default function ListarTurmas() {
     fetchTurmas();
   }, []);
 
-  const handleShow = () => setShowModal(true);
-  const handleClose = () => setShowModal(false);
+  const handleShow = () => {
+    setModoEdicao(false);
+    setFormData({
+      nome_turma: '',
+      id_curso_fk: '',
+      periodo_turma: 'Manhã',
+      max_aluno_turma: '',
+      data_inicio_turma: ''
+    });
+    setShowModal(true);
+  };
+
+  const handleClose = () => {
+    setShowModal(false);
+    setModoEdicao(false);
+    setTurmaEditando(null);
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -70,40 +88,47 @@ export default function ListarTurmas() {
     const idCurso = parseInt(id_curso_fk, 10);
 
     if (!nome_turma.trim() || !id_curso_fk || !periodo_turma || !max_aluno_turma || !data_inicio_turma ||
-        isNaN(maxAlunos) || maxAlunos <= 0 || isNaN(idCurso) || idCurso <= 0) {
+      isNaN(maxAlunos) || maxAlunos <= 0 || isNaN(idCurso) || idCurso <= 0) {
       alert('Preencha todos os campos obrigatórios corretamente.');
       return;
     }
 
+    const turmaData = {
+      nome_turma: nome_turma.trim(),
+      periodo_turma,
+      max_aluno_turma: maxAlunos,
+      data_inicio_turma,
+      id_curso_fk: idCurso
+    };
+
     try {
-      const novaTurma = {
-        nome_turma: nome_turma.trim(),
-        periodo_turma,
-        max_aluno_turma: maxAlunos,
-        data_inicio_turma,
-        id_curso_fk: idCurso
-      };
+      if (modoEdicao && turmaEditando) {
+        await editarTurma(turmaEditando.id, turmaData);
 
-      const turmaCriada = await inserirTurma(novaTurma);
+        setTurmas(prev =>
+          prev.map(t =>
+            t.id === turmaEditando.id
+              ? {
+                  ...t,
+                  ...turmaData,
+                  data_inicio_turma: turmaData.data_inicio_turma
+                }
+              : t
+          )
+        );
+      } else {
+        const nova = await inserirTurma(turmaData);
 
-      setTurmas(prev => [
-        ...prev,
-        {
-          id: turmaCriada.id_turma,
-          ...novaTurma,
-          data_inicio_turma: new Date(turmaCriada.data_inicio_turma).toLocaleDateString('pt-BR'),
-          ocupacaoAtual: 0,
-          ocupacaoMax: maxAlunos
-        }
-      ]);
-
-      setFormData({
-        nome_turma: '',
-        id_curso_fk: '',
-        periodo_turma: 'Manhã',
-        max_aluno_turma: '',
-        data_inicio_turma: ''
-      });
+        setTurmas(prev => [
+          ...prev,
+          {
+            id: nova.id_turma,
+            ...turmaData,
+            ocupacaoAtual: 0,
+            ocupacaoMax: maxAlunos
+          }
+        ]);
+      }
 
       handleClose();
     } catch (error) {
@@ -112,19 +137,29 @@ export default function ListarTurmas() {
     }
   };
 
-  // === Abre modal de confirmação de deleção
+  const abrirModalEditar = (turma) => {
+    setFormData({
+      nome_turma: turma.nome_turma,
+      id_curso_fk: turma.id_curso_fk,
+      periodo_turma: turma.periodo_turma,
+      max_aluno_turma: turma.max_aluno_turma,
+      data_inicio_turma: turma.data_inicio_turma
+    });
+    setModoEdicao(true);
+    setTurmaEditando(turma);
+    setShowModal(true);
+  };
+
   const abrirModalConfirmarDelecao = (turma) => {
     setTurmaParaDeletar(turma);
     setShowConfirmDelete(true);
   };
 
-  // === Fecha modal de confirmação
   const fecharModalConfirmarDelecao = () => {
     setShowConfirmDelete(false);
     setTurmaParaDeletar(null);
   };
 
-  // === Função que confirma a deleção da turma
   const confirmarDelecao = async () => {
     if (!turmaParaDeletar) return;
 
@@ -161,8 +196,11 @@ export default function ListarTurmas() {
                   <Card.Title className={styles.cardTitle}>
                     {turma.nome_turma}
                     <div>
-                      <FaEdit className={`${styles.icon} text-success me-2`} />
-                      {/* === Aqui abre o modal ao invés de confirmar direto */}
+                      <FaEdit
+                        className={`${styles.icon} text-success me-2`}
+                        onClick={() => abrirModalEditar(turma)}
+                        style={{ cursor: 'pointer' }}
+                      />
                       <FaTrash
                         className={`${styles.icon} text-danger`}
                         onClick={() => abrirModalConfirmarDelecao(turma)}
@@ -170,14 +208,12 @@ export default function ListarTurmas() {
                       />
                     </div>
                   </Card.Title>
-                  <Card.Subtitle className="mb-2">
-                    📘 {nomeCurso}
-                  </Card.Subtitle>
+                  <Card.Subtitle className="mb-2">📘 {nomeCurso}</Card.Subtitle>
                   <div className="mb-2">
                     ⏰ <Badge bg={turma.periodo_turma === 'Manhã' ? 'warning' : 'secondary'} text="dark">
                       {turma.periodo_turma}
                     </Badge>
-                    <span className="ms-2">📅 {turma.data_inicio_turma}</span>
+                    <span className="ms-2">📅 {new Date(turma.data_inicio_turma).toLocaleDateString('pt-BR')}</span>
                   </div>
                   <div>
                     Ocupação: <strong>{turma.ocupacaoAtual}/{turma.ocupacaoMax} alunos</strong>
@@ -190,10 +226,10 @@ export default function ListarTurmas() {
         })}
       </div>
 
-      {/* Modal Nova Turma */}
+      {/* Modal Criar/Editar Turma */}
       <Modal show={showModal} onHide={handleClose} centered backdrop="static" contentClassName={styles.modalDark}>
         <Modal.Header closeButton>
-          <Modal.Title>Criar Nova Turma</Modal.Title>
+          <Modal.Title>{modoEdicao ? 'Editar Turma' : 'Criar Nova Turma'}</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <Form>
@@ -202,10 +238,8 @@ export default function ListarTurmas() {
               <Form.Control
                 type="text"
                 name="nome_turma"
-                placeholder="Ex: Turma A - Manhã"
                 value={formData.nome_turma}
                 onChange={handleChange}
-                required
               />
             </Form.Group>
 
@@ -215,13 +249,10 @@ export default function ListarTurmas() {
                 name="id_curso_fk"
                 value={formData.id_curso_fk}
                 onChange={handleChange}
-                required
               >
                 <option value="">Selecione um curso</option>
                 {cursos.map((curso) => (
-                  <option key={curso.id_curso} value={curso.id_curso}>
-                    {curso.nome_curso}
-                  </option>
+                  <option key={curso.id_curso} value={curso.id_curso}>{curso.nome_curso}</option>
                 ))}
               </Form.Select>
             </Form.Group>
@@ -232,7 +263,6 @@ export default function ListarTurmas() {
                 name="periodo_turma"
                 value={formData.periodo_turma}
                 onChange={handleChange}
-                required
               >
                 <option value="Manhã">Manhã</option>
                 <option value="Tarde">Tarde</option>
@@ -247,7 +277,6 @@ export default function ListarTurmas() {
                 name="data_inicio_turma"
                 value={formData.data_inicio_turma}
                 onChange={handleChange}
-                required
               />
             </Form.Group>
 
@@ -256,10 +285,8 @@ export default function ListarTurmas() {
               <Form.Control
                 type="number"
                 name="max_aluno_turma"
-                placeholder="Ex: 30"
                 value={formData.max_aluno_turma}
                 onChange={handleChange}
-                required
                 min="1"
                 max="40"
               />
@@ -267,24 +294,22 @@ export default function ListarTurmas() {
           </Form>
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="secondary" onClick={handleClose}>
-            Cancelar
-          </Button>
+          <Button variant="secondary" onClick={handleClose}>Cancelar</Button>
           <Button variant="success" onClick={handleSalvar}>
-            Criar Turma
+            {modoEdicao ? 'Salvar Alterações' : 'Criar Turma'}
           </Button>
         </Modal.Footer>
       </Modal>
 
-      {/* === Modal Confirmar Deleção */}
+      {/* Modal Confirmar Deleção */}
       <Modal show={showConfirmDelete} onHide={fecharModalConfirmarDelecao} centered backdrop="static">
         <Modal.Header closeButton>
           <Modal.Title>Confirmar deleção</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          {turmaParaDeletar ? (
+          {turmaParaDeletar && (
             <p>Tem certeza que deseja deletar a turma <strong>{turmaParaDeletar.nome_turma}</strong>?</p>
-          ) : null}
+          )}
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={fecharModalConfirmarDelecao} disabled={loadingDelete}>
