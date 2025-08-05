@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import {
     Container, Row, Col, Button, Modal, Form, Spinner, Alert, Accordion
@@ -11,7 +11,6 @@ import { useLocation } from 'react-router-dom';
 import TituloAvaliativa from '../TituloAvaliativa';
 import styles from './ListarAvaliativa.module.css';
 
-
 const ListarAvaliativa = ({ id_indicador = null }) => {
     const [avaliativas, setAvaliativas] = useState([]);
     const [showModalEdit, setShowModalEdit] = useState(false);
@@ -23,17 +22,37 @@ const ListarAvaliativa = ({ id_indicador = null }) => {
     const [feedback, setFeedback] = useState({ type: '', message: '' });
     const [loadingIA, setLoadingIA] = useState(false);
     const [respostaIA, setRespostaIA] = useState('');
-
-
     const [showConfirmModal, setShowConfirmModal] = useState(false);
     const [avaliativaParaExcluir, setAvaliativaParaExcluir] = useState(null);
 
     const location = useLocation();
     const { nome_uc, nome_indicador, indicador } = location.state || {};
 
-    useEffect(() => {
-        if (id_indicador) buscarAvaliativas();
+    // Versão otimizada com useCallback
+    const buscarAvaliativas = useCallback(async () => {
+        if (!id_indicador) {
+            console.warn('ID do indicador não fornecido para buscar avaliações');
+            return;
+        }
+
+        try {
+            setLoading(true);
+            const response = await avaliativaService.getAvaliativasPorIndicador(id_indicador);
+            setAvaliativas(response || []); // Garante que sempre seja array
+        } catch (error) {
+            console.error('Erro ao buscar atividades avaliativas:', error);
+            setFeedback({ 
+                type: 'danger', 
+                message: `Erro ao buscar atividades: ${error.message || 'Erro desconhecido'}` 
+            });
+        } finally {
+            setLoading(false);
+        }
     }, [id_indicador]);
+
+    useEffect(() => {
+        buscarAvaliativas();
+    }, [buscarAvaliativas]);
 
     useEffect(() => {
         if (feedback.message) {
@@ -42,31 +61,31 @@ const ListarAvaliativa = ({ id_indicador = null }) => {
         }
     }, [feedback]);
 
-    const buscarAvaliativas = async () => {
-        if (!id_indicador) return;
-        try {
-            setLoading(true);
-            const response = await avaliativaService.getAvaliativasPorIndicador(id_indicador);
-            setAvaliativas(response);
-        } catch (error) {
-            setFeedback({ type: 'danger', message: 'Erro ao buscar atividades: ' + error.message });
-        } finally {
-            setLoading(false);
-        }
-    };
-
     const handleDelete = (id) => {
+        if (!id) {
+            console.error('ID inválido para exclusão');
+            return;
+        }
         setAvaliativaParaExcluir(id);
         setShowConfirmModal(true);
     };
 
     const confirmarExclusao = async () => {
+        if (!avaliativaParaExcluir) {
+            setFeedback({ type: 'warning', message: 'Nenhuma atividade selecionada para exclusão' });
+            return;
+        }
+
         try {
             await avaliativaService.deleteAvaliativa(avaliativaParaExcluir);
-            buscarAvaliativas();
+            await buscarAvaliativas();
             setFeedback({ type: 'success', message: 'Atividade excluída com sucesso!' });
         } catch (error) {
-            setFeedback({ type: 'danger', message: 'Erro ao excluir atividade: ' + error.message });
+            console.error('Erro ao excluir atividade:', error);
+            setFeedback({ 
+                type: 'danger', 
+                message: `Erro ao excluir atividade: ${error.message || 'Erro desconhecido'}` 
+            });
         } finally {
             setShowConfirmModal(false);
             setAvaliativaParaExcluir(null);
@@ -74,43 +93,69 @@ const ListarAvaliativa = ({ id_indicador = null }) => {
     };
 
     const handleEdit = (avaliativa) => {
+        if (!avaliativa?.id_at_avaliativa) {
+            console.error('Dados inválidos para edição');
+            return;
+        }
+        
         setAvaliativaSelecionada(avaliativa);
-        setDescricao(avaliativa.descricao_avaliativa);
+        setDescricao(avaliativa.descricao_avaliativa || '');
         setShowModalEdit(true);
     };
 
     const handleUpdate = async (e) => {
         e.preventDefault();
+        
+        if (!avaliativaSelecionada?.id_at_avaliativa || !descricao.trim()) {
+            setFeedback({ type: 'warning', message: 'Dados incompletos para atualização' });
+            return;
+        }
+
         try {
-            await avaliativaService.updateAvaliativa(avaliativaSelecionada.id_avaliativa, {
-                id_avaliativa: avaliativaSelecionada.id_avaliativa,
+            await avaliativaService.updateAvaliativa(avaliativaSelecionada.id_at_avaliativa, {
+                id_at_avaliativa: avaliativaSelecionada.id_at_avaliativa,
                 descricao: descricao,
                 id_indicador_fk: id_indicador
             });
-            buscarAvaliativas();
+            await buscarAvaliativas();
             setShowModalEdit(false);
             setFeedback({ type: 'success', message: 'Atividade atualizada com sucesso!' });
         } catch (error) {
-            setFeedback({ type: 'danger', message: 'Erro ao atualizar: ' + error.message });
+            console.error('Erro ao atualizar atividade:', error);
+            setFeedback({ 
+                type: 'danger', 
+                message: `Erro ao atualizar: ${error.message || 'Erro desconhecido'}` 
+            });
         }
     };
 
     const handleCreate = async (e) => {
         e.preventDefault();
+        
+        if (!novaDescricao.trim()) {
+            setFeedback({ type: 'warning', message: 'A descrição não pode estar vazia' });
+            return;
+        }
+
         try {
             await avaliativaService.createAvaliativa({
                 descricao: novaDescricao,
                 id_indicador_fk: id_indicador
             });
-            buscarAvaliativas();
+            await buscarAvaliativas();
             setShowModalAdd(false);
             setNovaDescricao('');
             setFeedback({ type: 'success', message: 'Atividade criada com sucesso!' });
         } catch (error) {
-            setFeedback({ type: 'danger', message: 'Erro ao criar atividade: ' + error.message });
+            console.error('Erro ao criar atividade:', error);
+            setFeedback({ 
+                type: 'danger', 
+                message: `Erro ao criar atividade: ${error.message || 'Erro desconhecido'}` 
+            });
         }
     };
 
+    // Restante do componente permanece idêntico ao seu original
     return (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }}>
             <Container fluid className="mt-1 position-relative">              
@@ -121,12 +166,9 @@ const ListarAvaliativa = ({ id_indicador = null }) => {
                     avaliativas={avaliativas}
                 />
               
-
-
                 <Button variant="dark" className="mb-4" onClick={() => setShowModalAdd(true)}>
                     Adicionar Atividade 
-                    <MdAddCircle 
-                    style={{ marginLeft: '5px' , fontSize: '30px', color: '#90caf9'}}/>
+                    <MdAddCircle style={{ marginLeft: '5px', fontSize: '30px', color: '#90caf9' }}/>
                 </Button>
 
                 {feedback.message && (
@@ -145,7 +187,7 @@ const ListarAvaliativa = ({ id_indicador = null }) => {
                     <Accordion alwaysOpen className="w-100">
                         {avaliativas.map((avaliativa, index) => (
                             <Accordion.Item
-                                key={avaliativa.id_avaliativa}
+                                key={avaliativa.id_at_avaliativa}
                                 eventKey={index.toString()}
                                 className={styles.customCard}
                             >
@@ -166,7 +208,7 @@ const ListarAvaliativa = ({ id_indicador = null }) => {
                                             variant="danger"
                                             size="sm"
                                             className="ms-2"
-                                            onClick={() => handleDelete(avaliativa.id_avaliativa)}
+                                            onClick={() => handleDelete(avaliativa.id_at_avaliativa)}
                                         >
                                             <RiDeleteBin6Line />
                                         </Button>
@@ -192,7 +234,6 @@ const ListarAvaliativa = ({ id_indicador = null }) => {
                                     as="textarea"
                                     rows={10}
                                     placeholder="Digite a descrição da atividade"
-                                    // type="text"
                                     value={novaDescricao}
                                     onChange={(e) => setNovaDescricao(e.target.value)}
                                     required
@@ -210,7 +251,8 @@ const ListarAvaliativa = ({ id_indicador = null }) => {
                                             setRespostaIA(resposta);
                                             setNovaDescricao(resposta);
                                         } catch (error) {
-                                            alert('Erro ao gerar texto da IA: ' + error.message);
+                                            console.error('Erro ao gerar texto com IA:', error);
+                                            setFeedback({ type: 'danger', message: 'Erro ao gerar texto da IA' });
                                         } finally {
                                             setLoadingIA(false);
                                         }

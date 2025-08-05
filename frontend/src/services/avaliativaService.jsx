@@ -33,8 +33,10 @@ const avaliativaService = {
   },
 
   deleteAvaliativa: async (id) => {
+    console.log(id);
     try {
       const response = await axios.delete(API_DELETAR(id), {
+   
         headers: { 'Content-Type': 'application/json' },
       });
       return response.data;
