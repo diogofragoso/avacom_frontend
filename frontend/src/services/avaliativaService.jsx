@@ -25,9 +25,15 @@ const avaliativaService = {
 
   getAvaliativasPorIndicador: async (id_indicador) => {
     try {
-      const response = await axios.get(`${API_LISTAR}/${id_indicador}`);       
-      return response.data;
+      const response = await axios.get(`${API_LISTAR}/${id_indicador}`);
+      // Retorna array vazio se não houver dados
+      return response.data || []; 
     } catch (error) {
+      // Se for um 404 (não encontrado), trata como lista vazia
+      if (error.response?.status === 404) {
+        return [];
+      }
+      // Outros erros continuam sendo lançados
       throw new Error('Erro ao buscar atividades avaliativas: ' + error.message);
     }
   },
