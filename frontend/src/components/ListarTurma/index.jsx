@@ -231,16 +231,23 @@ export default function ListarTurmas() {
   const navigate = useNavigate();
 
   const irParaGerenciamentoDeTurma = (turma) => {
+    const cursoObj = cursos.find(c => c.id_curso === turma.id_curso_fk);
+  
     navigate('GerenciarTurma', {
       state: {
-        id_turma: turma.id,
-        nome_turma: turma.nome_turma,
-        id_curso_fk: turma.id_curso_fk
+        turma: {
+          id_turma: turma.id,
+          nome_turma: turma.nome_turma,
+          id_curso_fk: turma.id_curso_fk,
+          nome_curso: cursoObj ? cursoObj.nome_curso : 'Curso não informado',
+          periodo_turma: turma.periodo_turma,
+          data_inicio_turma: turma.data_inicio_turma,
+          max_aluno_turma: turma.max_aluno_turma
+        }
       }
     });
   };
   
-
 
 
 
