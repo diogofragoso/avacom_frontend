@@ -5,6 +5,8 @@ import styles from './ListarTurma.module.css';
 import { useState, useEffect } from 'react';
 import cursoService from '../../services/cursoService';
 import { getTurmas, inserirTurma, editarTurma, deletarTurma } from '../../services/turmaService';
+import { useNavigate } from 'react-router-dom';
+
 
 export default function ListarTurmas() {
   const [showModal, setShowModal] = useState(false);
@@ -151,25 +153,25 @@ export default function ListarTurmas() {
     setNomeAlunoMatricula('');
     setShowModalMatricula(true);
   };
-  
+
   const fecharModalMatricula = () => {
     setShowModalMatricula(false);
     setTurmaParaMatricular(null);
     setNomeAlunoMatricula('');
   };
-  
+
   const handleMatricularAluno = () => {
     if (!nomeAlunoMatricula.trim()) {
       alert('Informe o nome do aluno para matricular');
       return;
     }
-  
+
     // Aqui você pode implementar a chamada API para matricular o aluno, por enquanto só alert:
     alert(`Aluno "${nomeAlunoMatricula}" matriculado na turma "${turmaParaMatricular.nome_turma}"`);
-  
+
     // Depois de matricular, fecha o modal
     fecharModalMatricula();
-  
+
     // Opcional: atualizar ocupacaoAtual da turma no estado turmas
     setTurmas(prevTurmas =>
       prevTurmas.map(t =>
@@ -179,7 +181,7 @@ export default function ListarTurmas() {
       )
     );
   };
-  
+
 
 
 
@@ -226,6 +228,26 @@ export default function ListarTurmas() {
     }
   };
 
+  const navigate = useNavigate();
+
+  const irParaGerenciamentoDeTurma = (turma) => {
+    navigate('GerenciarTurma', {
+      state: {
+        id_turma: turma.id,
+        nome_turma: turma.nome_turma,
+        id_curso_fk: turma.id_curso_fk
+      }
+    });
+  };
+  
+
+
+
+
+
+
+
+
   return (
     <div className={`container mt-4 ${styles.containerCustom}`}>
       <div className="d-flex justify-content-between align-items-center mb-4">
@@ -241,11 +263,19 @@ export default function ListarTurmas() {
 
           return (
             <div key={turma.id} className="col-md-4 mb-4">
+
+
+              {/* ########################################################################### */}
+
+
               <Card className={styles.card}>
-                <Card.Body>
+                <Card.Body
+                  style={{ cursor: 'pointer' }}
+                  onClick={() => irParaGerenciamentoDeTurma(turma)}
+                >
                   <Card.Title className={styles.cardTitle}>
                     {turma.nome_turma}
-                    <div>
+                    <div onClick={(e) => e.stopPropagation()}>
                       <FaUserPlus
                         className={`${styles.icon} text-info me-2`}
                         onClick={() => abrirModalMatricula(turma)}
@@ -279,14 +309,14 @@ export default function ListarTurmas() {
                     Ocupação: <strong>{turma.ocupacaoAtual}/{turma.ocupacaoMax} alunos</strong>
                     <ProgressBar now={ocupacaoPercentual} className="mt-1" />
                   </div>
-
-
-
-
-
-
                 </Card.Body>
               </Card>
+
+
+
+
+
+              {/* ########################################################################### */}
             </div>
           );
         })}
@@ -387,36 +417,36 @@ export default function ListarTurmas() {
         </Modal.Footer>
       </Modal>
 
-{/* Modal Matricula */}
-<Modal show={showModalMatricula} onHide={fecharModalMatricula} centered backdrop="static" contentClassName={styles.modalDark}>
-  <Modal.Header closeButton>
-    <Modal.Title>Matricular Aluno</Modal.Title>
-  </Modal.Header>
-  <Modal.Body>
-    <p>Turma: <strong>{turmaParaMatricular?.nome_turma}</strong></p>
-    <Form>
-      <Form.Group className="mb-3" controlId="nomeAluno">
-        <Form.Label>Nome do Aluno *</Form.Label>
-        <Form.Control
-          type="text"
-          placeholder="Digite o nome do aluno"
-          value={nomeAlunoMatricula}
-          onChange={e => setNomeAlunoMatricula(e.target.value)}
-        />
-      </Form.Group>
-    </Form>
-  </Modal.Body>
-  <Modal.Footer>
-    <Button variant="secondary" onClick={fecharModalMatricula}>Cancelar</Button>
-    <Button
-      variant="primary"
-      onClick={handleMatricularAluno}
-      disabled={nomeAlunoMatricula.trim() === ''}
-    >
-      Matricular
-    </Button>
-  </Modal.Footer>
-</Modal>
+      {/* Modal Matricula */}
+      <Modal show={showModalMatricula} onHide={fecharModalMatricula} centered backdrop="static" contentClassName={styles.modalDark}>
+        <Modal.Header closeButton>
+          <Modal.Title>Matricular Aluno</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <p>Turma: <strong>{turmaParaMatricular?.nome_turma}</strong></p>
+          <Form>
+            <Form.Group className="mb-3" controlId="nomeAluno">
+              <Form.Label>Nome do Aluno *</Form.Label>
+              <Form.Control
+                type="text"
+                placeholder="Digite o nome do aluno"
+                value={nomeAlunoMatricula}
+                onChange={e => setNomeAlunoMatricula(e.target.value)}
+              />
+            </Form.Group>
+          </Form>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={fecharModalMatricula}>Cancelar</Button>
+          <Button
+            variant="primary"
+            onClick={handleMatricularAluno}
+            disabled={nomeAlunoMatricula.trim() === ''}
+          >
+            Matricular
+          </Button>
+        </Modal.Footer>
+      </Modal>
 
 
 

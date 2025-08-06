@@ -8,6 +8,8 @@ const API_LISTAR_TURMAS = `${API_BASE_URL}/listarturmas`;
 const API_DELETAR_TURMA = (id) => `${API_BASE_URL}/deletarturma/${id}`;
 const API_EDITAR_TURMA = (id) => `${API_BASE_URL}/editarturma/${id}`;
 
+
+
 export const getTurmas = async () => {
   const response = await axios.get(API_LISTAR_TURMAS);
   return response.data;
@@ -27,3 +29,4 @@ export const deletarTurma = async (id) => {
   const response = await axios.delete(API_DELETAR_TURMA(id));
   return response.data;
 };
+

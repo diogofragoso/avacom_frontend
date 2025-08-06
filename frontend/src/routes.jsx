@@ -20,6 +20,7 @@ import PainelTurma from "./pages/PainelTurma";
 import ListarTurmas from "./components/ListarTurma";
 import NavPainel from "./components/NavPainel";
 import PainelDashBoard from "../src/pages/PainelDashBoard";
+import GerenciarTurma from "./components/GerenciarTurma";
 
 
 function AppRoutes() {
@@ -58,6 +59,7 @@ function AppRoutes() {
           <Route path="PainelTurma" element={<PainelTurma />}>
             {/* Rota aninhada dentro de PainelTurma */}
             <Route path="ListarTurma" element={<ListarTurmas />} />
+            <Route path="GerenciarTurma" element={<GerenciarTurma />} />
           </Route>
 
           <Route path="PainelDashBoard" element={<PainelDashBoard />} >
