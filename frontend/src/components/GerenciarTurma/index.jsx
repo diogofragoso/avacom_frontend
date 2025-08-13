@@ -15,6 +15,9 @@ function GerenciarTurma() {
     const [carregando, setCarregando] = useState(true);
     const [erro, setErro] = useState(null);
 
+    // Estado para controle do modal
+    const [mostrarModal, setMostrarModal] = useState(false);
+
     useEffect(() => {
         const carregarEstudantes = async () => {
             try {
@@ -44,35 +47,6 @@ function GerenciarTurma() {
         );
     }
 
-    <ModalMatricularAluno
-        show={mostrarModal}
-        handleClose={() => setMostrarModal(false)}
-        turmaId={turma.id_turma}
-        cursoId={turma.id_curso}
-        onMatriculaRealizada={() => {
-            setCarregando(true);
-            setErro(null);
-            matriculaService.getAlunosMatriculados(turma.id_turma)
-                .then(setEstudantes)
-                .catch(() => setErro('Erro ao atualizar alunos'))
-                .finally(() => setCarregando(false));
-        }}
-    />
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     return (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }}>
             <Container className="mt-4">
@@ -84,7 +58,7 @@ function GerenciarTurma() {
                         <Row>
                             <Col md={6}><strong>Curso:</strong> {turma.nome_curso}</Col>
                             <Col md={3}><strong>Período:</strong> {turma.periodo_turma}</Col>
-                            <Col md={3}><strong>Início:</strong> {new Date(turma.data_inicio_turma).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' })} </Col>
+                            <Col md={3}><strong>Início:</strong> {new Date(turma.data_inicio_turma).toLocaleDateString('pt-BR')} </Col>
                         </Row>
                         <Row className="mt-2">
                             <Col md={3}><strong>Máx. de Alunos:</strong> {turma.max_aluno_turma}</Col>
@@ -94,12 +68,9 @@ function GerenciarTurma() {
 
                         <div className="d-flex justify-content-between align-items-center mb-3">
                             <h5>Estudantes Matriculados</h5>
-
                             <Button variant="primary" onClick={() => setMostrarModal(true)}>
                                 + Adicionar Estudante <MdAddCircle className="ms-1" />
                             </Button>
-
-
                         </div>
 
                         {carregando && <Spinner animation="border" />}
@@ -136,6 +107,22 @@ function GerenciarTurma() {
                     </Card.Body>
                 </Card>
             </Container>
+
+            {/* Modal precisa estar dentro do JSX retornado */}
+            <ModalMatricularAluno
+                show={mostrarModal}
+                handleClose={() => setMostrarModal(false)}
+                turmaId={turma.id_turma}
+                cursoId={turma.id_curso}
+                onMatriculaRealizada={() => {
+                    setCarregando(true);
+                    setErro(null);
+                    matriculaService.getAlunosMatriculados(turma.id_turma)
+                        .then(setEstudantes)
+                        .catch(() => setErro('Erro ao atualizar alunos'))
+                        .finally(() => setCarregando(false));
+                }}
+            />
         </motion.div>
     );
 }

@@ -1,7 +1,7 @@
 // components/ModalMatricularAluno.js
 import React, { useEffect, useState } from 'react';
 import { Modal, Button, Form, Spinner, Alert } from 'react-bootstrap';
-import matriculaService from '../services/matriculaService';
+import matriculaService from '../../services/matriculaService';
 
 function ModalMatricularAluno({ show, handleClose, turmaId, cursoId, onMatriculaRealizada }) {
   const [alunosDisponiveis, setAlunosDisponiveis] = useState([]);
