@@ -14,25 +14,26 @@ function GerenciarTurma() {
     const [estudantes, setEstudantes] = useState([]);
     const [carregando, setCarregando] = useState(true);
     const [erro, setErro] = useState(null);
+
+    // Estado para controle do modal
     const [mostrarModal, setMostrarModal] = useState(false);
 
-    const carregarEstudantes = async () => {
-        if (!turma?.id_turma) return;
-        setCarregando(true);
-        setErro(null);
-        try {
-            const alunos = await matriculaService.getAlunosMatriculadosPorTurma(turma.id_turma);
-            setEstudantes(alunos);
-        } catch (err) {
-            setErro('Erro ao buscar estudantes.');
-            console.error(err);
-        } finally {
-            setCarregando(false);
-        }
-    };
-
     useEffect(() => {
-        carregarEstudantes();
+        const carregarEstudantes = async () => {
+            try {
+                const alunos = await matriculaService.getAlunosMatriculadosPorTurma(turma.id_turma);
+                setEstudantes(alunos);
+            } catch (err) {
+                setErro('Erro ao buscar estudantes.');
+                console.error(err);
+            } finally {
+                setCarregando(false);
+            }
+        };
+
+        if (turma?.id_turma) {
+            carregarEstudantes();
+        }
     }, [turma]);
 
     if (!turma) {
@@ -83,14 +84,14 @@ function GerenciarTurma() {
                             <Table striped bordered hover responsive>
                                 <thead className="table-dark">
                                     <tr>
-                                        <th>Nome</th>
+                                        <th>Nome</th>                                        
                                         <th>Email</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {estudantes.map((estudante, index) => (
                                         <tr key={index}>
-                                            <td>{estudante.nome_aluno}</td>
+                                            <td>{estudante.nome_aluno}</td>                                         
                                             <td>{estudante.email_aluno}</td>
                                         </tr>
                                     ))}
@@ -105,12 +106,20 @@ function GerenciarTurma() {
                 </Card>
             </Container>
 
+            {/* Modal precisa estar dentro do JSX retornado */}
             <ModalMatricularAluno
                 show={mostrarModal}
                 handleClose={() => setMostrarModal(false)}
                 turmaId={turma.id_turma}
                 cursoId={turma.id_curso}
-                onMatriculaRealizada={carregarEstudantes}
+                onMatriculaRealizada={() => {
+                    setCarregando(true);
+                    setErro(null);
+                    matriculaService.getAlunosMatriculadosPorTurma(turma.id_turma)
+                        .then(setEstudantes)
+                        .catch(() => setErro('Erro ao atualizar alunos'))
+                        .finally(() => setCarregando(false));
+                }}
             />
         </motion.div>
     );
