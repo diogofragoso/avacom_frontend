@@ -4,6 +4,7 @@ import { Card, Button, Container, Table, Spinner, Alert, Row, Col } from 'react-
 import { motion } from 'framer-motion';
 import matriculaService from '../../services/matriculaService';
 import ModalMatricularAluno from '../ModalMatricularAluno';
+import AvaliacaoEstudante from '../AvaliacaoEstudante'; // <-- importa aqui
 import { MdAddCircle } from 'react-icons/md';
 import { FaTrash, FaCheckCircle } from 'react-icons/fa';
 
@@ -15,8 +16,11 @@ function GerenciarTurma() {
     const [estudantes, setEstudantes] = useState([]);
     const [carregando, setCarregando] = useState(true);
     const [erro, setErro] = useState(null);
-
     const [mostrarModal, setMostrarModal] = useState(false);
+
+    // estados para avaliação
+    const [avaliando, setAvaliando] = useState(false);
+    const [alunoSelecionado, setAlunoSelecionado] = useState(null);
 
     useEffect(() => {
         const carregarEstudantes = async () => {
@@ -36,29 +40,23 @@ function GerenciarTurma() {
         }
     }, [turma]);
 
-    // Função para excluir estudante
-const handleExcluir = async (id_matricula) => {
-  if (window.confirm("Deseja realmente excluir esta matrícula?")) {
-    try {
-      await matriculaService.removerMatricula(id_matricula);
-      console.log("ID da matricula é esse --> : " + id_matricula);
-      // Atualiza a lista filtrando o estudante excluído
-      setEstudantes(estudantes.filter(e => e.id_matricula !== id_matricula));
-    } catch (err) {
-      console.error("Erro ao excluir matrícula:", err);
-      setErro("Erro ao excluir matrícula.");
-    }
-  }
-};
+    // Excluir estudante
+    const handleExcluir = async (id_matricula) => {
+        if (window.confirm("Deseja realmente excluir esta matrícula?")) {
+            try {
+                await matriculaService.removerMatricula(id_matricula);
+                setEstudantes(estudantes.filter(e => e.id_matricula !== id_matricula));
+            } catch (err) {
+                console.error("Erro ao excluir matrícula:", err);
+                setErro("Erro ao excluir matrícula.");
+            }
+        }
+    };
 
-
-    // Função para avaliar estudante
+    // Avaliar estudante
     const handleAvaliar = (estudante) => {
-        // Aqui você pode abrir um modal de avaliação
-        // ou redirecionar para outra página
-        navigate(`/avaliar-estudante/${estudante.id_aluno}`, {
-            state: { estudante, turma }
-        });
+        setAlunoSelecionado(estudante);
+        setAvaliando(true);
     };
 
     if (!turma) {
@@ -80,68 +78,81 @@ const handleExcluir = async (id_matricula) => {
                         <h4>Gerenciar Turma: {turma.nome_turma}</h4>
                     </Card.Header>
                     <Card.Body>
+                        {/* Dados da turma */}
                         <Row>
                             <Col md={6}><strong>Curso:</strong> {turma.nome_curso}</Col>
                             <Col md={3}><strong>Período:</strong> {turma.periodo_turma}</Col>
-                            <Col md={3}><strong>Início:</strong> {new Date(turma.data_inicio_turma).toLocaleDateString('pt-BR')} </Col>
+                            <Col md={3}><strong>Início:</strong> {new Date(turma.data_inicio_turma).toLocaleDateString('pt-BR')}</Col>
                         </Row>
                         <Row className="mt-2">
                             <Col md={3}><strong>Máx. de Alunos:</strong> {turma.max_aluno_turma}</Col>
-                            <Col md={9}></Col>
                         </Row>
                         <hr />
 
-                        <div className="d-flex justify-content-between align-items-center mb-3">
-                            <h5>Estudantes Matriculados</h5>
-                            <Button variant="primary" onClick={() => setMostrarModal(true)}>
-                                 Matricular Estudante <MdAddCircle className="ms-1" />
-                            </Button>
-                        </div>
+                        {/* Se estiver avaliando, mostra o AvaliacaoEstudante */}
+                        {avaliando && alunoSelecionado ? (
+                            <>
+                                <h5>Avaliando: {alunoSelecionado.nome_aluno}</h5>
+                                <AvaliacaoEstudante ucs={10} indicadores={9} />
+                                <Button variant="secondary" className="mt-3" onClick={() => setAvaliando(false)}>
+                                    Voltar para lista de estudantes
+                                </Button>
+                            </>
+                        ) : (
+                            <>
+                                {/* Lista de estudantes */}
+                                <div className="d-flex justify-content-between align-items-center mb-3">
+                                    <h5>Estudantes Matriculados</h5>
+                                    <Button variant="primary" onClick={() => setMostrarModal(true)}>
+                                        Matricular Estudante <MdAddCircle className="ms-1" />
+                                    </Button>
+                                </div>
 
-                        {carregando && <Spinner animation="border" />}
-                        {erro && <Alert variant="danger">{erro}</Alert>}
+                                {carregando && <Spinner animation="border" />}
+                                {erro && <Alert variant="danger">{erro}</Alert>}
+                                {!carregando && estudantes.length === 0 && (
+                                    <p className="text-muted">Nenhum estudante matriculado ainda.</p>
+                                )}
 
-                        {!carregando && estudantes.length === 0 && (
-                            <p className="text-muted">Nenhum estudante matriculado ainda.</p>
-                        )}
-
-                        {estudantes.length > 0 && (
-                            <Table striped bordered hover responsive>
-                                <thead className="table-dark">
-                                    <tr>
-                                        <th>Nome</th>
-                                        <th>Email</th>
-                                        <th>Excluir</th>
-                                        <th>Avaliar</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {estudantes.map((estudante, index) => (
-                                        <tr key={index}>
-                                            <td>{estudante.nome_aluno}</td>
-                                            <td>{estudante.email_aluno}</td>                                       
-                                            <td className="text-center">
-                                                <Button
-                                                    variant="danger"
-                                                    size="sm"
-                                                    onClick={() => handleExcluir(estudante.id_matricula)}
-                                                >
-                                                    <FaTrash />
-                                                </Button>
-                                            </td>
-                                            <td className="text-center">
-                                                <Button
-                                                    variant="success"
-                                                    size="sm"
-                                                    onClick={() => handleAvaliar(estudante)}
-                                                >
-                                                    <FaCheckCircle />
-                                                </Button>
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </Table>
+                                {estudantes.length > 0 && (
+                                    <Table striped bordered hover responsive>
+                                        <thead className="table-dark">
+                                            <tr>
+                                                <th>Nome</th>
+                                                <th>Email</th>
+                                                <th>Excluir</th>
+                                                <th>Avaliar</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {estudantes.map((estudante, index) => (
+                                                <tr key={index}>
+                                                    <td>{estudante.nome_aluno}</td>
+                                                    <td>{estudante.email_aluno}</td>
+                                                    <td className="text-center">
+                                                        <Button
+                                                            variant="danger"
+                                                            size="sm"
+                                                            onClick={() => handleExcluir(estudante.id_matricula)}
+                                                        >
+                                                            <FaTrash />
+                                                        </Button>
+                                                    </td>
+                                                    <td className="text-center">
+                                                        <Button
+                                                            variant="success"
+                                                            size="sm"
+                                                            onClick={() => handleAvaliar(estudante)}
+                                                        >
+                                                            <FaCheckCircle />
+                                                        </Button>
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </Table>
+                                )}
+                            </>
                         )}
 
                         <Button variant="secondary" className="mt-3" onClick={() => navigate(-1)}>
