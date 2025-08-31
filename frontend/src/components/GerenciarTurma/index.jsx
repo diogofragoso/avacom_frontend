@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import matriculaService from '../../services/matriculaService';
 import ModalMatricularAluno from '../ModalMatricularAluno';
 import { MdAddCircle } from 'react-icons/md';
+import { FaTrash, FaCheckCircle } from 'react-icons/fa';
 
 function GerenciarTurma() {
     const location = useLocation();
@@ -15,7 +16,6 @@ function GerenciarTurma() {
     const [carregando, setCarregando] = useState(true);
     const [erro, setErro] = useState(null);
 
-    // Estado para controle do modal
     const [mostrarModal, setMostrarModal] = useState(false);
 
     useEffect(() => {
@@ -35,6 +35,31 @@ function GerenciarTurma() {
             carregarEstudantes();
         }
     }, [turma]);
+
+    // Função para excluir estudante
+const handleExcluir = async (id_matricula) => {
+  if (window.confirm("Deseja realmente excluir esta matrícula?")) {
+    try {
+      await matriculaService.removerMatricula(id_matricula);
+      console.log("ID da matricula é esse --> : " + id_matricula);
+      // Atualiza a lista filtrando o estudante excluído
+      setEstudantes(estudantes.filter(e => e.id_matricula !== id_matricula));
+    } catch (err) {
+      console.error("Erro ao excluir matrícula:", err);
+      setErro("Erro ao excluir matrícula.");
+    }
+  }
+};
+
+
+    // Função para avaliar estudante
+    const handleAvaliar = (estudante) => {
+        // Aqui você pode abrir um modal de avaliação
+        // ou redirecionar para outra página
+        navigate(`/avaliar-estudante/${estudante.id_aluno}`, {
+            state: { estudante, turma }
+        });
+    };
 
     if (!turma) {
         return (
@@ -69,7 +94,7 @@ function GerenciarTurma() {
                         <div className="d-flex justify-content-between align-items-center mb-3">
                             <h5>Estudantes Matriculados</h5>
                             <Button variant="primary" onClick={() => setMostrarModal(true)}>
-                                + Adicionar Estudante <MdAddCircle className="ms-1" />
+                                 Matricular Estudante <MdAddCircle className="ms-1" />
                             </Button>
                         </div>
 
@@ -84,15 +109,35 @@ function GerenciarTurma() {
                             <Table striped bordered hover responsive>
                                 <thead className="table-dark">
                                     <tr>
-                                        <th>Nome</th>                                        
+                                        <th>Nome</th>
                                         <th>Email</th>
+                                        <th>Excluir</th>
+                                        <th>Avaliar</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {estudantes.map((estudante, index) => (
                                         <tr key={index}>
-                                            <td>{estudante.nome_aluno}</td>                                         
-                                            <td>{estudante.email_aluno}</td>
+                                            <td>{estudante.nome_aluno}</td>
+                                            <td>{estudante.email_aluno}</td>                                       
+                                            <td className="text-center">
+                                                <Button
+                                                    variant="danger"
+                                                    size="sm"
+                                                    onClick={() => handleExcluir(estudante.id_matricula)}
+                                                >
+                                                    <FaTrash />
+                                                </Button>
+                                            </td>
+                                            <td className="text-center">
+                                                <Button
+                                                    variant="success"
+                                                    size="sm"
+                                                    onClick={() => handleAvaliar(estudante)}
+                                                >
+                                                    <FaCheckCircle />
+                                                </Button>
+                                            </td>
                                         </tr>
                                     ))}
                                 </tbody>
@@ -106,7 +151,7 @@ function GerenciarTurma() {
                 </Card>
             </Container>
 
-            {/* Modal precisa estar dentro do JSX retornado */}
+            {/* Modal de matrícula */}
             <ModalMatricularAluno
                 show={mostrarModal}
                 handleClose={() => setMostrarModal(false)}

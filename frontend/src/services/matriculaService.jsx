@@ -6,6 +6,9 @@ const API_MATRICULAR_ESTUDANTE = `${API_BASE_URL}/matricularestudante`;
 // Retorna a URL para listar alunos matriculados de uma turma
 const API_LISTAR_MATRICULADOS = (idTurma) => `${API_BASE_URL}/${idTurma}`;
 
+// Rota para excluir matrícula
+const API_EXCLUIR_MATRICULA = (idMatricula) => `${API_BASE_URL}/excluirmatricula/${idMatricula}`;
+
 // Lista os alunos matriculados em uma turma
 const getAlunosMatriculadosPorTurma = async (idTurma) => {
   try {
@@ -33,7 +36,19 @@ const matricularEstudante = async (dados) => {
   }
 };
 
+// Remover matrícula pelo ID da matrícula
+const removerMatricula = async (idMatricula) => {
+  try {
+    const resposta = await axios.delete(API_EXCLUIR_MATRICULA(idMatricula));
+    return resposta.data;
+  } catch (erro) {
+    console.error('Erro detalhado ao remover matrícula:', erro);
+    throw new Error('Erro ao remover matrícula do estudante.');
+  }
+};
+
 export default {
   getAlunosMatriculadosPorTurma,
   matricularEstudante,
+  removerMatricula,
 };
