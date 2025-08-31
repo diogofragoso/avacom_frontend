@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Tempo de geração: 23-Maio-2025 às 21:28
+-- Tempo de geração: 31-Ago-2025 às 16:19
 -- Versão do servidor: 10.4.27-MariaDB
 -- versão do PHP: 8.2.0
 
@@ -49,7 +49,9 @@ INSERT INTO `aluno` (`id_aluno`, `nome_aluno`, `email_aluno`, `senha_aluno`) VAL
 (9, 'Joana bananeira', 'joana@gmail.com', '1221'),
 (10, 'Ana', 'ana@gmail.com', '1234'),
 (11, 'Pedro Pedreira', 'diogofragoso@yahoo.com.br', 'senac'),
-(12, 'Pedro Pedreira', 'fragoso23rln@gmail.com', '1234');
+(12, 'Pedro Pedreira', 'fragoso23rln@gmail.com', '1234'),
+(13, 'Natalia', 'fragoso23rln@gmail.com', '1234'),
+(14, 'Nala Fragoso', 'nalinha@gmail.com', 'auau');
 
 -- --------------------------------------------------------
 
@@ -68,7 +70,7 @@ CREATE TABLE `atividade_avaliativa` (
 --
 
 INSERT INTO `atividade_avaliativa` (`id_avaliativa`, `descricao_avaliativa`, `id_indicador_fk`) VALUES
-(2, 'Realiza a instalação de sistemas operacionais', 2),
+(2, 'Realiza a instalação de sistemas', 2),
 (13, 'Nesta atividade os aluno realizaram uma atividade avaliativa usando os servidores do laboratório 21\n', 2),
 (15, 'Elabore uma atividade  avaliativa sobre configurar servidores linux ', 2),
 (17, 'Configura servidores ', 2),
@@ -148,7 +150,6 @@ INSERT INTO `indicador` (`id_indicador`, `numero_indicador`, `descricao_indicado
 CREATE TABLE `matricula` (
   `id_matricula` int(11) NOT NULL,
   `id_aluno_fk` int(11) NOT NULL,
-  `id_curso_fk` int(11) NOT NULL,
   `id_turma_fk` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -156,8 +157,13 @@ CREATE TABLE `matricula` (
 -- Extraindo dados da tabela `matricula`
 --
 
-INSERT INTO `matricula` (`id_matricula`, `id_aluno_fk`, `id_curso_fk`, `id_turma_fk`) VALUES
-(1, 2, 1, 1);
+INSERT INTO `matricula` (`id_matricula`, `id_aluno_fk`, `id_turma_fk`) VALUES
+(1, 2, 1),
+(3, 7, 1),
+(4, 5, 1),
+(5, 13, 1),
+(10, 3, 21),
+(11, 5, 21);
 
 -- --------------------------------------------------------
 
@@ -168,7 +174,7 @@ INSERT INTO `matricula` (`id_matricula`, `id_aluno_fk`, `id_curso_fk`, `id_turma
 CREATE TABLE `turma` (
   `id_turma` int(11) NOT NULL,
   `nome_turma` varchar(50) NOT NULL,
-  `perido_turma` varchar(10) NOT NULL,
+  `periodo_turma` varchar(10) NOT NULL,
   `max_aluno_turma` int(11) NOT NULL,
   `data_inicio_turma` date NOT NULL,
   `id_curso_fk` int(11) DEFAULT NULL
@@ -178,8 +184,10 @@ CREATE TABLE `turma` (
 -- Extraindo dados da tabela `turma`
 --
 
-INSERT INTO `turma` (`id_turma`, `nome_turma`, `perido_turma`, `max_aluno_turma`, `data_inicio_turma`, `id_curso_fk`) VALUES
-(1, '', '', 0, '2024-11-11', 1);
+INSERT INTO `turma` (`id_turma`, `nome_turma`, `periodo_turma`, `max_aluno_turma`, `data_inicio_turma`, `id_curso_fk`) VALUES
+(1, 'Técnico em informática - T1', 'Manhã', 30, '2024-11-11', 1),
+(21, 'Técnico em informática - T1', 'Noite', 40, '2025-08-14', 1),
+(22, 'Excel', 'Manhã', 20, '2025-08-08', 12);
 
 -- --------------------------------------------------------
 
@@ -257,7 +265,6 @@ ALTER TABLE `indicador`
 ALTER TABLE `matricula`
   ADD PRIMARY KEY (`id_matricula`),
   ADD KEY `id_aluno_fk` (`id_aluno_fk`),
-  ADD KEY `id_curso_fk` (`id_curso_fk`),
   ADD KEY `id_turma_fk` (`id_turma_fk`);
 
 --
@@ -282,7 +289,7 @@ ALTER TABLE `uc`
 -- AUTO_INCREMENT de tabela `aluno`
 --
 ALTER TABLE `aluno`
-  MODIFY `id_aluno` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+  MODIFY `id_aluno` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 
 --
 -- AUTO_INCREMENT de tabela `atividade_avaliativa`
@@ -312,13 +319,13 @@ ALTER TABLE `indicador`
 -- AUTO_INCREMENT de tabela `matricula`
 --
 ALTER TABLE `matricula`
-  MODIFY `id_matricula` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id_matricula` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- AUTO_INCREMENT de tabela `turma`
 --
 ALTER TABLE `turma`
-  MODIFY `id_turma` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id_turma` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
 
 --
 -- AUTO_INCREMENT de tabela `uc`
