@@ -94,7 +94,7 @@ function GerenciarTurma() {
                             <>
                                 <h5>Avaliando: {alunoSelecionado.nome_aluno}</h5>
                                 <AvaliacaoEstudante ucs={10} indicadores={9} />
-                                <Button variant="secondary" className="mt-3" onClick={() => setAvaliando(false)}>
+                                <Button variant="secondary" className="mt-3 me-2" onClick={() => setAvaliando(false)}>
                                     Voltar para lista de estudantes
                                 </Button>
                             </>
@@ -155,7 +155,7 @@ function GerenciarTurma() {
                             </>
                         )}
 
-                        <Button variant="secondary" className="mt-3" onClick={() => navigate(-1)}>
+                        <Button variant="secondary" className="mt-3 me-3" onClick={() => navigate(-1)}>
                             Voltar para Turmas
                         </Button>
                     </Card.Body>
