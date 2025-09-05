@@ -93,7 +93,7 @@ const ListarAvaliativa = ({ id_indicador = null }) => {
     };
 
     const handleEdit = (avaliativa) => {
-        if (!avaliativa?.id_at_avaliativa) {
+        if (!avaliativa?.id_avaliativa) {
             console.error('Dados inválidos para edição');
             return;
         }
@@ -106,14 +106,14 @@ const ListarAvaliativa = ({ id_indicador = null }) => {
     const handleUpdate = async (e) => {
         e.preventDefault();
         
-        if (!avaliativaSelecionada?.id_at_avaliativa || !descricao.trim()) {
+        if (!avaliativaSelecionada?.id_avaliativa || !descricao.trim()) {
             setFeedback({ type: 'warning', message: 'Dados incompletos para atualização' });
             return;
         }
 
         try {
-            await avaliativaService.updateAvaliativa(avaliativaSelecionada.id_at_avaliativa, {
-                id_at_avaliativa: avaliativaSelecionada.id_at_avaliativa,
+            await avaliativaService.updateAvaliativa(avaliativaSelecionada.id_avaliativa, {
+                id_avaliativa: avaliativaSelecionada.id_avaliativa,
                 descricao: descricao,
                 id_indicador_fk: id_indicador
             });
@@ -187,12 +187,13 @@ const ListarAvaliativa = ({ id_indicador = null }) => {
                     <Accordion alwaysOpen className="w-100">
                         {avaliativas.map((avaliativa, index) => (
                             <Accordion.Item
-                                key={avaliativa.id_at_avaliativa}
+                                key={avaliativa.id_avaliativa}
                                 eventKey={index.toString()}
                                 className={styles.customCard}
                             >
                                 <Accordion.Header>
                                     <p>Atividade avaliativa opção: {index + 1}</p>
+                                  
                                 </Accordion.Header>
                                 <Accordion.Body>
                                     <p>{avaliativa.descricao_avaliativa}</p>
@@ -208,7 +209,7 @@ const ListarAvaliativa = ({ id_indicador = null }) => {
                                             variant="danger"
                                             size="sm"
                                             className="ms-2"
-                                            onClick={() => handleDelete(avaliativa.id_at_avaliativa)}
+                                            onClick={() => handleDelete(avaliativa.id_avaliativa)}
                                         >
                                             <RiDeleteBin6Line />
                                         </Button>
