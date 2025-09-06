@@ -2,8 +2,8 @@ import axios from "axios";
 
 const API_URL = "http://localhost:3000/api/avaliacao";
 
-const getMatriz = async (estudanteId) => {
-  const response = await axios.get(`${API_URL}/matriz/${estudanteId}`);
+const getMatriz = async (cursoId) => {
+  const response = await axios.get(`${API_URL}/${cursoId}`);
   return response.data;
 };
 
