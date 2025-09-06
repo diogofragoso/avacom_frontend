@@ -1,27 +1,30 @@
 import axios from "axios";
 
-const API_URL = "http://localhost:3000/api/avaliacao";
+// URL base da sua API
+const API_URL = "http://localhost:3000/api";
 
 const getMatriz = async (cursoId) => {
-  const response = await axios.get(`${API_URL}/${cursoId}`);
-  return response.data;
-};
-
-const salvar = async (estudanteId, avaliacoes) => {
-  return await axios.post(`${API_URL}/salvar/${estudanteId}`, avaliacoes);
-};
-
-export const criarAvaliacao = async (avaliacao) => {
   try {
-    const response = await axios.post(API_URL, avaliacao);
+    const response = await axios.get(`${API_URL}/avaliacao/${cursoId}`);
     return response.data;
   } catch (error) {
-    console.error("Erro ao criar avaliação", error);
+    console.error("Erro ao obter a matriz de avaliação:", error);
     throw error;
   }
 };
+
+const salvar = async (avaliacoes) => {
+  try {
+    // A chamada POST para a nova rota 'salvar.js'
+    const response = await axios.post(`${API_URL}/avaliacao/salvar`, { avaliacoes });
+    return response.data;
+  } catch (error) {
+    console.error("Erro ao salvar avaliações:", error);
+    throw error;
+  }
+};
+
 export default { 
-    getMatriz, 
-    salvar, 
-    criarAvaliacao 
+  getMatriz, 
+  salvar, 
 };

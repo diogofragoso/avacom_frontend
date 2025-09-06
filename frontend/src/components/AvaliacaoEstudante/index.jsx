@@ -8,23 +8,32 @@ const estados = [
   { label: "Não Avaliado", text: "", variant: "secondary" },
 ];
 
-const AvaliacaoEstudante = ({ ucs = 10, indicadores = 9 }) => {
-  // matriz inicial preenchida como "Não Avaliado"
-  const [matriz, setMatriz] = useState(
-    Array.from({ length: ucs }, () =>
-      Array.from({ length: indicadores }, () => 3) // 3 = "Não Avaliado"
-    )
-  );
+const AvaliacaoEstudante = ({ matriz }) => {
+  // Retorna uma mensagem de carregamento se a matriz ainda não estiver disponível
+  if (!matriz || !matriz.ucs) {
+    return <div>Carregando dados de avaliação...</div>;
+  }
 
-  // alterna estado ao clicar
+  // Criar uma matriz de estados inicial baseada na estrutura de UCs e indicadores
+  const [estadoMatriz, setEstadoMatriz] = useState(() => {
+    return matriz.ucs.map(uc => {
+      // Para cada UC, cria uma linha de estados para seus indicadores
+      return uc.indicadores.map(() => 3); // 3 = "Não Avaliado"
+    });
+  });
+
+  // Função para lidar com o clique e alternar o estado de uma célula
   const handleClick = (ucIndex, indIndex) => {
-    setMatriz((prev) => {
-      const novaMatriz = prev.map((row) => [...row]);
-      novaMatriz[ucIndex][indIndex] =
-        (novaMatriz[ucIndex][indIndex] + 1) % estados.length;
+    setEstadoMatriz(prev => {
+      const novaMatriz = [...prev];
+      novaMatriz[ucIndex] = [...novaMatriz[ucIndex]];
+      novaMatriz[ucIndex][indIndex] = (novaMatriz[ucIndex][indIndex] + 1) % estados.length;
       return novaMatriz;
     });
   };
+
+  // Encontra o maior número de indicadores para definir o número de colunas
+  const maxIndicadores = Math.max(...matriz.ucs.map(uc => uc.indicadores.length));
 
   return (
     <div className="p-3">
@@ -44,7 +53,8 @@ const AvaliacaoEstudante = ({ ucs = 10, indicadores = 9 }) => {
           <thead>
             <tr>
               <th style={{ backgroundColor: "#0d6efd", color: "white" }}>UC</th>
-              {Array.from({ length: indicadores }, (_, i) => (
+              {/* Renderiza as colunas de indicadores com base no maior número de indicadores */}
+              {Array.from({ length: maxIndicadores }, (_, i) => (
                 <th
                   key={i}
                   style={{ backgroundColor: "#0d6efd", color: "white" }}
@@ -55,8 +65,9 @@ const AvaliacaoEstudante = ({ ucs = 10, indicadores = 9 }) => {
             </tr>
           </thead>
           <tbody>
-            {matriz.map((row, ucIndex) => (
-              <tr key={ucIndex}>
+            {/* Renderiza as linhas dinamicamente com base nas UCs */}
+            {matriz.ucs.map((uc, ucIndex) => (
+              <tr key={uc.id_uc}>
                 <td
                   style={{
                     backgroundColor: "#0d6efd",
@@ -64,18 +75,23 @@ const AvaliacaoEstudante = ({ ucs = 10, indicadores = 9 }) => {
                     fontWeight: "bold",
                   }}
                 >
-                  UC{ucIndex + 1}
+                  UC{uc.numero_uc}
                 </td>
-                {row.map((estadoIndex, indIndex) => {
+                {/* Renderiza as células de avaliação para os indicadores da UC */}
+                {Array.from({ length: maxIndicadores }, (_, indIndex) => {
+                  const indicador = uc.indicadores[indIndex];
+                  const estadoIndex = estadoMatriz[ucIndex]?.[indIndex];
                   const estado = estados[estadoIndex];
+                  
+                  // Renderiza a célula se o indicador existir, senão, uma célula vazia
                   return (
                     <td
                       key={indIndex}
                       className="text-center"
-                      style={{ cursor: "pointer" }}
-                      onClick={() => handleClick(ucIndex, indIndex)}
+                      style={{ cursor: indicador ? "pointer" : "default" }}
+                      onClick={indicador ? () => handleClick(ucIndex, indIndex) : undefined}
                     >
-                      <Badge bg={estado.variant}>{estado.text || " "}</Badge>
+                      {indicador && <Badge bg={estado.variant}>{estado.text || " "}</Badge>}
                     </td>
                   );
                 })}

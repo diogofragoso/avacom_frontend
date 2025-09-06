@@ -21,11 +21,9 @@ function GerenciarTurma() {
 
   const [avaliando, setAvaliando] = useState(false);
   const [alunoSelecionado, setAlunoSelecionado] = useState(null);
+  const [matrizAvaliacao, setMatrizAvaliacao] = useState(null);
+  const [carregandoAvaliacao, setCarregandoAvaliacao] = useState(false);
 
-  // **Variável para armazenar quantidade de UCs e Indicadores**
-  const [matriz, setMatriz] = useState({ ucs: 0, indicadores: 0 });
-
-  // Carregar estudantes matriculados
   useEffect(() => {
     if (!turma?.id_turma) return;
 
@@ -33,7 +31,6 @@ function GerenciarTurma() {
       try {
         const alunos = await matriculaService.getAlunosMatriculadosPorTurma(turma.id_turma);
         setEstudantes(alunos);
-        console.log("Estudantes carregados:", turma.id_curso, alunos);
       } catch (err) {
         setErro('Erro ao buscar estudantes.');
         console.error(err);
@@ -41,31 +38,8 @@ function GerenciarTurma() {
         setCarregando(false);
       }
     };
-
     carregarEstudantes();
   }, [turma?.id_turma]);
-
-  // **Carregar matriz (quantidade de UCs e Indicadores) apenas uma vez**
- useEffect(() => {
-  if (!turma?.id_curso_fk) return; // ✅ correto
-
-  const carregarMatriz = async () => {
-    try {
-      const dados = await avaliacaoService.getMatriz(turma.id_curso_fk);
-      console.log("Dados da matriz recebidos:", dados);
-      setMatriz({
-        ucs: dados.total_ucs || 0,
-        indicadores: dados.total_indicadores || 0,
-      });
-    } catch (err) {
-      console.error("Erro ao carregar matriz:", err);
-      setErro("Erro ao buscar dados de avaliação.");
-    }
-  };
-
-  carregarMatriz();
-}, [turma?.id_curso_fk]);
-
 
   const handleExcluir = async (id_matricula) => {
     if (!window.confirm("Deseja realmente excluir esta matrícula?")) return;
@@ -79,9 +53,20 @@ function GerenciarTurma() {
     }
   };
 
-  const handleAvaliar = (estudante) => {
+  const handleAvaliar = async (estudante) => {
     setAlunoSelecionado(estudante);
     setAvaliando(true);
+    setCarregandoAvaliacao(true); // Inicia o carregamento
+
+    try {
+      const dados = await avaliacaoService.getMatriz(turma.id_curso_fk);
+      setMatrizAvaliacao(dados);
+    } catch (err) {
+      console.error("Erro ao carregar matriz:", err);
+      setErro("Erro ao buscar dados de avaliação.");
+    } finally {
+      setCarregandoAvaliacao(false); // Finaliza o carregamento
+    }
   };
 
   if (!turma) {
@@ -103,7 +88,6 @@ function GerenciarTurma() {
           <Card.Body>
             <Row>
               <Col md={6}><strong>Curso:</strong> {turma.nome_curso}</Col>
-              <Col md={6}><strong>ID do Curso:</strong> {turma.id_curso_fk}</Col>
               <Col md={3}><strong>Período:</strong> {turma.periodo_turma}</Col>
               <Col md={3}><strong>Início:</strong> {new Date(turma.data_inicio_turma).toLocaleDateString('pt-BR')}</Col>
             </Row>
@@ -115,8 +99,11 @@ function GerenciarTurma() {
             {avaliando && alunoSelecionado ? (
               <>
                 <h5>Avaliando: {alunoSelecionado.nome_aluno}</h5>
-                {/* Passando a matriz carregada da API */}
-                <AvaliacaoEstudante ucs={matriz.ucs} indicadores={matriz.indicadores} />
+                {carregandoAvaliacao ? (
+                  <Spinner animation="border" />
+                ) : (
+                  matrizAvaliacao && <AvaliacaoEstudante matriz={matrizAvaliacao} />
+                )}
                 <Button variant="secondary" className="mt-3 me-2" onClick={() => setAvaliando(false)}>
                   Voltar para lista de estudantes
                 </Button>
@@ -188,7 +175,7 @@ function GerenciarTurma() {
         show={mostrarModal}
         handleClose={() => setMostrarModal(false)}
         turmaId={turma.id_turma}
-        cursoId={turma.id_curso}
+        cursoId={turma.id_curso_fk}
         onMatriculaRealizada={() => {
           setCarregando(true);
           setErro(null);
