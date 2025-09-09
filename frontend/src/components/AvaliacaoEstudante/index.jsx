@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import { Table, Badge } from "react-bootstrap";
+import { Table, Badge, Button, Modal, Form } from "react-bootstrap";
 import { FaSave } from "react-icons/fa";
-import { MdAssignment } from "react-icons/md";
+import { MdAssignment, MdComment } from "react-icons/md";
 
 const estados = [
   { label: "Atendido", text: "A", variant: "success" },
@@ -10,17 +10,32 @@ const estados = [
   { label: "Não Avaliado", text: "", variant: "secondary" },
 ];
 
-const AvaliacaoEstudante = ({ matriz, onSalvar, onSelecionarAtividade }) => {
+const AvaliacaoEstudante = ({
+  matriz,
+  atividades = [],
+  estudanteId,
+  turmaId,
+  avaliacaoId, // id da avaliação ou matrícula
+  onSalvar,
+  onSalvarTodos,
+  onSelecionarAtividade,
+  onObservacao,
+}) => {
   if (!matriz || !matriz.ucs) {
     return <div>Carregando dados de avaliação...</div>;
   }
 
   const [estadoMatriz, setEstadoMatriz] = useState(() =>
-    matriz.ucs.map(uc => uc.indicadores.map(() => 3)) // 3 = "Não Avaliado"
+    matriz.ucs.map((uc) => uc.indicadores.map(() => 3)) // 3 = "Não Avaliado"
   );
 
+  // Modal
+  const [showModal, setShowModal] = useState(false);
+  const [atividadeSelecionada, setAtividadeSelecionada] = useState({});
+  const [modalContext, setModalContext] = useState(null); // guarda uc e indicador
+
   const handleClick = (ucIndex, indIndex) => {
-    setEstadoMatriz(prev => {
+    setEstadoMatriz((prev) => {
       const novaMatriz = [...prev];
       novaMatriz[ucIndex] = [...novaMatriz[ucIndex]];
       novaMatriz[ucIndex][indIndex] =
@@ -29,8 +44,33 @@ const AvaliacaoEstudante = ({ matriz, onSalvar, onSelecionarAtividade }) => {
     });
   };
 
+  const handleAbrirModal = (ucId, indicadorId) => {
+    setModalContext({ ucId, indicadorId });
+    setShowModal(true);
+  };
+
+  const handleConfirmarAtividade = () => {
+    if (onSelecionarAtividade && modalContext) {
+      const selecionadas = Object.entries(atividadeSelecionada)
+        .filter(([_, checked]) => checked)
+        .map(([id]) => id);
+
+      onSelecionarAtividade({
+        estudanteId,
+        turmaId,
+        avaliacaoId,
+        ucId: modalContext.ucId,
+        indicadorId: modalContext.indicadorId,
+        atividades: selecionadas,
+      });
+    }
+    setShowModal(false);
+    setAtividadeSelecionada({});
+    setModalContext(null);
+  };
+
   const maxIndicadores = Math.max(
-    ...matriz.ucs.map(uc => uc.indicadores.length)
+    ...matriz.ucs.map((uc) => uc.indicadores.length)
   );
 
   return (
@@ -111,19 +151,36 @@ const AvaliacaoEstudante = ({ matriz, onSalvar, onSelecionarAtividade }) => {
                             <FaSave
                               style={{ cursor: "pointer", color: "#0d6efd" }}
                               onClick={() =>
-                                onSalvar?.(uc.id_uc, indicador.id_indicador, estado)
+                                onSalvar?.({
+                                  estudanteId,
+                                  turmaId,
+                                  avaliacaoId,
+                                  ucId: uc.id_uc,
+                                  indicadorId: indicador.id_indicador,
+                                  estado,
+                                })
                               }
                               title="Salvar"
                             />
                             <MdAssignment
                               style={{ cursor: "pointer", color: "gray" }}
                               onClick={() =>
-                                onSelecionarAtividade?.(
-                                  uc.id_uc,
-                                  indicador.id_indicador
-                                )
+                                handleAbrirModal(uc.id_uc, indicador.id_indicador)
                               }
                               title="Selecionar Atividade"
+                            />
+                            <MdComment
+                              style={{ cursor: "pointer", color: "#198754" }}
+                              onClick={() =>
+                                onObservacao?.({
+                                  estudanteId,
+                                  turmaId,
+                                  avaliacaoId,
+                                  ucId: uc.id_uc,
+                                  indicadorId: indicador.id_indicador,
+                                })
+                              }
+                              title="Inserir Observação"
                             />
                           </div>
                         </div>
@@ -136,6 +193,56 @@ const AvaliacaoEstudante = ({ matriz, onSalvar, onSelecionarAtividade }) => {
           </tbody>
         </Table>
       </div>
+
+      {/* Botão global para salvar todos */}
+      <div className="d-flex justify-content-end mt-3">
+        <Button
+          variant="primary"
+          onClick={() =>
+            onSalvarTodos?.({ estudanteId, turmaId, avaliacaoId, estadoMatriz })
+          }
+        >
+          <FaSave className="me-2" />
+          Salvar Todos
+        </Button>
+      </div>
+
+      {/* Modal Seleção de Atividades */}
+      <Modal show={showModal} onHide={() => setShowModal(false)} size="lg">
+        <Modal.Header closeButton>
+          <Modal.Title>Selecionar Atividade Avaliativa</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          {atividades.length > 0 ? (
+            <Form>
+              {atividades.map((atv) => (
+                <Form.Check
+                  key={atv.id}
+                  type="checkbox"
+                  label={atv.nome}
+                  checked={atividadeSelecionada[atv.id] || false}
+                  onChange={(e) =>
+                    setAtividadeSelecionada((prev) => ({
+                      ...prev,
+                      [atv.id]: e.target.checked,
+                    }))
+                  }
+                />
+              ))}
+            </Form>
+          ) : (
+            <p>Nenhuma atividade disponível.</p>
+          )}
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setShowModal(false)}>
+            Cancelar
+          </Button>
+          <Button variant="primary" onClick={handleConfirmarAtividade}>
+            Confirmar
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </div>
   );
 };
