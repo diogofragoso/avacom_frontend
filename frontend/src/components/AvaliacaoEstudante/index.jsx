@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import { Table, Badge } from "react-bootstrap";
+import { FaSave } from "react-icons/fa";
+import { MdAssignment } from "react-icons/md";
 
 const estados = [
   { label: "Atendido", text: "A", variant: "success" },
@@ -8,32 +10,28 @@ const estados = [
   { label: "Não Avaliado", text: "", variant: "secondary" },
 ];
 
-const AvaliacaoEstudante = ({ matriz }) => {
-  // Retorna uma mensagem de carregamento se a matriz ainda não estiver disponível
+const AvaliacaoEstudante = ({ matriz, onSalvar, onSelecionarAtividade }) => {
   if (!matriz || !matriz.ucs) {
     return <div>Carregando dados de avaliação...</div>;
   }
 
-  // Criar uma matriz de estados inicial baseada na estrutura de UCs e indicadores
-  const [estadoMatriz, setEstadoMatriz] = useState(() => {
-    return matriz.ucs.map(uc => {
-      // Para cada UC, cria uma linha de estados para seus indicadores
-      return uc.indicadores.map(() => 3); // 3 = "Não Avaliado"
-    });
-  });
+  const [estadoMatriz, setEstadoMatriz] = useState(() =>
+    matriz.ucs.map(uc => uc.indicadores.map(() => 3)) // 3 = "Não Avaliado"
+  );
 
-  // Função para lidar com o clique e alternar o estado de uma célula
   const handleClick = (ucIndex, indIndex) => {
     setEstadoMatriz(prev => {
       const novaMatriz = [...prev];
       novaMatriz[ucIndex] = [...novaMatriz[ucIndex]];
-      novaMatriz[ucIndex][indIndex] = (novaMatriz[ucIndex][indIndex] + 1) % estados.length;
+      novaMatriz[ucIndex][indIndex] =
+        (novaMatriz[ucIndex][indIndex] + 1) % estados.length;
       return novaMatriz;
     });
   };
 
-  // Encontra o maior número de indicadores para definir o número de colunas
-  const maxIndicadores = Math.max(...matriz.ucs.map(uc => uc.indicadores.length));
+  const maxIndicadores = Math.max(
+    ...matriz.ucs.map(uc => uc.indicadores.length)
+  );
 
   return (
     <div className="p-3">
@@ -53,7 +51,6 @@ const AvaliacaoEstudante = ({ matriz }) => {
           <thead>
             <tr>
               <th style={{ backgroundColor: "#0d6efd", color: "white" }}>UC</th>
-              {/* Renderiza as colunas de indicadores com base no maior número de indicadores */}
               {Array.from({ length: maxIndicadores }, (_, i) => (
                 <th
                   key={i}
@@ -65,7 +62,6 @@ const AvaliacaoEstudante = ({ matriz }) => {
             </tr>
           </thead>
           <tbody>
-            {/* Renderiza as linhas dinamicamente com base nas UCs */}
             {matriz.ucs.map((uc, ucIndex) => (
               <tr key={uc.id_uc}>
                 <td
@@ -77,21 +73,61 @@ const AvaliacaoEstudante = ({ matriz }) => {
                 >
                   UC{uc.numero_uc}
                 </td>
-                {/* Renderiza as células de avaliação para os indicadores da UC */}
                 {Array.from({ length: maxIndicadores }, (_, indIndex) => {
                   const indicador = uc.indicadores[indIndex];
                   const estadoIndex = estadoMatriz[ucIndex]?.[indIndex];
                   const estado = estados[estadoIndex];
-                  
-                  // Renderiza a célula se o indicador existir, senão, uma célula vazia
+
                   return (
-                    <td
-                      key={indIndex}
-                      className="text-center"
-                      style={{ cursor: indicador ? "pointer" : "default" }}
-                      onClick={indicador ? () => handleClick(ucIndex, indIndex) : undefined}
-                    >
-                      {indicador && <Badge bg={estado.variant}>{estado.text || " "}</Badge>}
+                    <td key={indIndex}>
+                      {indicador ? (
+                        <div
+                          className="d-flex"
+                          style={{ height: "100%", alignItems: "center" }}
+                        >
+                          {/* Esquerda: Estado */}
+                          <div
+                            className="flex-grow-1 d-flex justify-content-center align-items-center"
+                            onClick={() => handleClick(ucIndex, indIndex)}
+                            style={{ cursor: "pointer" }}
+                          >
+                            <Badge bg={estado.variant}>
+                              {estado.text || " "}
+                            </Badge>
+                          </div>
+
+                          {/* Linha divisória */}
+                          <div
+                            style={{
+                              width: "1px",
+                              backgroundColor: "#dee2e6",
+                              margin: "0 6px",
+                              alignSelf: "stretch",
+                            }}
+                          ></div>
+
+                          {/* Direita: Ícones */}
+                          <div className="d-flex gap-2 justify-content-end align-items-center">
+                            <FaSave
+                              style={{ cursor: "pointer", color: "#0d6efd" }}
+                              onClick={() =>
+                                onSalvar?.(uc.id_uc, indicador.id_indicador, estado)
+                              }
+                              title="Salvar"
+                            />
+                            <MdAssignment
+                              style={{ cursor: "pointer", color: "gray" }}
+                              onClick={() =>
+                                onSelecionarAtividade?.(
+                                  uc.id_uc,
+                                  indicador.id_indicador
+                                )
+                              }
+                              title="Selecionar Atividade"
+                            />
+                          </div>
+                        </div>
+                      ) : null}
                     </td>
                   );
                 })}
