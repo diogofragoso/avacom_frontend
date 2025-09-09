@@ -102,7 +102,12 @@ function GerenciarTurma() {
                 {carregandoAvaliacao ? (
                   <Spinner animation="border" />
                 ) : (
-                  matrizAvaliacao && <AvaliacaoEstudante matriz={matrizAvaliacao} />
+                  matrizAvaliacao && <AvaliacaoEstudante // passando o estado para o componente AvaliacaoEstudante
+                    matriz={matrizAvaliacao}
+                    idCurso={turma.id_curso_fk}
+                    idTurma={turma.id_turma}
+                    idEstudante={alunoSelecionado.id_aluno}
+                  /> 
                 )}
                 <Button variant="secondary" className="mt-3 me-2" onClick={() => setAvaliando(false)}>
                   Voltar para lista de estudantes

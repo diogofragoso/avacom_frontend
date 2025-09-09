@@ -13,6 +13,9 @@ const estados = [
 const AvaliacaoEstudante = ({
   matriz,
   atividades = [],
+  idCurso,       // <-- Novo prop
+  idTurma,       // <-- Novo prop
+  idEstudante,   // <-- Novo prop
   estudanteId,
   turmaId,
   avaliacaoId, // id da avaliação ou matrícula
@@ -205,6 +208,11 @@ const AvaliacaoEstudante = ({
           <FaSave className="me-2" />
           Salvar Todos
         </Button>
+      </div>
+      <div>
+        <p>ID do curso: {idCurso} </p>
+        <p>ID da turma: {idTurma} </p>
+        <p>ID Estutante: {idEstudante}</p>
       </div>
 
       {/* Modal Seleção de Atividades */}
