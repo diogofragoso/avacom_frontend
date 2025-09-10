@@ -12,13 +12,11 @@ const estados = [
 
 const AvaliacaoEstudante = ({
   matriz,
-  atividades = [],
-  idCurso,       // <-- Novo prop
-  idTurma,       // <-- Novo prop
-  idEstudante,   // <-- Novo prop
-  estudanteId,
+  idCurso,
+  idTurma,
+  idEstudante,
   turmaId,
-  avaliacaoId, // id da avaliação ou matrícula
+  avaliacaoId,
   onSalvar,
   onSalvarTodos,
   onSelecionarAtividade,
@@ -36,6 +34,7 @@ const AvaliacaoEstudante = ({
   const [showModal, setShowModal] = useState(false);
   const [atividadeSelecionada, setAtividadeSelecionada] = useState({});
   const [modalContext, setModalContext] = useState(null); // guarda uc e indicador
+  const [atividadesModal, setAtividadesModal] = useState([]); // atividades carregadas dinamicamente
 
   const handleClick = (ucIndex, indIndex) => {
     setEstadoMatriz((prev) => {
@@ -49,6 +48,22 @@ const AvaliacaoEstudante = ({
 
   const handleAbrirModal = (ucId, indicadorId) => {
     setModalContext({ ucId, indicadorId });
+
+    // Filtrar atividades avaliativas do indicador clicado
+    const uc = matriz.ucs.find((u) => u.id_uc === ucId);
+    const indicador = uc?.indicadores.find(
+      (ind) => ind.id_indicador === indicadorId
+    );
+    const avaliativas = indicador?.avaliativas || [];
+
+    // Mapear para o formato usado no modal
+    const lista = avaliativas.map((a) => ({
+      id: a.id_avaliativa,
+      nome: a.descricao_avaliativa,
+    }));
+
+    setAtividadesModal(lista);
+    setAtividadeSelecionada({});
     setShowModal(true);
   };
 
@@ -59,7 +74,7 @@ const AvaliacaoEstudante = ({
         .map(([id]) => id);
 
       onSelecionarAtividade({
-        estudanteId,
+        estudanteId: idEstudante,
         turmaId,
         avaliacaoId,
         ucId: modalContext.ucId,
@@ -155,7 +170,7 @@ const AvaliacaoEstudante = ({
                               style={{ cursor: "pointer", color: "#0d6efd" }}
                               onClick={() =>
                                 onSalvar?.({
-                                  estudanteId,
+                                  estudanteId: idEstudante,
                                   turmaId,
                                   avaliacaoId,
                                   ucId: uc.id_uc,
@@ -168,7 +183,10 @@ const AvaliacaoEstudante = ({
                             <MdAssignment
                               style={{ cursor: "pointer", color: "gray" }}
                               onClick={() =>
-                                handleAbrirModal(uc.id_uc, indicador.id_indicador)
+                                handleAbrirModal(
+                                  uc.id_uc,
+                                  indicador.id_indicador
+                                )
                               }
                               title="Selecionar Atividade"
                             />
@@ -176,7 +194,7 @@ const AvaliacaoEstudante = ({
                               style={{ cursor: "pointer", color: "#198754" }}
                               onClick={() =>
                                 onObservacao?.({
-                                  estudanteId,
+                                  estudanteId: idEstudante,
                                   turmaId,
                                   avaliacaoId,
                                   ucId: uc.id_uc,
@@ -202,7 +220,12 @@ const AvaliacaoEstudante = ({
         <Button
           variant="primary"
           onClick={() =>
-            onSalvarTodos?.({ estudanteId, turmaId, avaliacaoId, estadoMatriz })
+            onSalvarTodos?.({
+              estudanteId: idEstudante,
+              turmaId,
+              avaliacaoId,
+              estadoMatriz,
+            })
           }
         >
           <FaSave className="me-2" />
@@ -212,7 +235,7 @@ const AvaliacaoEstudante = ({
       <div>
         <p>ID do curso: {idCurso} </p>
         <p>ID da turma: {idTurma} </p>
-        <p>ID Estutante: {idEstudante}</p>
+        <p>ID Estudante: {idEstudante}</p>
       </div>
 
       {/* Modal Seleção de Atividades */}
@@ -221,9 +244,9 @@ const AvaliacaoEstudante = ({
           <Modal.Title>Selecionar Atividade Avaliativa</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          {atividades.length > 0 ? (
+          {atividadesModal.length > 0 ? (
             <Form>
-              {atividades.map((atv) => (
+              {atividadesModal.map((atv) => (
                 <Form.Check
                   key={atv.id}
                   type="checkbox"
