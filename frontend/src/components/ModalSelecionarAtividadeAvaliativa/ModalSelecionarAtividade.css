@@ -1,0 +1,50 @@
+.lista-atividades-container {
+    max-height: 250px;
+    overflow-y: auto;
+    border: 1px solid #dee2e6;
+    border-radius: 0.375rem;
+    padding: 0.5rem;
+  }
+  
+  .list-group-item.active {
+    background-color: #e7f1ff;
+    border-color: #0d6efd;
+    color: #000;
+  }
+  
+  .list-group-item-action {
+    cursor: pointer;
+  }
+  
+  .list-group-item .arrow-icon {
+    font-size: 1.5rem;
+    color: #6c757d;
+  }
+  
+  .list-group-item.active .arrow-icon {
+    color: #0d6efd;
+  }
+  
+  /* Estilos para o tipo de atividade */
+  .tipo-atividade {
+      display: inline-block;
+      padding: 0.2em 0.6em;
+      font-size: 75%;
+      font-weight: 700;
+      line-height: 1;
+      text-align: center;
+      white-space: nowrap;
+      vertical-align: baseline;
+      border-radius: 0.25rem;
+      color: #fff;
+  }
+  
+  .tipo-prova {
+      background-color: #0d6efd; /* Azul */
+  }
+  .tipo-lista {
+      background-color: #dc3545; /* Vermelho */
+  }
+  .tipo-trabalho {
+      background-color: #198754; /* Verde */
+  }
