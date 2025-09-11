@@ -1,5 +1,6 @@
+// 1. ADICIONADO 'Outlet' À IMPORTAÇÃO
+import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import React, { useEffect, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
 import { Card, Button, Container, Table, Spinner, Alert, Row, Col } from 'react-bootstrap';
 import { motion } from 'framer-motion';
 import { MdAddCircle } from 'react-icons/md';
@@ -33,7 +34,6 @@ function GerenciarTurma() {
 
   useEffect(() => {
     if (!turma?.id_turma) return;
-
     const carregarEstudantes = async () => {
       try {
         const alunos = await matriculaService.getAlunosMatriculadosPorTurma(turma.id_turma);
@@ -50,7 +50,6 @@ function GerenciarTurma() {
 
   const handleExcluir = async (id_matricula) => {
     if (!window.confirm("Deseja realmente excluir esta matrícula?")) return;
-
     try {
       await matriculaService.removerMatricula(id_matricula);
       setEstudantes(estudantes.filter(e => e.id_matricula !== id_matricula));
@@ -64,7 +63,6 @@ function GerenciarTurma() {
     setAlunoSelecionado(estudante);
     setAvaliando(true);
     setCarregandoAvaliacao(true);
-
     try {
       const dados = await avaliacaoService.getMatriz(turma.id_curso_fk);
       setMatrizAvaliacao(dados);
@@ -90,6 +88,12 @@ function GerenciarTurma() {
     } finally {
       setCarregandoAvaliacao(false);
     }
+  };
+
+  // 2. NOVA FUNÇÃO ADICIONADA PARA O NOVO BOTÃO
+  const handleGerenciarAtividades = () => {
+    // Usa a rota aninhada 'GerenciarAvaliativa'
+    navigate('GerenciarAvaliativa', { state: { turma } });
   };
 
   if (!turma) {
@@ -141,6 +145,10 @@ function GerenciarTurma() {
                 <div className="d-flex justify-content-between align-items-center mb-3">
                   <h5>Estudantes Matriculados</h5>
                   <div>
+                    {/* 3. NOVO BOTÃO ADICIONADO AO LADO DO EXISTENTE */}
+                    <Button variant="secondary" className="me-2" onClick={handleGerenciarAtividades}>
+                      Gerenciar Atividades
+                    </Button>
                     <Button variant="info" className="me-2" onClick={handleSelecionarAtividadeAvaliativa}>
                       Selecionar avaliativas
                     </Button>
@@ -149,8 +157,6 @@ function GerenciarTurma() {
                     </Button>
                   </div>
                 </div>
-
-                {/* --- O ALERT INFORMATIVO FOI REMOVIDO DESTA SEÇÃO --- */}
 
                 {carregando && <Spinner animation="border" />}
                 {erro && <Alert variant="danger">{erro}</Alert>}
@@ -188,6 +194,11 @@ function GerenciarTurma() {
             <Button variant="secondary" className="mt-3 me-3" onClick={() => navigate(-1)}>Voltar para Turmas</Button>
           </Card.Body>
         </Card>
+
+        {/* 4. ADICIONADO O OUTLET PARA RENDERIZAR A ROTA FILHA */}
+        <div className="mt-4">
+            <Outlet />
+        </div>
       </Container>
 
       <ModalMatricularAluno
@@ -195,7 +206,7 @@ function GerenciarTurma() {
         handleClose={() => setMostrarModal(false)}
         turmaId={turma.id_turma}
         cursoId={turma.id_curso_fk}
-        onMatriculaRealizada={() => { /* ... lógica de recarregar ... */ }}
+        onMatriculaRealizada={() => { /* ... */ }}
       />
 
       <ModalSelecionarAtividadeAvaliativa

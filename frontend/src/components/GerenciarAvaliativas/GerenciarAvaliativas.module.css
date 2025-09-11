@@ -1,0 +1,46 @@
+.gerenciar-avaliativa-page {
+    background-color: #f4f7fa; /* Um fundo leve para a página */
+  }
+  
+  .column-header {
+    margin-bottom: 1.25rem;
+  }
+  
+  /* Estilo base para os cards nas colunas */
+  .uc-card, .indicador-card {
+    margin-bottom: 0.75rem;
+    border: 1px solid #e0e0e0;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+  }
+  
+  .uc-card:hover, .indicador-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    border-color: #0d6efd;
+  }
+  
+  /* Estilo do card SELECIONADO */
+  .uc-card.selected {
+    background-color: #0d6efd;
+    color: white;
+    border-color: #0d6efd;
+  }
+  
+  .indicador-card.selected {
+    border-left: 4px solid #0d6efd;
+    background-color: #e7f1ff;
+  }
+  
+  .uc-card.selected .subtext {
+    color: rgba(255, 255, 255, 0.8);
+  }
+  
+  .subtext {
+    font-size: 0.85rem;
+    color: #6c757d;
+  }
+  
+  .atividade-card {
+    margin-bottom: 0.5rem;
+  }

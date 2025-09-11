@@ -22,6 +22,7 @@ import NavPainel from "./components/NavPainel";
 import PainelDashBoard from "../src/pages/PainelDashBoard";
 import GerenciarTurma from "./components/GerenciarTurma";
 import AvaliacaoEstudante from "./components/AvaliacaoEstudante";
+import GerenciarAvaliativa from "./components/GerenciarAvaliativas";
 
 
 function AppRoutes() {
@@ -34,18 +35,15 @@ function AppRoutes() {
           <Route path="Tarefas" element={<Tarefas />} />
           <Route path="Contador" element={<Contador />} />
           <Route path="PainelEstudante" element={<PainelEstudante />}>
-            {/* Rota aninhada dentro de PainelEstudante */}
             <Route path="RegistroEstudante" element={<RegistroEstudante />} />
           </Route>
 
           <Route path="PainelCurso" element={<PainelCurso />}>
-            {/* Rota aninhada dentro de PainelCurso */}
             <Route path="RegistroCurso" element={<RegistroCurso />} />
             <Route path="EditarCurso" element={<EditarCurso />} />
           </Route>
 
           <Route path="PainelUc" element={<PainelUc />}>
-            {/* Rota aninhada dentro de PainelCurso */}
             <Route path="RegistroUc" element={<RegistroUc />} />
             <Route path="InserirEstudanteCurso" element={<InserirEstudanteCurso />} />
           </Route>
@@ -57,24 +55,27 @@ function AppRoutes() {
           <Route path="PainelAvaliativa" element={<PainelAvaliativa />}>
             <Route path="ListarAvaliativa" element={<ListarAvaliativa />} />
           </Route>
+
+          {/* --- ESTRUTURA CORRIGIDA AQUI --- */}
           <Route path="PainelTurma" element={<PainelTurma />}>
-            {/* Rota aninhada dentro de PainelTurma */}
+            {/* ListarTurma e GerenciarTurma agora são irmãos */}
             <Route path="ListarTurma" element={<ListarTurmas />} />
-            <Route path="GerenciarTurma" element={<GerenciarTurma />} />
+            
+            <Route path="GerenciarTurma" element={<GerenciarTurma />}>
+              {/* GerenciarAvaliativa continua sendo filho de GerenciarTurma */}
+              <Route path="GerenciarAvaliativa" element={<GerenciarAvaliativa />} />
+            </Route>
+
             <Route path="AvaliacaoEstudante" element={<AvaliacaoEstudante />} />
           </Route>
 
           <Route path="PainelDashBoard" element={<PainelDashBoard />} >
-          <Route path="NavPainel" element={<NavPainel />} />
+            <Route path="NavPainel" element={<NavPainel />} />
           </Route>
-
-
-
-
         </Route>
-        <Route path="/Login" element={<Login />} />
 
-        {/* Página Não Encontrada */}
+        <Route path="/Login" element={<Login />} />
+        
         {/* <Route path="*" element={<PageNotFound />} /> */}
       </Routes>
     </BrowserRouter>

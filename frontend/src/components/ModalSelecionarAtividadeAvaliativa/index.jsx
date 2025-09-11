@@ -136,7 +136,7 @@ function ModalSelecionarAtividadeAvaliativa({ show, handleClose, ucs, onSelecion
           onClick={handleContinuarAvaliacao} 
           disabled={!atividadeSelecionada}
         >
-          Continuar Avaliação
+          Salvar
         </Button>
       </Modal.Footer>
     </Modal>
