@@ -56,15 +56,12 @@ function AppRoutes() {
             <Route path="ListarAvaliativa" element={<ListarAvaliativa />} />
           </Route>
 
-          {/* --- ESTRUTURA CORRIGIDA AQUI --- */}
           <Route path="PainelTurma" element={<PainelTurma />}>
-            {/* ListarTurma e GerenciarTurma agora são irmãos */}
             <Route path="ListarTurma" element={<ListarTurmas />} />
-            
-            <Route path="GerenciarTurma" element={<GerenciarTurma />}>
-              {/* GerenciarAvaliativa continua sendo filho de GerenciarTurma */}
-              <Route path="GerenciarAvaliativa" element={<GerenciarAvaliativa />} />
-            </Route>
+
+            {/* GerenciarTurma e GerenciarAvaliativa no mesmo nível */}
+            <Route path="GerenciarTurma" element={<GerenciarTurma />} />
+            <Route path="GerenciarAvaliativa" element={<GerenciarAvaliativa />} />
 
             <Route path="AvaliacaoEstudante" element={<AvaliacaoEstudante />} />
           </Route>
@@ -75,7 +72,7 @@ function AppRoutes() {
         </Route>
 
         <Route path="/Login" element={<Login />} />
-        
+
         {/* <Route path="*" element={<PageNotFound />} /> */}
       </Routes>
     </BrowserRouter>

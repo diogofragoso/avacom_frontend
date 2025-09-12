@@ -1,46 +1,252 @@
-.gerenciar-avaliativa-page {
-    background-color: #f4f7fa; /* Um fundo leve para a página */
-  }
-  
-  .column-header {
-    margin-bottom: 1.25rem;
-  }
-  
-  /* Estilo base para os cards nas colunas */
-  .uc-card, .indicador-card {
-    margin-bottom: 0.75rem;
-    border: 1px solid #e0e0e0;
-    cursor: pointer;
-    transition: all 0.2s ease-in-out;
-  }
-  
-  .uc-card:hover, .indicador-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-    border-color: #0d6efd;
-  }
-  
-  /* Estilo do card SELECIONADO */
-  .uc-card.selected {
-    background-color: #0d6efd;
-    color: white;
-    border-color: #0d6efd;
-  }
-  
-  .indicador-card.selected {
-    border-left: 4px solid #0d6efd;
-    background-color: #e7f1ff;
-  }
-  
-  .uc-card.selected .subtext {
-    color: rgba(255, 255, 255, 0.8);
-  }
-  
-  .subtext {
-    font-size: 0.85rem;
+/* --- GERAL --- */
+.pageContainer {
+  background-color: #f8f9fa;
+  min-height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.header h3 {
+  margin: 0;
+  font-weight: 600;
+  font-size: 1.5rem;
+}
+
+.header p {
+  margin: 0;
+  color: #6c757d;
+}
+
+/* --- CABEÇALHO COM PASSOS (STEPPER) --- */
+.stepsContainer {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 2.5rem;
+  padding-left: 1rem; /* Alinhamento com as colunas */
+}
+
+.step {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: #adb5bd; /* Cor inativa */
+  font-weight: 500;
+  font-size: 1rem;
+}
+
+.step span {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background-color: #e9ecef; /* Fundo inativo */
+  color: #adb5bd; /* Cor do número inativo */
+  font-weight: 700;
+  border: 2px solid #e9ecef;
+}
+
+/* Estilo do Passo ATIVO */
+.step.active {
+  color: #343a40; /* Cor ativa */
+}
+
+.step.active span {
+  background-color: #3267E6;
+  color: #ffffff;
+  border: 2px solid #3267E6;
+}
+
+/* --- COLUNAS --- */
+.columnTitle {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #343a40;
+}
+
+.columnTitle span {
+  background-color: #dee2e6;
+  color: #495057;
+  font-size: 0.9rem;
+  font-weight: 700;
+  padding: 0.2rem 0.6rem;
+  border-radius: 50px;
+}
+
+/* --- CARD: UNIDADE CURRICULAR (UC) --- */
+.ucCard {
+  border-radius: 12px;
+  margin-bottom: 0.75rem;
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+  color: white;
+  position: relative;
+}
+
+.ucCard:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+.ucCardBody {
+  padding: 1rem 1.25rem;
+}
+
+.ucCard strong {
+  font-weight: 600;
+}
+
+.ucCard .text-muted {
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.85) !important;
+}
+
+/* Cores específicas para cada matéria */
+.matematica { background-color: #4285F4; }
+.portugues { background-color: #34A853; }
+.historia { background-color: #A042F4; }
+.fisica { background-color: #F48042; }
+.quimica { background-color: #EA4335; }
+.biologia { background-color: #34A890; }
+.default { background-color: #6c757d; }
+
+/* Estilo do card de UC SELECIONADO */
+.ucCard.selected {
+  border: 2px solid #a8c7fa;
+}
+
+.ucCard.selected.matematica::after { border-left-color: #4285F4; }
+.ucCard.selected.portugues::after { border-left-color: #34A853; }
+.ucCard.selected.historia::after { border-left-color: #A042F4; }
+.ucCard.selected.fisica::after { border-left-color: #F48042; }
+.ucCard.selected.quimica::after { border-left-color: #EA4335; }
+.ucCard.selected.biologia::after { border-left-color: #34A890; }
+.ucCard.selected.default::after { border-left-color: #6c757d; }
+
+/* Triângulo de seleção */
+.ucCard.selected::after {
+    content: '';
+    position: absolute;
+    right: -12px;
+    top: 50%;
+    transform: translateY(-50%);
+    border-top: 12px solid transparent;
+    border-bottom: 12px solid transparent;
+    border-left: 12px solid white; /* Cor padrão */
+}
+
+/* --- CARD: INDICADOR DE AVALIAÇÃO --- */
+.indicadorCard {
+  border: 1px solid #dee2e6;
+  background-color: #fff;
+  border-radius: 8px;
+  margin-bottom: 0.75rem;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+
+.indicadorCard:hover {
+  border-color: #0d6efd;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+.indicadorCard.selected {
+  border-left: 4px solid #0d6efd;
+  background-color: #f8f9fa;
+  border-color: #0d6efd;
+}
+
+/* --- ITEM: ATIVIDADE AVALIATIVA --- */
+.atividadeItem {
+  background-color: #fff;
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  margin-bottom: 0.75rem;
+  padding: 0.75rem 1rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.atividadeItem .form-check-input {
+    width: 1.2em;
+    height: 1.2em;
+    margin-top: 0.2em;
+}
+
+.atividadeDetails {
+    flex-grow: 1;
+}
+
+.atividadeDetails strong {
+    display: block;
+    margin-bottom: 0.25rem;
+    color: #343a40;
+}
+
+.atividadeMeta {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    font-size: 0.8rem;
     color: #6c757d;
-  }
-  
-  .atividade-card {
-    margin-bottom: 0.5rem;
-  }
+}
+
+.atividadeMeta > span {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+.statusPendente {
+    background-color: #FEF3C7;
+    color: #92400E;
+    padding: 0.2em 0.6em;
+    border-radius: 10px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+/* --- CARD: INDICADOR DE AVALIAÇÃO --- */
+.indicadorCard {
+  border: 1px solid #dee2e6;
+  background-color: #fff;
+  border-radius: 8px;
+  margin-bottom: 0.75rem;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  /* position: relative;  <-- Pode remover esta linha também se ela existir */
+}
+
+.indicadorCard:hover {
+  border-color: #0d6efd;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+/* ESTA É A REGRA CORRETA PARA A SELEÇÃO DO INDICADOR */
+.indicadorCard.selected {
+  border-left: 4px solid #0d6efd; /* Borda grossa na esquerda */
+  background-color: #f8f9fa;      /* Fundo levemente destacado */
+  border-color: #0d6efd;          /* Mantém a borda geral azul também */
+}
+
+/* Remova também esta regra se ela existir no seu CSS */
+.indicadorCard.selected::after {
+    border-left-color: #0d6efd; 
+}
+
+
+

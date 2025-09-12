@@ -93,7 +93,7 @@ function GerenciarTurma() {
   // 2. NOVA FUNÇÃO ADICIONADA PARA O NOVO BOTÃO
   const handleGerenciarAtividades = () => {
     // Usa a rota aninhada 'GerenciarAvaliativa'
-    navigate('GerenciarAvaliativa', { state: { turma } });
+    navigate('/PainelTurma/GerenciarAvaliativa', { state: { turma } });
   };
 
   if (!turma) {
@@ -195,10 +195,7 @@ function GerenciarTurma() {
           </Card.Body>
         </Card>
 
-        {/* 4. ADICIONADO O OUTLET PARA RENDERIZAR A ROTA FILHA */}
-        <div className="mt-4">
-            <Outlet />
-        </div>
+       
       </Container>
 
       <ModalMatricularAluno

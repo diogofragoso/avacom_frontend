@@ -9,13 +9,17 @@ function PainelTurma() {
   const location = useLocation();
   const { curso } = location.state || {};
 
-  // Verifica se estamos na página de gerenciamento de turma
-  const estaGerenciandoTurma = location.pathname.includes('GerenciarTurma');
+  // pathname atual
+  const path = location.pathname;
+
+  // Mostra a lista de turmas apenas na raiz do painel ou na rota ListarTurma
+  const deveMostrarLista =
+    path === '/PainelTurma' || path === '/PainelTurma/ListarTurma';
 
   return (
-    <Container fluid className='px-0'>
+    <Container fluid className="px-0">
       <div className={styles.paineluc}>
-        <div className='row'>
+        <div className="row">
           <Navbar bg="dark" data-bs-theme="dark" expand="lg">
             <Nav tabs>
               <NavItem>
@@ -34,7 +38,7 @@ function PainelTurma() {
           </Navbar>
 
           <div>
-            {!estaGerenciandoTurma && <ListarTurmas />}
+            {deveMostrarLista && <ListarTurmas />}
             <Outlet />
           </div>
         </div>
