@@ -30,14 +30,14 @@
   align-items: center;
   gap: 1rem;
   margin-bottom: 2.5rem;
-  padding-left: 1rem; /* Alinhamento com as colunas */
+  padding-left: 1rem;
 }
 
 .step {
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  color: #adb5bd; /* Cor inativa */
+  color: #adb5bd;
   font-weight: 500;
   font-size: 1rem;
 }
@@ -49,15 +49,14 @@
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  background-color: #e9ecef; /* Fundo inativo */
-  color: #adb5bd; /* Cor do número inativo */
+  background-color: #e9ecef;
+  color: #adb5bd;
   font-weight: 700;
   border: 2px solid #e9ecef;
 }
 
-/* Estilo do Passo ATIVO */
 .step.active {
-  color: #343a40; /* Cor ativa */
+  color: #343a40;
 }
 
 .step.active span {
@@ -86,8 +85,9 @@
   border-radius: 50px;
 }
 
-/* --- CARD: UNIDADE CURRICULAR (UC) --- */
-.ucCard {
+/* --- ESTILO UNIFICADO PARA CARDS DE UC E INDICADOR --- */
+.ucCard,
+.indicadorCard {
   border-radius: 12px;
   margin-bottom: 0.75rem;
   border: 2px solid transparent;
@@ -97,78 +97,64 @@
   position: relative;
 }
 
-.ucCard:hover {
+.ucCard:hover,
+.indicadorCard:hover {
   transform: translateY(-3px);
   box-shadow: 0 4px 15px rgba(0,0,0,0.1);
 }
 
-.ucCardBody {
+.ucCardBody,
+.indicadorCardBody {
   padding: 1rem 1.25rem;
 }
 
-.ucCard strong {
+.ucCardBody strong,
+.indicadorCardBody strong {
   font-weight: 600;
 }
 
-.ucCard .text-muted {
+.ucCardBody .text-muted,
+.indicadorCardBody .text-muted {
   font-size: 0.85rem;
   color: rgba(255, 255, 255, 0.85) !important;
 }
 
-/* Cores específicas para cada matéria */
-.matematica { background-color: #4285F4; }
-.portugues { background-color: #34A853; }
-.historia { background-color: #A042F4; }
-.fisica { background-color: #F48042; }
-.quimica { background-color: #EA4335; }
-.biologia { background-color: #34A890; }
-.default { background-color: #6c757d; }
-
-/* Estilo do card de UC SELECIONADO */
-.ucCard.selected {
+.ucCard.selected,
+.indicadorCard.selected {
   border: 2px solid #a8c7fa;
 }
 
-.ucCard.selected.matematica::after { border-left-color: #4285F4; }
-.ucCard.selected.portugues::after { border-left-color: #34A853; }
-.ucCard.selected.historia::after { border-left-color: #A042F4; }
-.ucCard.selected.fisica::after { border-left-color: #F48042; }
-.ucCard.selected.quimica::after { border-left-color: #EA4335; }
-.ucCard.selected.biologia::after { border-left-color: #34A890; }
-.ucCard.selected.default::after { border-left-color: #6c757d; }
-
-/* Triângulo de seleção */
-.ucCard.selected::after {
-    content: '';
-    position: absolute;
-    right: -12px;
-    top: 50%;
-    transform: translateY(-50%);
-    border-top: 12px solid transparent;
-    border-bottom: 12px solid transparent;
-    border-left: 12px solid white; /* Cor padrão */
+.ucCard.selected::after,
+.indicadorCard.selected::after {
+  content: '';
+  position: absolute;
+  right: -12px;
+  top: 50%;
+  transform: translateY(-50%);
+  border-top: 12px solid transparent;
+  border-bottom: 12px solid transparent;
 }
 
-/* --- CARD: INDICADOR DE AVALIAÇÃO --- */
-.indicadorCard {
-  border: 1px solid #dee2e6;
-  background-color: #fff;
-  border-radius: 8px;
-  margin-bottom: 0.75rem;
-  cursor: pointer;
-  transition: all 0.2s ease-in-out;
-}
+/* --- PALETA DE CORES MODERNA --- */
+.color1 { background-color: #0ea5e9; } /* Sky Blue */
+.color2 { background-color: #10b981; } /* Emerald Green */
+.color3 { background-color: #f59e0b; } /* Amber */
+.color4 { background-color: #ef4444; } /* Red */
+.color5 { background-color: #8b5cf6; } /* Violet */
+.color6 { background-color: #3b82f6; } /* Blue */
+.color7 { background-color: #ec4899; } /* Pink */
+.default { background-color: #64748b; } /* Slate Grey */
 
-.indicadorCard:hover {
-  border-color: #0d6efd;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-}
+/* --- COR DO TRIÂNGULO PARA CADA COR DA PALETA --- */
+.ucCard.selected.color1::after, .indicadorCard.selected.color1::after { border-left: 12px solid #0ea5e9; }
+.ucCard.selected.color2::after, .indicadorCard.selected.color2::after { border-left: 12px solid #10b981; }
+.ucCard.selected.color3::after, .indicadorCard.selected.color3::after { border-left: 12px solid #f59e0b; }
+.ucCard.selected.color4::after, .indicadorCard.selected.color4::after { border-left: 12px solid #ef4444; }
+.ucCard.selected.color5::after, .indicadorCard.selected.color5::after { border-left: 12px solid #8b5cf6; }
+.ucCard.selected.color6::after, .indicadorCard.selected.color6::after { border-left: 12px solid #3b82f6; }
+.ucCard.selected.color7::after, .indicadorCard.selected.color7::after { border-left: 12px solid #ec4899; }
+.ucCard.selected.default::after, .indicadorCard.selected.default::after { border-left: 12px solid #64748b; }
 
-.indicadorCard.selected {
-  border-left: 4px solid #0d6efd;
-  background-color: #f8f9fa;
-  border-color: #0d6efd;
-}
 
 /* --- ITEM: ATIVIDADE AVALIATIVA --- */
 .atividadeItem {
@@ -220,33 +206,3 @@
     font-size: 0.75rem;
     font-weight: 600;
 }
-/* --- CARD: INDICADOR DE AVALIAÇÃO --- */
-.indicadorCard {
-  border: 1px solid #dee2e6;
-  background-color: #fff;
-  border-radius: 8px;
-  margin-bottom: 0.75rem;
-  cursor: pointer;
-  transition: all 0.2s ease-in-out;
-  /* position: relative;  <-- Pode remover esta linha também se ela existir */
-}
-
-.indicadorCard:hover {
-  border-color: #0d6efd;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-}
-
-/* ESTA É A REGRA CORRETA PARA A SELEÇÃO DO INDICADOR */
-.indicadorCard.selected {
-  border-left: 4px solid #0d6efd; /* Borda grossa na esquerda */
-  background-color: #f8f9fa;      /* Fundo levemente destacado */
-  border-color: #0d6efd;          /* Mantém a borda geral azul também */
-}
-
-/* Remova também esta regra se ela existir no seu CSS */
-.indicadorCard.selected::after {
-    border-left-color: #0d6efd; 
-}
-
-
-

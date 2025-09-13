@@ -1,32 +1,25 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Container, Row, Col, Spinner, Alert, Button, Form } from 'react-bootstrap';
-import avaliacaoService from '../../services/avaliacaoService'; // Sua importação do serviço
-import styles from './GerenciarAvaliativas.module.css'; // O CSS da resposta anterior
+import avaliacaoService from '../../services/avaliacaoService';
+import styles from './GerenciarAvaliativas.module.css';
 
-// Objeto para mapear nomes de matérias para classes CSS
-const ucStyleMap = {
-  'matemática': { colorClass: 'matematica' },
-  'português': { colorClass: 'portugues' },
-  'história': { colorClass: 'historia' },
-  'física': { colorClass: 'fisica' },
-  'química': { colorClass: 'quimica' },
-  'biologia': { colorClass: 'biologia' },
-};
-const defaultStyle = { colorClass: 'default' };
+// Array de classes de cor definidas no CSS
+const colorClasses = ['color1', 'color2', 'color3', 'color4', 'color5', 'color6', 'color7'];
 
-const getUcStyle = (ucName) => {
-  if (!ucName) return defaultStyle;
-  // Normaliza o nome para remover acentos e pegar a primeira palavra
-  const normalizedName = ucName.toLowerCase().split(' ')[0]
-    .normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-  return ucStyleMap[normalizedName] || defaultStyle;
+// Função que retorna uma classe de cor de forma consistente, baseado no ID
+const getStyleClassForId = (id) => {
+  if (id === null || id === undefined) return 'default';
+  const numericId = typeof id === 'string'
+    ? id.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0)
+    : id;
+  const index = numericId % colorClasses.length;
+  return colorClasses[index];
 };
 
 function GerenciarAvaliativa() {
   const navigate = useNavigate();
   const location = useLocation();
-
   const { turma } = location.state || {};
 
   const [matrizCompleta, setMatrizCompleta] = useState(null);
@@ -37,53 +30,46 @@ function GerenciarAvaliativa() {
   const [atividadesSelecionadasIds, setAtividadesSelecionadasIds] = useState([]);
 
   useEffect(() => {
-    // Verifica se os dados necessários da turma existem
     if (!turma?.id_curso_fk) {
       setErro("Dados da turma não encontrados. Volte e tente novamente.");
       setCarregando(false);
       return;
     }
     
-    // Função para carregar os dados da sua API
     const carregarDados = async () => {
       try {
-        setCarregando(true); // Garante que o spinner apareça ao carregar
-        
-        // --- SUA LÓGICA DE API RESTAURADA AQUI ---
+        setCarregando(true);
         const dados = await avaliacaoService.getMatriz(turma.id_curso_fk);
-        
         setMatrizCompleta(dados);
-        
-        // Seleciona a primeira UC da lista por padrão
         if (dados?.ucs?.length > 0) {
           setUcSelecionadaId(dados.ucs[0].id_uc);
         }
       } catch (err) {
-        console.error("Erro ao carregar dados da matriz:", err);
-        setErro("Não foi possível carregar os dados de avaliação. Tente novamente mais tarde.");
+        console.error(err);
+        setErro("Não foi possível carregar os dados de avaliação.");
       } finally {
         setCarregando(false);
       }
     };
 
     carregarDados();
-  }, [turma]); // Dependência do useEffect
+  }, [turma]);
 
-  // Lógica para filtrar os dados com base na seleção (sem alterações)
   const ucs = matrizCompleta?.ucs || [];
-  const indicadoresFiltrados = ucs.find(uc => uc.id_uc === ucSelecionadaId)?.indicadores || [];
+  const ucSelecionada = ucs.find(uc => uc.id_uc === ucSelecionadaId);
+  const indicadoresFiltrados = ucSelecionada?.indicadores || [];
   const atividadesFiltradas = indicadoresFiltrados.find(ind => ind.id_indicador === indicadorSelecionadoId)?.avaliativas || [];
 
-  // Funções de manipulação de estado (sem alterações)
   const handleSelecionarUc = (id) => { setUcSelecionadaId(id); setIndicadorSelecionadoId(null); setAtividadesSelecionadasIds([]); };
   const handleSelecionarIndicador = (id) => { setIndicadorSelecionadoId(id); setAtividadesSelecionadasIds([]); };
   const handleToggleAtividade = (id) => { setAtividadesSelecionadasIds(p => p.includes(id) ? p.filter(i => i !== id) : [...p, id]); };
 
-  // Renderização de loading e erro (sem alterações)
   if (carregando) return <Container className="d-flex justify-content-center align-items-center" style={{height: '80vh'}}><Spinner animation="border" /></Container>;
   if (erro) return <Container className="mt-5"><Alert variant="danger">{erro}</Alert></Container>;
 
-  // JSX do componente (sem alterações na estrutura, apenas populado pela API)
+  // Pega a classe de cor da UC selecionada para passar para os indicadores
+  const corClasseUcSelecionada = ucSelecionada ? getStyleClassForId(ucSelecionada.id_uc) : 'default';
+
   return (
     <div className={`p-4 ${styles.pageContainer}`}>
       <div className={styles.header}>
@@ -106,53 +92,48 @@ function GerenciarAvaliativa() {
       </div>
 
       <Row>
-        {/* Coluna 1: Unidades Curriculares */}
+        {/* Coluna 1: UCs */}
         <Col md={3}>
           <h5 className={styles.columnTitle}><span>1</span> Unidades Curriculares</h5>
           {ucs.map(uc => {
-            const ucStyle = getUcStyle(uc.nome_uc);
             const isSelected = uc.id_uc === ucSelecionadaId;
+            const styleClass = getStyleClassForId(uc.id_uc);
             return (
               <div
                 key={uc.id_uc}
-                className={`${styles.ucCard} ${styles[ucStyle.colorClass]} ${isSelected ? styles.selected : ''}`}
+                className={`${styles.ucCard} ${styles[styleClass]} ${isSelected ? styles.selected : ''}`}
                 onClick={() => handleSelecionarUc(uc.id_uc)}
               >
                 <div className={styles.ucCardBody}>
                   <strong>{uc.nome_uc}</strong>
-                  <div className="text-muted">{uc.descricao_uc}</div>
+                  <div className="text-muted">{uc.numero_uc} - {uc.descricao_uc || "Sem descrição"}</div>
                 </div>
               </div>
             );
           })}
         </Col>
 
-    
-
-        {/* Coluna 2: Indicadores de Avaliação */}
+        {/* Coluna 2: Indicadores */}
         <Col md={4}>
           <h5 className={styles.columnTitle}><span>2</span> Indicadores de Avaliação</h5>
-          {ucSelecionadaId && indicadoresFiltrados.map(indicador => (
-            <div
-              key={indicador.id_indicador}
-              className={`${styles.indicadorCard} ${indicador.id_indicador === indicadorSelecionadoId ? styles.selected : ''}`}
-              onClick={() => handleSelecionarIndicador(indicador.id_indicador)}
-            >
-              <div className="d-flex justify-content-between align-items-center p-3">
-                <div>
+          {ucSelecionadaId && indicadoresFiltrados.map(indicador => {
+            const isSelected = indicador.id_indicador === indicadorSelecionadoId;
+            return (
+              <div
+                key={indicador.id_indicador}
+                className={`${styles.indicadorCard} ${styles[corClasseUcSelecionada]} ${isSelected ? styles.selected : ''}`}
+                onClick={() => handleSelecionarIndicador(indicador.id_indicador)}
+              >
+                <div className={styles.indicadorCardBody}>
                   <strong>{indicador.descricao_indicador}</strong>
                   <div className="text-muted small">{indicador.avaliativas?.length || 0} atividades</div>
                 </div>
-                {/* REMOVIDO: <span>&gt;</span> */}
-                {/* O triângulo será gerado pelo CSS ::after no .indicadorCard */}
               </div>
-            </div>
-          ))}
+            );
+          })}
         </Col>
 
-
-
-        {/* Coluna 3: Atividades Avaliativas */}
+        {/* Coluna 3: Atividades */}
         <Col md={5}>
           <div className="d-flex justify-content-between align-items-center mb-3">
             <h5 className={styles.columnTitle}><span>3</span> Atividades Avaliativas</h5>
@@ -169,10 +150,10 @@ function GerenciarAvaliativa() {
               <div className={styles.atividadeDetails}>
                 <strong>{atividade.descricao_avaliativa}</strong>
                 <div className={styles.atividadeMeta}>
-                    <span>🔹 {atividade.tipo || 'Não definido'}</span>
-                    <span>📅 {new Date(atividade.data).toLocaleDateString('pt-BR')}</span>
-                    <span>👥 {atividade.alunos || 0} alunos</span>
-                    <span className={styles.statusPendente}>Pendente</span>
+                  <span>🔹 {atividade.tipo || 'Não definido'}</span>
+                  <span>📅 {new Date(atividade.data).toLocaleDateString('pt-BR')}</span>
+                  <span>👥 {atividade.alunos || 0} alunos</span>
+                  <span className={styles.statusPendente}>Pendente</span>
                 </div>
               </div>
             </div>
