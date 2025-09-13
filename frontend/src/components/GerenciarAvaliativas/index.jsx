@@ -140,7 +140,7 @@ function GerenciarAvaliativa() {
         <Col md={5}>
           <div className="d-flex justify-content-between align-items-center mb-3">
             <h5 className={styles.columnTitle}><span>3</span> Atividades Avaliativas</h5>
-            {atividadesFiltradas.length > 0 && <Button variant="link" size="sm">Selecionar Todas</Button>}
+          
           </div>
           {indicadorSelecionadoId && atividadesFiltradas.map(atividade => (
             <div key={atividade.id_avaliativa} className={styles.atividadeItem}>
@@ -153,10 +153,7 @@ function GerenciarAvaliativa() {
               <div className={styles.atividadeDetails}>
                 <strong>{atividade.descricao_avaliativa}</strong>
                 <div className={styles.atividadeMeta}>
-                  <span>🔹 {atividade.tipo || 'Não definido'}</span>
-                  <span>📅 {new Date(atividade.data).toLocaleDateString('pt-BR')}</span>
-                  <span>👥 {atividade.alunos || 0} alunos</span>
-                  <span className={styles.statusPendente}>Pendente</span>
+                  
                 </div>
               </div>
             </div>
