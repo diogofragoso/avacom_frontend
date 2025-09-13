@@ -1,3 +1,5 @@
+// Caminho: src/components/GerenciarTurma/index.js
+
 // 1. ADICIONADO 'Outlet' À IMPORTAÇÃO
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import React, { useEffect, useState } from 'react';
@@ -32,19 +34,21 @@ function GerenciarTurma() {
   const [carregandoAvaliacao, setCarregandoAvaliacao] = useState(false);
   const [atividadeSelecionada, setAtividadeSelecionada] = useState(null);
 
+  // 🔹 Função reutilizável para buscar estudantes
+  const carregarEstudantes = async () => {
+    try {
+      const alunos = await matriculaService.getAlunosMatriculadosPorTurma(turma.id_turma);
+      setEstudantes(alunos);
+    } catch (err) {
+      setErro('Erro ao buscar estudantes.');
+      console.error(err);
+    } finally {
+      setCarregando(false);
+    }
+  };
+
   useEffect(() => {
     if (!turma?.id_turma) return;
-    const carregarEstudantes = async () => {
-      try {
-        const alunos = await matriculaService.getAlunosMatriculadosPorTurma(turma.id_turma);
-        setEstudantes(alunos);
-      } catch (err) {
-        setErro('Erro ao buscar estudantes.');
-        console.error(err);
-      } finally {
-        setCarregando(false);
-      }
-    };
     carregarEstudantes();
   }, [turma?.id_turma]);
 
@@ -194,16 +198,17 @@ function GerenciarTurma() {
             <Button variant="secondary" className="mt-3 me-3" onClick={() => navigate(-1)}>Voltar para Turmas</Button>
           </Card.Body>
         </Card>
-
-       
       </Container>
 
+      {/* 🔹 Ajustado: chama carregarEstudantes após matrícula */}
       <ModalMatricularAluno
         show={mostrarModal}
         handleClose={() => setMostrarModal(false)}
         turmaId={turma.id_turma}
         cursoId={turma.id_curso_fk}
-        onMatriculaRealizada={() => { /* ... */ }}
+        onMatriculaRealizada={() => {
+          carregarEstudantes();
+        }}
       />
 
       <ModalSelecionarAtividadeAvaliativa
