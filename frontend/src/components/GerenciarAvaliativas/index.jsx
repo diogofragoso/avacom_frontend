@@ -154,10 +154,6 @@ function GerenciarAvaliativa() {
                   </Button>
                 )}
                 <div className={styles.atividadeMeta}>
-                  <span>🔹 {atividade.tipo || 'Não definido'}</span>
-                  <span>📅 {atividade.data ? new Date(atividade.data).toLocaleDateString('pt-BR') : '-'}</span>
-                  <span>👥 {atividade.alunos || 0} alunos</span>
-                  <span className={styles.statusPendente}>Pendente</span>
                 </div>
               </div>
             </div>
