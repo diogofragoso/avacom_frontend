@@ -35,7 +35,7 @@ function GerenciarAvaliativa() {
       setCarregando(false);
       return;
     }
-    
+
     const carregarDados = async () => {
       try {
         setCarregando(true);
@@ -64,7 +64,7 @@ function GerenciarAvaliativa() {
   const handleSelecionarIndicador = (id) => { setIndicadorSelecionadoId(id); setAtividadesSelecionadasIds([]); };
   const handleToggleAtividade = (id) => { setAtividadesSelecionadasIds(p => p.includes(id) ? p.filter(i => i !== id) : [...p, id]); };
 
-  if (carregando) return <Container className="d-flex justify-content-center align-items-center" style={{height: '80vh'}}><Spinner animation="border" /></Container>;
+  if (carregando) return <Container className="d-flex justify-content-center align-items-center" style={{ height: '80vh' }}><Spinner animation="border" /></Container>;
   if (erro) return <Container className="mt-5"><Alert variant="danger">{erro}</Alert></Container>;
 
   // Pega a classe de cor da UC selecionada para passar para os indicadores
@@ -78,7 +78,7 @@ function GerenciarAvaliativa() {
           <p>Selecione UC, indicadores e atividades para avaliar</p>
         </div>
       </div>
-      
+
       <div className={styles.stepsContainer}>
         <div className={`${styles.step} ${ucSelecionadaId ? styles.active : ''}`}>
           <span>1</span> Selecionar UC
@@ -105,8 +105,9 @@ function GerenciarAvaliativa() {
                 onClick={() => handleSelecionarUc(uc.id_uc)}
               >
                 <div className={styles.ucCardBody}>
+                  <div className={styles.ucNumeroBadge}>UC {uc.numero_uc}</div>
                   <strong>{uc.nome_uc}</strong>
-                  <div className="text-muted">{uc.numero_uc} - {uc.descricao_uc || "Sem descrição"}</div>
+                  <div className="text-muted">{uc.descricao_uc || "Sem descrição"}</div>
                 </div>
               </div>
             );
@@ -125,6 +126,7 @@ function GerenciarAvaliativa() {
                 onClick={() => handleSelecionarIndicador(indicador.id_indicador)}
               >
                 <div className={styles.indicadorCardBody}>
+                  <div className={styles.indicadorNumeroBadge}>Indicador {indicador.numero_indicador}</div>
                   <strong>{indicador.descricao_indicador}</strong>
                   <div className="text-muted small">{indicador.avaliativas?.length || 0} atividades</div>
                 </div>
@@ -132,6 +134,7 @@ function GerenciarAvaliativa() {
             );
           })}
         </Col>
+
 
         {/* Coluna 3: Atividades */}
         <Col md={5}>
