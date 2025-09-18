@@ -27,7 +27,7 @@ function GerenciarAvaliativa() {
   const [erro, setErro] = useState(null);
   const [ucSelecionadaId, setUcSelecionadaId] = useState(null);
   const [indicadorSelecionadoId, setIndicadorSelecionadoId] = useState(null);
-  const [atividadesSelecionadasIds, setAtividadesSelecionadasIds] = useState([]);
+  const [atividadeSelecionadaId, setAtividadeSelecionadaId] = useState(null); // Somente uma atividade
   const [expandedIds, setExpandedIds] = useState([]);
 
   useEffect(() => {
@@ -59,23 +59,60 @@ function GerenciarAvaliativa() {
   const indicadoresFiltrados = ucSelecionada?.indicadores || [];
   const atividadesFiltradas = indicadoresFiltrados.find(ind => ind.id_indicador === indicadorSelecionadoId)?.avaliativas || [];
 
-  const handleSelecionarUc = (id) => { setUcSelecionadaId(id); setIndicadorSelecionadoId(null); setAtividadesSelecionadasIds([]); setExpandedIds([]); };
-  const handleSelecionarIndicador = (id) => { setIndicadorSelecionadoId(id); setAtividadesSelecionadasIds([]); setExpandedIds([]); };
-  const handleToggleAtividade = (id) => { setAtividadesSelecionadasIds(p => p.includes(id) ? p.filter(i => i !== id) : [...p, id]); };
-  const toggleExpand = (id) => { setExpandedIds(p => p.includes(id) ? p.filter(i => i !== id) : [...p, id]); };
-  const selecionarTodas = () => { setAtividadesSelecionadasIds(atividadesFiltradas.map(a => a.id_avaliativa)); };
+  const handleSelecionarUc = (id) => { 
+    setUcSelecionadaId(id); 
+    setIndicadorSelecionadoId(null); 
+    setAtividadeSelecionadaId(null); 
+    setExpandedIds([]); 
+  };
+
+  const handleSelecionarIndicador = (id) => { 
+    setIndicadorSelecionadoId(id); 
+    setAtividadeSelecionadaId(null); 
+    setExpandedIds([]); 
+  };
+
+  const handleSelecionarAtividade = (id) => { 
+    setAtividadeSelecionadaId(prev => prev === id ? null : id); // Toggle
+  };
+
+  const toggleExpand = (id) => { 
+    setExpandedIds(prev => prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]); 
+  };
 
   if (carregando) return <Container className="d-flex justify-content-center align-items-center" style={{ height: '80vh' }}><Spinner animation="border" /></Container>;
   if (erro) return <Container className="mt-5"><Alert variant="danger">{erro}</Alert></Container>;
 
   const corClasseUcSelecionada = ucSelecionada ? getStyleClassForId(ucSelecionada.id_uc) : 'default';
 
+  const handleSalvarSelecionada = async () => {
+    if (!ucSelecionadaId || !indicadorSelecionadoId || !atividadeSelecionadaId) {
+      alert("Selecione uma UC, um indicador e uma atividade para salvar.");
+      return;
+    }
+
+    const payload = {
+      id_turma_fk: turma.id_turma,
+      id_at_avaliativa_fk: atividadeSelecionadaId
+    };
+    console.log('Enviando para a API:', payload); 
+
+    try {
+      await avaliacaoService.salvar(payload);
+      alert("Atividade atribuída a todos os alunos da turma com sucesso!");
+      setAtividadeSelecionadaId(null); // limpa seleção após salvar
+    } catch (error) {
+      console.error("Erro ao salvar avaliação:", error);
+      alert("Erro ao salvar avaliação. Veja o console para detalhes.");
+    }
+  };
+
   return (
     <div className={`p-4 ${styles.pageContainer}`}>
       <div className={styles.header}>
         <div>
           <h3>Avaliação de Atividades</h3>
-          <p>Selecione UC, indicadores e atividades para avaliar</p>
+          <p>Selecione UC, indicadores e atividade para avaliar</p>
         </div>
       </div>
 
@@ -86,8 +123,8 @@ function GerenciarAvaliativa() {
         <div className={`${styles.step} ${indicadorSelecionadoId ? styles.active : ''}`}>
           <span>2</span> Escolher Indicador
         </div>
-        <div className={`${styles.step} ${atividadesSelecionadasIds.length > 0 ? styles.active : ''}`}>
-          <span>3</span> Selecionar Atividades
+        <div className={`${styles.step} ${atividadeSelecionadaId ? styles.active : ''}`}>
+          <span>3</span> Selecionar Atividade
         </div>
       </div>
 
@@ -130,16 +167,24 @@ function GerenciarAvaliativa() {
         {/* Coluna 3: Atividades */}
         <Col xs={12} md={5}>
           <div className="d-flex justify-content-between align-items-center mb-3">
-            <h5 className={styles.columnTitle}><span>3</span> Atividades Avaliativas</h5>
-            {atividadesFiltradas.length > 0 && <Button size="sm" variant="outline-primary" onClick={selecionarTodas}>Selecionar Todas</Button>}
+            <h5 className={styles.columnTitle}><span>3</span> Atividade Avaliativa</h5>
+            <Button
+              size="sm"
+              variant="success"
+              onClick={handleSalvarSelecionada}
+              disabled={!atividadeSelecionadaId}
+            >
+              Salvar Atividade
+            </Button>
           </div>
           {indicadorSelecionadoId && atividadesFiltradas.map(atividade => (
             <div key={atividade.id_avaliativa} className={styles.atividadeItem}>
               <Form.Check
-                type="checkbox"
+                type="radio"
+                name="atividadeSelecionada"
                 id={`check-${atividade.id_avaliativa}`}
-                checked={atividadesSelecionadasIds.includes(atividade.id_avaliativa)}
-                onChange={() => handleToggleAtividade(atividade.id_avaliativa)}
+                checked={atividadeSelecionadaId === atividade.id_avaliativa}
+                onChange={() => handleSelecionarAtividade(atividade.id_avaliativa)}
               />
               <div className={styles.atividadeDetails}>
                 <strong>
@@ -153,8 +198,6 @@ function GerenciarAvaliativa() {
                     {expandedIds.includes(atividade.id_avaliativa) ? 'ver menos' : 'ver mais'}
                   </Button>
                 )}
-                <div className={styles.atividadeMeta}>
-                </div>
               </div>
             </div>
           ))}
