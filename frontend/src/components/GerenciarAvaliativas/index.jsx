@@ -85,6 +85,7 @@ function GerenciarAvaliativa() {
 
   const corClasseUcSelecionada = ucSelecionada ? getStyleClassForId(ucSelecionada.id_uc) : 'default';
 
+  // 🔹 Ajuste: enviar também o id_indicador_fk
   const handleSalvarSelecionada = async () => {
     if (!ucSelecionadaId || !indicadorSelecionadoId || !atividadeSelecionadaId) {
       alert("Selecione uma UC, um indicador e uma atividade para salvar.");
@@ -93,7 +94,8 @@ function GerenciarAvaliativa() {
 
     const payload = {
       id_turma_fk: turma.id_turma,
-      id_at_avaliativa_fk: atividadeSelecionadaId
+      id_avaliativa_fk: atividadeSelecionadaId,
+      id_indicador_fk: indicadorSelecionadoId
     };
     console.log('Enviando para a API:', payload); 
 
@@ -103,7 +105,12 @@ function GerenciarAvaliativa() {
       setAtividadeSelecionadaId(null); // limpa seleção após salvar
     } catch (error) {
       console.error("Erro ao salvar avaliação:", error);
-      alert("Erro ao salvar avaliação. Veja o console para detalhes.");
+      if (error.response?.data) {
+        console.log("Detalhes do erro:", error.response.data);
+        alert("Erro ao salvar avaliação: " + JSON.stringify(error.response.data));
+      } else {
+        alert("Erro ao salvar avaliação. Veja o console para detalhes.");
+      }
     }
   };
 
