@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Container, Row, Col, Spinner, Alert, Button, Form } from 'react-bootstrap';
+import { Container, Row, Col, Spinner, Alert, Button, Form, Toast, ToastContainer } from 'react-bootstrap';
 import avaliacaoService from '../../services/avaliacaoService';
 import styles from './GerenciarAvaliativas.module.css';
 
@@ -27,8 +27,17 @@ function GerenciarAvaliativa() {
   const [erro, setErro] = useState(null);
   const [ucSelecionadaId, setUcSelecionadaId] = useState(null);
   const [indicadorSelecionadoId, setIndicadorSelecionadoId] = useState(null);
-  const [atividadeSelecionadaId, setAtividadeSelecionadaId] = useState(null); // Somente uma atividade
+  const [atividadeSelecionadaId, setAtividadeSelecionadaId] = useState(null);
   const [expandedIds, setExpandedIds] = useState([]);
+  const [salvando, setSalvando] = useState(false);
+
+  // Estados para controlar o Toast
+  const [showToast, setShowToast] = useState(false);
+  const [toastInfo, setToastInfo] = useState({
+    variant: 'success', // 'success', 'danger', 'warning'
+    title: '',
+    message: ''
+  });
 
   useEffect(() => {
     if (!turma?.id_curso_fk) {
@@ -59,36 +68,35 @@ function GerenciarAvaliativa() {
   const indicadoresFiltrados = ucSelecionada?.indicadores || [];
   const atividadesFiltradas = indicadoresFiltrados.find(ind => ind.id_indicador === indicadorSelecionadoId)?.avaliativas || [];
 
-  const handleSelecionarUc = (id) => { 
-    setUcSelecionadaId(id); 
-    setIndicadorSelecionadoId(null); 
-    setAtividadeSelecionadaId(null); 
-    setExpandedIds([]); 
+  const handleSelecionarUc = (id) => {
+    setUcSelecionadaId(id);
+    setIndicadorSelecionadoId(null);
+    setAtividadeSelecionadaId(null);
+    setExpandedIds([]);
   };
 
-  const handleSelecionarIndicador = (id) => { 
-    setIndicadorSelecionadoId(id); 
-    setAtividadeSelecionadaId(null); 
-    setExpandedIds([]); 
+  const handleSelecionarIndicador = (id) => {
+    setIndicadorSelecionadoId(id);
+    setAtividadeSelecionadaId(null);
+    setExpandedIds([]);
   };
 
-  const handleSelecionarAtividade = (id) => { 
+  const handleSelecionarAtividade = (id) => {
     setAtividadeSelecionadaId(prev => prev === id ? null : id); // Toggle
   };
 
-  const toggleExpand = (id) => { 
-    setExpandedIds(prev => prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]); 
+  const toggleExpand = (id) => {
+    setExpandedIds(prev => prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]);
   };
 
-  if (carregando) return <Container className="d-flex justify-content-center align-items-center" style={{ height: '80vh' }}><Spinner animation="border" /></Container>;
-  if (erro) return <Container className="mt-5"><Alert variant="danger">{erro}</Alert></Container>;
-
-  const corClasseUcSelecionada = ucSelecionada ? getStyleClassForId(ucSelecionada.id_uc) : 'default';
-
-  // 🔹 Ajuste: enviar também o id_indicador_fk
   const handleSalvarSelecionada = async () => {
     if (!ucSelecionadaId || !indicadorSelecionadoId || !atividadeSelecionadaId) {
-      alert("Selecione uma UC, um indicador e uma atividade para salvar.");
+      setToastInfo({
+        variant: 'warning',
+        title: 'Atenção',
+        message: 'Selecione uma UC, um indicador e uma atividade para salvar.'
+      });
+      setShowToast(true);
       return;
     }
 
@@ -97,25 +105,55 @@ function GerenciarAvaliativa() {
       id_avaliativa_fk: atividadeSelecionadaId,
       id_indicador_fk: indicadorSelecionadoId
     };
-    console.log('Enviando para a API:', payload); 
+
+    setSalvando(true);
 
     try {
-      await avaliacaoService.salvar(payload);
-      alert("Atividade atribuída a todos os alunos da turma com sucesso!");
-      setAtividadeSelecionadaId(null); // limpa seleção após salvar
+      const response = await avaliacaoService.salvar(payload);
+      setToastInfo({
+        variant: 'success',
+        title: 'Sucesso!',
+        message: response.message || 'Operação realizada com sucesso!'
+      });
+      setShowToast(true);
+      setAtividadeSelecionadaId(null);
     } catch (error) {
       console.error("Erro ao salvar avaliação:", error);
-      if (error.response?.data) {
-        console.log("Detalhes do erro:", error.response.data);
-        alert("Erro ao salvar avaliação: " + JSON.stringify(error.response.data));
-      } else {
-        alert("Erro ao salvar avaliação. Veja o console para detalhes.");
-      }
+      const errorMessage = error.response?.data?.message || error.response?.data?.error || "Ocorreu um erro inesperado.";
+      setToastInfo({
+        variant: 'danger',
+        title: 'Erro ao Salvar',
+        message: errorMessage
+      });
+      setShowToast(true);
+    } finally {
+      setSalvando(false);
     }
   };
 
+  if (carregando) return <Container className="d-flex justify-content-center align-items-center" style={{ height: '80vh' }}><Spinner animation="border" /></Container>;
+  if (erro) return <Container className="mt-5"><Alert variant="danger">{erro}</Alert></Container>;
+
+  const corClasseUcSelecionada = ucSelecionada ? getStyleClassForId(ucSelecionada.id_uc) : 'default';
+
   return (
     <div className={`p-4 ${styles.pageContainer}`}>
+      <ToastContainer position="top-end" className="p-3" style={{ zIndex: 1050 }}>
+        <Toast
+          onClose={() => setShowToast(false)}
+          show={showToast}
+          delay={5000}
+          autohide
+          bg={toastInfo.variant.toLowerCase()}
+          className={toastInfo.variant === 'warning' ? 'text-dark' : 'text-white'}
+        >
+          <Toast.Header>
+            <strong className="me-auto">{toastInfo.title}</strong>
+          </Toast.Header>
+          <Toast.Body>{toastInfo.message}</Toast.Body>
+        </Toast>
+      </ToastContainer>
+
       <div className={styles.header}>
         <div>
           <h3>Avaliação de Atividades</h3>
@@ -179,9 +217,9 @@ function GerenciarAvaliativa() {
               size="sm"
               variant="success"
               onClick={handleSalvarSelecionada}
-              disabled={!atividadeSelecionadaId}
+              disabled={!atividadeSelecionadaId || salvando}
             >
-              Salvar Atividade
+              {salvando ? <Spinner as="span" animation="border" size="sm" /> : 'Salvar Atividade'}
             </Button>
           </div>
           {indicadorSelecionadoId && atividadesFiltradas.map(atividade => (
