@@ -1,3 +1,4 @@
+// Caminho: src/services/avaliacaoService.jsx
 import axios from "axios";
 
 const API_URL = "http://localhost:3000/api/avaliacao";
@@ -24,7 +25,19 @@ const salvar = async (payload) => {
   }
 };
 
+// 🔹 Atualizar avaliação (menção, data, observação)
+const atualizar = async (id, payload) => {
+  try {
+    const response = await axios.put(`${API_URL}/atualizar/${id}`, payload);
+    return response.data;
+  } catch (error) {
+    console.error("Erro ao atualizar avaliação:", error);
+    throw error;
+  }
+};
+
 export default {
   getMatriz,
   salvar,
+  atualizar,
 };

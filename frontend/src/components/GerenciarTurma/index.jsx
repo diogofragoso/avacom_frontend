@@ -1,9 +1,17 @@
 // Caminho: src/components/GerenciarTurma/index.js
 
-// 1. ADICIONADO 'Outlet' À IMPORTAÇÃO
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import React, { useEffect, useState } from 'react';
-import { Card, Button, Container, Table, Spinner, Alert, Row, Col } from 'react-bootstrap';
+import {
+  Card,
+  Button,
+  Container,
+  Table,
+  Spinner,
+  Alert,
+  Row,
+  Col
+} from 'react-bootstrap';
 import { motion } from 'framer-motion';
 import { MdAddCircle } from 'react-icons/md';
 import { FaTrash, FaCheckCircle } from 'react-icons/fa';
@@ -20,49 +28,56 @@ function GerenciarTurma() {
   const navigate = useNavigate();
   const { turma } = location.state || {};
 
-  // Estados dos estudantes e UI
+  // 🔹 Estados principais
   const [estudantes, setEstudantes] = useState([]);
   const [carregando, setCarregando] = useState(true);
   const [erro, setErro] = useState(null);
+
   const [mostrarModal, setMostrarModal] = useState(false);
   const [mostrarModalAtividade, setMostrarModalAtividade] = useState(false);
 
-  // Estados de Avaliação
   const [avaliando, setAvaliando] = useState(false);
   const [alunoSelecionado, setAlunoSelecionado] = useState(null);
+
   const [matrizAvaliacao, setMatrizAvaliacao] = useState(null);
   const [carregandoAvaliacao, setCarregandoAvaliacao] = useState(false);
   const [atividadeSelecionada, setAtividadeSelecionada] = useState(null);
 
-  // 🔹 Função reutilizável para buscar estudantes
+  // 🔹 Buscar estudantes da turma
   const carregarEstudantes = async () => {
+    setCarregando(true);
     try {
-      const alunos = await matriculaService.getAlunosMatriculadosPorTurma(turma.id_turma);
+      const alunos = await matriculaService.getAlunosMatriculadosPorTurma(
+        turma.id_turma
+      );
       setEstudantes(alunos);
     } catch (err) {
-      setErro('Erro ao buscar estudantes.');
       console.error(err);
+      setErro('Erro ao buscar estudantes.');
     } finally {
       setCarregando(false);
     }
   };
 
   useEffect(() => {
-    if (!turma?.id_turma) return;
-    carregarEstudantes();
+    if (turma?.id_turma) carregarEstudantes();
   }, [turma?.id_turma]);
 
+  // 🔹 Excluir matrícula
   const handleExcluir = async (id_matricula) => {
-    if (!window.confirm("Deseja realmente excluir esta matrícula?")) return;
+    if (!window.confirm('Deseja realmente excluir esta matrícula?')) return;
     try {
       await matriculaService.removerMatricula(id_matricula);
-      setEstudantes(estudantes.filter(e => e.id_matricula !== id_matricula));
+      setEstudantes((prev) =>
+        prev.filter((e) => e.id_matricula !== id_matricula)
+      );
     } catch (err) {
-      console.error("Erro ao excluir matrícula:", err);
-      setErro("Erro ao excluir matrícula.");
+      console.error('Erro ao excluir matrícula:', err);
+      setErro('Erro ao excluir matrícula.');
     }
   };
 
+  // 🔹 Abrir avaliação para aluno
   const handleAvaliar = async (estudante) => {
     setAlunoSelecionado(estudante);
     setAvaliando(true);
@@ -71,32 +86,32 @@ function GerenciarTurma() {
       const dados = await avaliacaoService.getMatriz(turma.id_curso_fk);
       setMatrizAvaliacao(dados);
     } catch (err) {
-      console.error("Erro ao carregar matriz:", err);
-      setErro("Erro ao buscar dados de avaliação.");
+      console.error('Erro ao carregar matriz:', err);
+      setErro('Erro ao buscar dados de avaliação.');
     } finally {
       setCarregandoAvaliacao(false);
     }
   };
 
+  // 🔹 Selecionar atividades avaliativas
   const handleSelecionarAtividadeAvaliativa = async () => {
-    setCarregandoAvaliacao(true);
-    try {
-      if (!matrizAvaliacao) {
+    if (!matrizAvaliacao) {
+      setCarregandoAvaliacao(true);
+      try {
         const dados = await avaliacaoService.getMatriz(turma.id_curso_fk);
         setMatrizAvaliacao(dados);
+      } catch (err) {
+        console.error('Erro ao carregar matriz para o modal:', err);
+        setErro('Erro ao buscar dados de avaliação.');
+      } finally {
+        setCarregandoAvaliacao(false);
       }
-      setMostrarModalAtividade(true);
-    } catch (err) {
-      console.error("Erro ao carregar matriz para o modal:", err);
-      setErro("Erro ao buscar dados de avaliação.");
-    } finally {
-      setCarregandoAvaliacao(false);
     }
+    setMostrarModalAtividade(true);
   };
 
-  // 2. NOVA FUNÇÃO ADICIONADA PARA O NOVO BOTÃO
+  // 🔹 Navegar para gerenciar atividades
   const handleGerenciarAtividades = () => {
-    // Usa a rota aninhada 'GerenciarAvaliativa'
     navigate('/PainelTurma/GerenciarAvaliativa', { state: { turma } });
   };
 
@@ -104,13 +119,19 @@ function GerenciarTurma() {
     return (
       <Container className="mt-4">
         <p>Turma não encontrada. Retorne e selecione uma turma.</p>
-        <Button variant="secondary" onClick={() => navigate(-1)}>Voltar</Button>
+        <Button variant="secondary" onClick={() => navigate(-1)}>
+          Voltar
+        </Button>
       </Container>
     );
   }
 
   return (
-    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }}>
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.5 }}
+    >
       <Container className="mt-4">
         <Card className="shadow-lg">
           <Card.Header className="bg-dark text-white">
@@ -118,45 +139,137 @@ function GerenciarTurma() {
           </Card.Header>
           <Card.Body>
             <Row>
-              <Col md={6}><strong>Curso:</strong> {turma.nome_curso}</Col>
-              <Col md={3}><strong>Período:</strong> {turma.periodo_turma}</Col>
-              <Col md={3}><strong>Início:</strong> {new Date(turma.data_inicio_turma).toLocaleDateString('pt-BR')}</Col>
+              <Col md={6}>
+                <strong>Curso:</strong> {turma.nome_curso}
+              </Col>
+              <Col md={3}>
+                <strong>Período:</strong> {turma.periodo_turma}
+              </Col>
+              <Col md={3}>
+                <strong>Início:</strong>{' '}
+                {new Date(turma.data_inicio_turma).toLocaleDateString('pt-BR')}
+              </Col>
             </Row>
             <Row className="mt-2">
-              <Col md={3}><strong>Máx. de Alunos:</strong> {turma.max_aluno_turma}</Col>
+              <Col md={3}>
+                <strong>Máx. de Alunos:</strong> {turma.max_aluno_turma}
+              </Col>
             </Row>
             <hr />
 
+            {/* 🔹 Avaliação de estudante */}
             {avaliando && alunoSelecionado ? (
               <>
                 <h5>Avaliando: {alunoSelecionado.nome_aluno}</h5>
                 {carregandoAvaliacao ? (
                   <Spinner animation="border" />
                 ) : (
-                  matrizAvaliacao && <AvaliacaoEstudante
-                    matriz={matrizAvaliacao}
-                    idCurso={turma.id_curso_fk}
-                    idTurma={turma.id_turma}
-                    idEstudante={alunoSelecionado.id_aluno}
-                  />
+                  matrizAvaliacao && (
+                    <AvaliacaoEstudante
+                      matriz={matrizAvaliacao}
+                      idCurso={turma.id_curso_fk}
+                      idTurma={turma.id_turma}
+                      idEstudante={alunoSelecionado.id_aluno}
+                      turmaId={turma.id_turma}
+                      avaliacaoId={alunoSelecionado.avaliacaoId || null}
+
+                    onSalvar={async (dados) => {
+  try {
+    if (!dados.avaliacaoId) {
+      const payload = {
+        id_estudante_fk: dados.estudanteId,
+        id_turma_fk: dados.turmaId,
+        id_uc_fk: dados.ucId,
+        id_indicador_fk: dados.indicadorId,
+        mencao: dados.estado
+      };
+      const nova = await avaliacaoService.salvar(payload);
+      console.log('Avaliação criada:', nova);
+
+      if (nova?.id_avaliacao) {
+        // Atualiza no estado do componente AvaliacaoEstudante
+        setAlunoSelecionado((prev) => ({
+          ...prev,
+          avaliacaoId: nova.id_avaliacao
+        }));
+        return nova.id_avaliacao;
+      }
+    } else {
+      const payload = { mencao: dados.estado };
+      await avaliacaoService.atualizar(dados.avaliacaoId, payload);
+      console.log('Avaliação atualizada!');
+      return dados.avaliacaoId;
+    }
+  } catch (err) {
+    console.error('Erro ao salvar avaliação:', err);
+    alert('Erro ao salvar avaliação!');
+  }
+}}
+
+
+
+                      
+
+
+
+
+
+                      onObservacao={async (obs) => {
+                        console.log('Salvar observação:', obs);
+                        try {
+                          if (!obs.avaliacaoId) {
+                            alert(
+                              'Crie a avaliação primeiro antes de adicionar observação!'
+                            );
+                            return;
+                          }
+                          const payload = {
+                            observacao_avaliacao: obs.observacao
+                          };
+                          await avaliacaoService.atualizar(
+                            obs.avaliacaoId,
+                            payload
+                          );
+                          console.log('Observação salva!');
+                        } catch (err) {
+                          console.error('Erro ao salvar observação:', err);
+                        }
+                      }}
+                    />
+                  )
                 )}
-                <Button variant="secondary" className="mt-3 me-2" onClick={() => setAvaliando(false)}>
+                <Button
+                  variant="secondary"
+                  className="mt-3 me-2"
+                  onClick={() => setAvaliando(false)}
+                >
                   Voltar para lista de estudantes
                 </Button>
               </>
             ) : (
               <>
+                {/* 🔹 Lista de estudantes */}
                 <div className="d-flex justify-content-between align-items-center mb-3">
                   <h5>Estudantes Matriculados</h5>
                   <div>
-                    {/* 3. NOVO BOTÃO ADICIONADO AO LADO DO EXISTENTE */}
-                    <Button variant="secondary" className="me-2" onClick={handleGerenciarAtividades}>
+                    <Button
+                      variant="secondary"
+                      className="me-2"
+                      onClick={handleGerenciarAtividades}
+                    >
                       Gerenciar Atividades
                     </Button>
-                    <Button variant="info" className="me-2" onClick={handleSelecionarAtividadeAvaliativa}>
+                    <Button
+                      variant="info"
+                      className="me-2"
+                      onClick={handleSelecionarAtividadeAvaliativa}
+                    >
                       Selecionar avaliativas
                     </Button>
-                    <Button variant="primary" onClick={() => setMostrarModal(true)}>
+                    <Button
+                      variant="primary"
+                      onClick={() => setMostrarModal(true)}
+                    >
                       Matricular Estudante <MdAddCircle className="ms-1" />
                     </Button>
                   </div>
@@ -164,7 +277,11 @@ function GerenciarTurma() {
 
                 {carregando && <Spinner animation="border" />}
                 {erro && <Alert variant="danger">{erro}</Alert>}
-                {!carregando && estudantes.length === 0 && <p className="text-muted">Nenhum estudante matriculado ainda.</p>}
+                {!carregando && estudantes.length === 0 && (
+                  <p className="text-muted">
+                    Nenhum estudante matriculado ainda.
+                  </p>
+                )}
 
                 {estudantes.length > 0 && (
                   <Table striped bordered hover responsive>
@@ -182,10 +299,22 @@ function GerenciarTurma() {
                           <td>{estudante.nome_aluno}</td>
                           <td>{estudante.email_aluno}</td>
                           <td className="text-center">
-                            <Button variant="danger" size="sm" onClick={() => handleExcluir(estudante.id_matricula)}><FaTrash /></Button>
+                            <Button
+                              variant="danger"
+                              size="sm"
+                              onClick={() => handleExcluir(estudante.id_matricula)}
+                            >
+                              <FaTrash />
+                            </Button>
                           </td>
                           <td className="text-center">
-                            <Button variant="success" size="sm" onClick={() => handleAvaliar(estudante)}><FaCheckCircle /></Button>
+                            <Button
+                              variant="success"
+                              size="sm"
+                              onClick={() => handleAvaliar(estudante)}
+                            >
+                              <FaCheckCircle />
+                            </Button>
                           </td>
                         </tr>
                       ))}
@@ -195,29 +324,32 @@ function GerenciarTurma() {
               </>
             )}
 
-            <Button variant="secondary" className="mt-3 me-3" onClick={() => navigate(-1)}>Voltar para Turmas</Button>
+            <Button
+              variant="secondary"
+              className="mt-3 me-3"
+              onClick={() => navigate(-1)}
+            >
+              Voltar para Turmas
+            </Button>
           </Card.Body>
         </Card>
       </Container>
 
-      {/* 🔹 Ajustado: chama carregarEstudantes após matrícula */}
+      {/* 🔹 Modal matricular */}
       <ModalMatricularAluno
         show={mostrarModal}
         handleClose={() => setMostrarModal(false)}
         turmaId={turma.id_turma}
         cursoId={turma.id_curso_fk}
-        onMatriculaRealizada={() => {
-          carregarEstudantes();
-        }}
+        onMatriculaRealizada={carregarEstudantes}
       />
 
+      {/* 🔹 Modal selecionar atividade */}
       <ModalSelecionarAtividadeAvaliativa
         show={mostrarModalAtividade}
         handleClose={() => setMostrarModalAtividade(false)}
         ucs={matrizAvaliacao?.ucs}
-        onSelecionar={(atividade) => {
-          setAtividadeSelecionada(atividade);
-        }}
+        onSelecionar={(atividade) => setAtividadeSelecionada(atividade)}
       />
     </motion.div>
   );
