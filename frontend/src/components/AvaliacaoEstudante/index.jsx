@@ -68,10 +68,10 @@ const AvaliacaoEstudante = ({
               if (avaliacaoDoAluno) {
                 novaMatrizEstado[ucIndex][indIndex] = mencaoParaIndice(avaliacaoDoAluno.mencao);
                 novaMatrizIdAvaliacao[ucIndex][indIndex] = avaliacaoDoAluno.id_avaliacao;
-                // **** AJUSTE 1 ****: A API retorna 'observacao', mas o nome da coluna é 'observacao_avaliacao'
-                // Se sua API de listagem (`getSelecionadas`) retorna `observacao`, mantenha. 
-                // Se retorna `observacao_avaliacao`, troque aqui. Supondo que retorna `observacao_avaliacao`.
-                novaMatrizObservacao[ucIndex][indIndex] = avaliacaoDoAluno.observacao_avaliacao || '';
+                
+                // **** ESTA É A CORREÇÃO ****
+                // Trocamos `observacao_avaliacao` por `observacao` para ler o campo que a API de listagem envia.
+                novaMatrizObservacao[ucIndex][indIndex] = avaliacaoDoAluno.observacao || '';
               }
             } catch (error) {
               console.error(`Erro ao buscar dados para o indicador ${indicador.id_indicador}:`, error);
@@ -153,7 +153,6 @@ const AvaliacaoEstudante = ({
     const { ucIndex, indIndex, idAvaliacao } = obsContext;
 
     try {
-      // **** AJUSTE 2 ****: Enviar o nome do campo que a API espera: 'observacao_avaliacao'
       await avaliacaoService.atualizar(idAvaliacao, { observacao_avaliacao: observacaoAtual });
       
       const novaObservacaoMatriz = observacaoMatriz.map(row => [...row]);
@@ -171,8 +170,8 @@ const AvaliacaoEstudante = ({
   const maxIndicadores = Math.max(0, ...matriz.ucs.map((uc) => uc.indicadores.length));
 
   return (
+    // O JSX abaixo está completo e não precisa de mais alterações.
     <div className="p-3">
-      {/* Alerta Flutuante */}
       {alertInfo.show && (
         <Alert
           variant={alertInfo.variant}
@@ -186,7 +185,6 @@ const AvaliacaoEstudante = ({
         </Alert>
       )}
 
-      {/* Legenda */}
       <div className="d-flex gap-3 mb-3">
         {estados.map((estado, idx) => (
           <div key={idx} className="d-flex align-items-center gap-2">
@@ -196,10 +194,8 @@ const AvaliacaoEstudante = ({
         ))}
       </div>
 
-      {/* Tabela Principal */}
       <div style={{ overflowX: "auto" }}>
         <Table bordered responsive>
-          {/* ... Head da tabela sem alterações ... */}
           <thead>
             <tr>
               <th style={{ backgroundColor: "#0d6efd", color: "white" }}>UC</th>
@@ -234,21 +230,9 @@ const AvaliacaoEstudante = ({
                           </div>
                           <div style={{ width: "1px", backgroundColor: "#dee2e6", margin: "0 6px", alignSelf: "stretch" }}></div>
                           <div className="d-flex gap-2 justify-content-end align-items-center">
-                            <FaSave
-                              style={{ cursor: "pointer", color: "#0d6efd" }}
-                              onClick={() => handleAtualizarBadge(ucIndex, indIndex)}
-                              title="Salvar Menção"
-                            />
-                            <MdAssignment
-                              style={{ cursor: "pointer", color: "gray" }}
-                              onClick={() => handleAbrirModalAtividade(uc.id_uc, indicador.id_indicador)}
-                              title="Selecionar Atividade"
-                            />
-                            <MdComment
-                              style={{ cursor: "pointer", color: "#198754" }}
-                              onClick={() => handleAbrirObsModal(ucIndex, indIndex)}
-                              title="Inserir Observação"
-                            />
+                            <FaSave style={{ cursor: "pointer", color: "#0d6efd" }} onClick={() => handleAtualizarBadge(ucIndex, indIndex)} title="Salvar Menção" />
+                            <MdAssignment style={{ cursor: "pointer", color: "gray" }} onClick={() => handleAbrirModalAtividade(uc.id_uc, indicador.id_indicador)} title="Selecionar Atividade" />
+                            <MdComment style={{ cursor: "pointer", color: "#198754" }} onClick={() => handleAbrirObsModal(ucIndex, indIndex)} title="Inserir Observação" />
                           </div>
                         </div>
                       ) : null}
@@ -260,71 +244,15 @@ const AvaliacaoEstudante = ({
           </tbody>
         </Table>
       </div>
-
-      {/* Modal de Seleção de Atividades */}
-      {/* ... Sem alterações ... */}
+      
       <Modal show={showAtividadeModal} onHide={() => setShowAtividadeModal(false)} size="lg">
-        <Modal.Header closeButton>
-          <Modal.Title>Selecionar Atividade Avaliativa</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          {atividadesModal.length > 0 ? (
-            <Form>
-              {atividadesModal.map((atv) => (
-                <Form.Check
-                  key={atv.id}
-                  type="checkbox"
-                  label={atv.nome}
-                  checked={atividadeSelecionada[atv.id] || false}
-                  onChange={(e) =>
-                    setAtividadeSelecionada((prev) => ({
-                      ...prev,
-                      [atv.id]: e.target.checked,
-                    }))
-                  }
-                />
-              ))}
-            </Form>
-          ) : (
-            <p>Nenhuma atividade disponível.</p>
-          )}
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={() => setShowAtividadeModal(false)}>
-            Cancelar
-          </Button>
-          <Button variant="primary" onClick={handleConfirmarAtividade}>
-            Confirmar
-          </Button>
-        </Modal.Footer>
+         {/* ... JSX do modal de atividade sem alterações ... */}
+         <Modal.Header closeButton><Modal.Title>Selecionar Atividade Avaliativa</Modal.Title></Modal.Header><Modal.Body>{atividadesModal.length>0?<Form>{atividadesModal.map((atv)=>(<Form.Check key={atv.id} type="checkbox" label={atv.nome} checked={atividadeSelecionada[atv.id]||false} onChange={(e)=>setAtividadeSelecionada((prev)=>({...prev,[atv.id]:e.target.checked,}))}/>))}</Form>:<p>Nenhuma atividade disponível.</p>}</Modal.Body><Modal.Footer><Button variant="secondary" onClick={()=>setShowAtividadeModal(false)}>Cancelar</Button><Button variant="primary" onClick={handleConfirmarAtividade}>Confirmar</Button></Modal.Footer>
       </Modal>
 
-      {/* Modal de Observação */}
-      {/* ... Sem alterações ... */}
       <Modal show={showObsModal} onHide={() => setShowObsModal(false)} centered>
-        <Modal.Header closeButton>
-          <Modal.Title>Adicionar / Editar Observação</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <Form.Group>
-            <Form.Label>Observação sobre o desempenho do aluno neste indicador:</Form.Label>
-            <Form.Control
-              as="textarea"
-              rows={5}
-              value={observacaoAtual}
-              onChange={(e) => setObservacaoAtual(e.target.value)}
-              placeholder="Digite sua observação aqui..."
-            />
-          </Form.Group>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={() => setShowObsModal(false)}>
-            Cancelar
-          </Button>
-          <Button variant="primary" onClick={handleSalvarObservacao}>
-            Salvar Observação
-          </Button>
-        </Modal.Footer>
+         {/* ... JSX do modal de observação sem alterações ... */}
+         <Modal.Header closeButton><Modal.Title>Adicionar / Editar Observação</Modal.Title></Modal.Header><Modal.Body><Form.Group><Form.Label>Observação sobre o desempenho do aluno neste indicador:</Form.Label><Form.Control as="textarea" rows={5} value={observacaoAtual} onChange={(e)=>setObservacaoAtual(e.target.value)} placeholder="Digite sua observação aqui..."/></Form.Group></Modal.Body><Modal.Footer><Button variant="secondary" onClick={()=>setShowObsModal(false)}>Cancelar</Button><Button variant="primary" onClick={handleSalvarObservacao}>Salvar Observação</Button></Modal.Footer>
       </Modal>
     </div>
   );
