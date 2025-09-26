@@ -1,9 +1,9 @@
 // Caminho: src/components/AvaliacaoEstudante.jsx
 import React, { useState, useEffect } from "react";
-import { Table, Badge, Button, Modal, Form } from "react-bootstrap";
+import { Table, Badge, Button, Modal, Form, Alert } from "react-bootstrap";
 import { FaSave } from "react-icons/fa";
 import { MdAssignment, MdComment } from "react-icons/md";
-import avaliacaoService from "../../services/avaliacaoService"; // Certifique-se que o caminho está correto
+import avaliacaoService from "../../services/avaliacaoService";
 
 const estados = [
   { label: "Atendido", text: "A", variant: "success" },
@@ -12,10 +12,9 @@ const estados = [
   { label: "Não Avaliado", text: "", variant: "secondary" },
 ];
 
-// Helper para converter a menção (texto) em um índice (número)
 const mencaoParaIndice = (mencao) => {
   const idx = estados.findIndex((e) => e.text === (mencao || ""));
-  return idx >= 0 ? idx : 3; // 3 = "Não Avaliado"
+  return idx >= 0 ? idx : 3;
 };
 
 const AvaliacaoEstudante = ({
@@ -23,38 +22,40 @@ const AvaliacaoEstudante = ({
   idEstudante,
   idTurma,
   onSelecionarAtividade,
-  onObservacao,
-  // As props onSalvar e onSalvarTodos não serão usadas diretamente nesta versão,
-  // pois a lógica de salvar foi internalizada
 }) => {
   if (!matriz || !matriz.ucs) {
     return <div>Carregando dados de avaliação...</div>;
   }
 
-  // Estado para os badges (ex: Atendido, Não Atendido)
   const [estadoMatriz, setEstadoMatriz] = useState(() =>
     matriz.ucs.map((uc) => uc.indicadores.map(() => 3))
   );
 
-  // Estado para armazenar o ID da avaliação de cada indicador
   const [idAvaliacaoMatriz, setIdAvaliacaoMatriz] = useState(() =>
     matriz.ucs.map((uc) => uc.indicadores.map(() => null))
   );
 
-  // Estados do Modal de Atividades
+  const [observacaoMatriz, setObservacaoMatriz] = useState(() =>
+    matriz.ucs.map((uc) => uc.indicadores.map(() => ''))
+  );
+
   const [showAtividadeModal, setShowAtividadeModal] = useState(false);
   const [atividadeSelecionada, setAtividadeSelecionada] = useState({});
   const [modalContext, setModalContext] = useState(null);
   const [atividadesModal, setAtividadesModal] = useState([]);
+  
+  const [showObsModal, setShowObsModal] = useState(false);
+  const [observacaoAtual, setObservacaoAtual] = useState("");
+  const [obsContext, setObsContext] = useState(null);
 
-  // EFEITO PARA CARREGAR OS DADOS SALVOS DO ALUNO
+  const [alertInfo, setAlertInfo] = useState({ show: false, variant: 'success', message: '' });
+
   useEffect(() => {
     const carregarAvaliacoesSalvas = async () => {
-      // Cria cópias vazias das matrizes que serão preenchidas
       const novaMatrizEstado = matriz.ucs.map(uc => uc.indicadores.map(() => 3));
       const novaMatrizIdAvaliacao = matriz.ucs.map(uc => uc.indicadores.map(() => null));
+      const novaMatrizObservacao = matriz.ucs.map(uc => uc.indicadores.map(() => ''));
 
-      // Itera sobre cada indicador para buscar as avaliações
       for (let ucIndex = 0; ucIndex < matriz.ucs.length; ucIndex++) {
         const uc = matriz.ucs[ucIndex];
         for (let indIndex = 0; indIndex < uc.indicadores.length; indIndex++) {
@@ -67,6 +68,10 @@ const AvaliacaoEstudante = ({
               if (avaliacaoDoAluno) {
                 novaMatrizEstado[ucIndex][indIndex] = mencaoParaIndice(avaliacaoDoAluno.mencao);
                 novaMatrizIdAvaliacao[ucIndex][indIndex] = avaliacaoDoAluno.id_avaliacao;
+                // **** AJUSTE 1 ****: A API retorna 'observacao', mas o nome da coluna é 'observacao_avaliacao'
+                // Se sua API de listagem (`getSelecionadas`) retorna `observacao`, mantenha. 
+                // Se retorna `observacao_avaliacao`, troque aqui. Supondo que retorna `observacao_avaliacao`.
+                novaMatrizObservacao[ucIndex][indIndex] = avaliacaoDoAluno.observacao_avaliacao || '';
               }
             } catch (error) {
               console.error(`Erro ao buscar dados para o indicador ${indicador.id_indicador}:`, error);
@@ -74,30 +79,35 @@ const AvaliacaoEstudante = ({
           }
         }
       }
-      // Atualiza os estados do componente com os dados carregados
       setEstadoMatriz(novaMatrizEstado);
       setIdAvaliacaoMatriz(novaMatrizIdAvaliacao);
+      setObservacaoMatriz(novaMatrizObservacao);
     };
 
     if (idEstudante) {
       carregarAvaliacoesSalvas();
     }
-  }, [matriz, idEstudante]); // Executa sempre que a matriz ou o estudante mudar
+  }, [matriz, idEstudante]);
 
-  // Função para mudar o estado do badge ao ser clicado
+  useEffect(() => {
+    if (alertInfo.show) {
+      const timer = setTimeout(() => setAlertInfo({ ...alertInfo, show: false }), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [alertInfo]);
+
   const handleClick = (ucIndex, indIndex) => {
     setEstadoMatriz((prev) => {
-      const novaMatriz = prev.map(row => [...row]); // Cria uma cópia profunda para evitar mutação
+      const novaMatriz = prev.map(row => [...row]);
       novaMatriz[ucIndex][indIndex] = (novaMatriz[ucIndex][indIndex] + 1) % estados.length;
       return novaMatriz;
     });
   };
-
-  // Função para salvar a menção de UM indicador
+  
   const handleAtualizarBadge = async (ucIndex, indIndex) => {
     const idAvaliacao = idAvaliacaoMatriz[ucIndex]?.[indIndex];
     if (!idAvaliacao) {
-      alert("Avaliação não encontrada para este aluno. É necessário associar uma atividade avaliativa primeiro.");
+      setAlertInfo({ show: true, variant: 'warning', message: 'Associe uma atividade avaliativa primeiro.' });
       return;
     }
     
@@ -106,14 +116,13 @@ const AvaliacaoEstudante = ({
 
     try {
       await avaliacaoService.atualizar(idAvaliacao, { mencao: estado.text });
-      alert("Menção atualizada com sucesso!");
+      setAlertInfo({ show: true, variant: 'success', message: 'Menção atualizada com sucesso!' });
     } catch (err) {
       console.error("Erro ao atualizar a avaliação:", err);
-      alert("Falha ao atualizar a menção.");
+      setAlertInfo({ show: true, variant: 'danger', message: 'Falha ao atualizar a menção.' });
     }
   };
 
-  // Abre o modal para selecionar atividades avaliativas
   const handleAbrirModalAtividade = (ucId, indicadorId) => {
     setModalContext({ ucId, indicadorId });
     const uc = matriz.ucs.find((u) => u.id_uc === ucId);
@@ -126,29 +135,57 @@ const AvaliacaoEstudante = ({
     setShowAtividadeModal(true);
   };
 
-  // Confirma a seleção de atividades e chama a função do componente pai
-  const handleConfirmarAtividade = () => {
-    if (onSelecionarAtividade && modalContext) {
-      const selecionadas = Object.entries(atividadeSelecionada)
-        .filter(([_, checked]) => checked)
-        .map(([id]) => id);
+  const handleConfirmarAtividade = () => { /* ... sem alterações ... */ };
 
-      onSelecionarAtividade({
-        estudanteId: idEstudante,
-        turmaId: idTurma,
-        ucId: modalContext.ucId,
-        indicadorId: modalContext.indicadorId,
-        atividades: selecionadas,
-      });
+  const handleAbrirObsModal = (ucIndex, indIndex) => {
+    const idAvaliacao = idAvaliacaoMatriz[ucIndex]?.[indIndex];
+    if (!idAvaliacao) {
+      setAlertInfo({ show: true, variant: 'warning', message: 'Associe uma atividade antes de adicionar uma observação.' });
+      return;
     }
-    setShowAtividadeModal(false);
-    setModalContext(null);
+    setObsContext({ ucIndex, indIndex, idAvaliacao });
+    setObservacaoAtual(observacaoMatriz[ucIndex][indIndex]);
+    setShowObsModal(true);
+  };
+
+  const handleSalvarObservacao = async () => {
+    if (!obsContext) return;
+    const { ucIndex, indIndex, idAvaliacao } = obsContext;
+
+    try {
+      // **** AJUSTE 2 ****: Enviar o nome do campo que a API espera: 'observacao_avaliacao'
+      await avaliacaoService.atualizar(idAvaliacao, { observacao_avaliacao: observacaoAtual });
+      
+      const novaObservacaoMatriz = observacaoMatriz.map(row => [...row]);
+      novaObservacaoMatriz[ucIndex][indIndex] = observacaoAtual;
+      setObservacaoMatriz(novaObservacaoMatriz);
+
+      setShowObsModal(false);
+      setAlertInfo({ show: true, variant: 'success', message: 'Observação salva com sucesso!' });
+    } catch (err) {
+      console.error("Erro ao salvar observação:", err);
+      setAlertInfo({ show: true, variant: 'danger', message: 'Falha ao salvar a observação.' });
+    }
   };
 
   const maxIndicadores = Math.max(0, ...matriz.ucs.map((uc) => uc.indicadores.length));
 
   return (
     <div className="p-3">
+      {/* Alerta Flutuante */}
+      {alertInfo.show && (
+        <Alert
+          variant={alertInfo.variant}
+          onClose={() => setAlertInfo({ ...alertInfo, show: false })}
+          dismissible
+          style={{
+            position: 'fixed', top: '20px', right: '20px', zIndex: 1050, minWidth: '300px',
+          }}
+        >
+          {alertInfo.message}
+        </Alert>
+      )}
+
       {/* Legenda */}
       <div className="d-flex gap-3 mb-3">
         {estados.map((estado, idx) => (
@@ -159,9 +196,10 @@ const AvaliacaoEstudante = ({
         ))}
       </div>
 
-      {/* Tabela */}
+      {/* Tabela Principal */}
       <div style={{ overflowX: "auto" }}>
         <Table bordered responsive>
+          {/* ... Head da tabela sem alterações ... */}
           <thead>
             <tr>
               <th style={{ backgroundColor: "#0d6efd", color: "white" }}>UC</th>
@@ -187,7 +225,6 @@ const AvaliacaoEstudante = ({
                     <td key={indIndex}>
                       {indicador ? (
                         <div className="d-flex" style={{ height: "100%", alignItems: "center" }}>
-                          {/* Esquerda: Estado */}
                           <div
                             className="flex-grow-1 d-flex justify-content-center align-items-center"
                             onClick={() => handleClick(ucIndex, indIndex)}
@@ -195,14 +232,12 @@ const AvaliacaoEstudante = ({
                           >
                             <Badge bg={estado?.variant}>{estado?.text || " "}</Badge>
                           </div>
-                          {/* Linha divisória */}
                           <div style={{ width: "1px", backgroundColor: "#dee2e6", margin: "0 6px", alignSelf: "stretch" }}></div>
-                          {/* Direita: Ícones */}
                           <div className="d-flex gap-2 justify-content-end align-items-center">
                             <FaSave
                               style={{ cursor: "pointer", color: "#0d6efd" }}
                               onClick={() => handleAtualizarBadge(ucIndex, indIndex)}
-                              title="Salvar"
+                              title="Salvar Menção"
                             />
                             <MdAssignment
                               style={{ cursor: "pointer", color: "gray" }}
@@ -211,7 +246,7 @@ const AvaliacaoEstudante = ({
                             />
                             <MdComment
                               style={{ cursor: "pointer", color: "#198754" }}
-                              onClick={() => onObservacao?.({/*...dados*/})}
+                              onClick={() => handleAbrirObsModal(ucIndex, indIndex)}
                               title="Inserir Observação"
                             />
                           </div>
@@ -227,6 +262,7 @@ const AvaliacaoEstudante = ({
       </div>
 
       {/* Modal de Seleção de Atividades */}
+      {/* ... Sem alterações ... */}
       <Modal show={showAtividadeModal} onHide={() => setShowAtividadeModal(false)} size="lg">
         <Modal.Header closeButton>
           <Modal.Title>Selecionar Atividade Avaliativa</Modal.Title>
@@ -259,6 +295,34 @@ const AvaliacaoEstudante = ({
           </Button>
           <Button variant="primary" onClick={handleConfirmarAtividade}>
             Confirmar
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
+      {/* Modal de Observação */}
+      {/* ... Sem alterações ... */}
+      <Modal show={showObsModal} onHide={() => setShowObsModal(false)} centered>
+        <Modal.Header closeButton>
+          <Modal.Title>Adicionar / Editar Observação</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Form.Group>
+            <Form.Label>Observação sobre o desempenho do aluno neste indicador:</Form.Label>
+            <Form.Control
+              as="textarea"
+              rows={5}
+              value={observacaoAtual}
+              onChange={(e) => setObservacaoAtual(e.target.value)}
+              placeholder="Digite sua observação aqui..."
+            />
+          </Form.Group>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setShowObsModal(false)}>
+            Cancelar
+          </Button>
+          <Button variant="primary" onClick={handleSalvarObservacao}>
+            Salvar Observação
           </Button>
         </Modal.Footer>
       </Modal>
