@@ -4,6 +4,7 @@ import { Outlet } from 'react-router-dom';
 import { NavLink as NavLink2 } from 'react-router-dom';
 
 import { Nav, NavItem,   NavLink,Navbar } from 'react-bootstrap';
+import RegistroEstudante from '../RegistroEstudante';
 
 function PainelEstudante() {
  
@@ -37,7 +38,8 @@ function PainelEstudante() {
           
           
                 <div>
-                  <Outlet />
+                  <RegistroEstudante />
+                  {/* <Outlet /> */}
                 </div>
 
           </div>

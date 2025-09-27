@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
-import { Container, Form, Button, Row, Col, FormGroup, FormLabel, FormControl, Alert } from 'react-bootstrap'; // Adicionado Alert para feedback
+import React, { useState, useEffect } from 'react'; // 1. Importe o useEffect
+import { Alert } from 'react-bootstrap';
 import estudanteService from '../../services/estudanteService';
-import 'bootstrap/dist/css/bootstrap.min.css';
+
+import styles from './RegistroEstudante.module.css'; 
 
 const RegistroEstudante = () => {
   const [formData, setFormData] = useState({
@@ -10,7 +11,21 @@ const RegistroEstudante = () => {
     senha_aluno: ''
   });
 
-  const [feedback, setFeedback] = useState({ type: '', message: '' }); // Estado para feedback
+  const [feedback, setFeedback] = useState({ type: '', message: '' });
+
+  // 2. Adicione este bloco useEffect
+  useEffect(() => {
+    // Se existe uma mensagem no feedback...
+    if (feedback.message) {
+      // Cria um temporizador para limpar o feedback após 1 segundo
+      const timer = setTimeout(() => {
+        setFeedback({ type: '', message: '' });
+      }, 1000); // 1000ms = 1 segundo
+
+      // Função de limpeza: se o componente for desmontado, o timer é cancelado
+      return () => clearTimeout(timer);
+    }
+  }, [feedback]); // O hook vai rodar toda vez que o estado 'feedback' mudar
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -22,7 +37,7 @@ const RegistroEstudante = () => {
     try {
       await estudanteService.createStudent(formData);
       setFeedback({ type: 'success', message: 'Estudante inserido com sucesso!' });
-      setFormData({ nome_aluno: '', email_aluno: '', senha_aluno: '' }); // Limpa o formulário após o cadastro
+      setFormData({ nome_aluno: '', email_aluno: '', senha_aluno: '' });
     } catch (error) {
       console.error('Erro ao cadastrar aluno:', error);
       setFeedback({ type: 'danger', message: 'Erro ao cadastrar aluno: ' + error.message });
@@ -30,70 +45,76 @@ const RegistroEstudante = () => {
   };
 
   return (
-    <Container className="mt-5">
-      <h2 className="mb-4">Cadastro de estudantes</h2>
+    <div className={styles.registroEstudante}>
+      
+      {/* Coluna da Esquerda: Formulário */}
+      <div className={styles.formContainer}>
+        <div className={styles.formLogo}>
+           {/* Ícone de exemplo */}
+           🎓
+        </div>
+        <h2>Cadastro de Estudante</h2>
 
-      {/* Feedback para o usuário */}
-      {feedback.message && (
-        <Alert variant={feedback.type} onClose={() => setFeedback({ type: '', message: '' })} dismissible>
-          {feedback.message}
-        </Alert>
-      )}
+        {/* Feedback para o usuário (NENHUMA MUDANÇA AQUI) */}
+        {feedback.message && (
+          <Alert variant={feedback.type} onClose={() => setFeedback({ type: '', message: '' })} dismissible className={styles.feedbackAlert}>
+            {feedback.message}
+          </Alert>
+        )}
 
-      <Form onSubmit={handleSubmit}>
-        <FormGroup as={Row} className="mb-3">
-          <FormLabel column sm={2}>
-            Nome
-          </FormLabel>
-          <Col sm={10}>
-            <FormControl
+        <form onSubmit={handleSubmit}>
+          <div className={styles.formGroup}>
+            <label htmlFor="nome_aluno">Nome Completo</label>
+            <input
               type="text"
+              id="nome_aluno"
               name="nome_aluno"
-              placeholder="Digite o nome do aluno"
+              placeholder="Digite seu nome completo"
               value={formData.nome_aluno}
               onChange={handleChange}
               required
             />
-          </Col>
-        </FormGroup>
+          </div>
 
-        <FormGroup as={Row} className="mb-3">
-          <FormLabel column sm={2}>
-            Email
-          </FormLabel>
-          <Col sm={10}>
-            <FormControl
+          <div className={styles.formGroup}>
+            <label htmlFor="email_aluno">Email</label>
+            <input
               type="email"
+              id="email_aluno"
               name="email_aluno"
-              placeholder="Digite o email do aluno"
+              placeholder="seu@email.com"
               value={formData.email_aluno}
               onChange={handleChange}
               required
             />
-          </Col>
-        </FormGroup>
+          </div>
 
-        <FormGroup as={Row} className="mb-3">
-          <FormLabel column sm={2}>
-            Senha
-          </FormLabel>
-          <Col sm={10}>
-            <FormControl
+          <div className={styles.formGroup}>
+            <label htmlFor="senha_aluno">Senha</label>
+            <input
               type="password"
+              id="senha_aluno"
               name="senha_aluno"
-              placeholder="Digite uma senha"
+              placeholder="Mínimo 6 caracteres"
               value={formData.senha_aluno}
               onChange={handleChange}
               required
             />
-          </Col>
-        </FormGroup>
+          </div>
 
-        <Button variant="dark" type="submit">
-          Cadastrar
-        </Button>
-      </Form>
-    </Container>
+          <button type="submit" className={styles.submitBtn}>
+            Cadastrar
+          </button>
+        </form>
+      </div>
+
+      {/* Coluna da Direita: Ilustração */}
+      <div className={styles.illustrationContainer}>
+        {/* Adicione sua imagem ou ilustração aqui */}
+        {/* Ex: <img src="/ilustracao.svg" alt="Ilustração" className={styles.illustrationImage} /> */}
+      </div>
+
+    </div>
   );
 };
 
