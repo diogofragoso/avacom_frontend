@@ -1,15 +1,14 @@
 import React, { useState } from 'react';
-import { Container, Row, Col, Form, Button, Alert } from 'react-bootstrap'; // Adicionado Alert
-import { FaEye, FaEyeSlash, FaEnvelope, FaLock, FaUser, FaIdCard, FaBuilding } from 'react-icons/fa'; // Ícones adicionados
+import { Container, Row, Col, Form, Button, Alert } from 'react-bootstrap';
+import { FaEye, FaEyeSlash, FaEnvelope, FaLock, FaUser, FaIdCard, FaBuilding } from 'react-icons/fa';
 import styles from './Login.module.css';
-import usuarioService from '../../services/usuarioService'; // 👈 IMPORTANTE: ajuste o caminho para o seu service
+import usuarioService from '../../services/usuarioService';
 
 export default function Login() {
     // --- ESTADOS ---
     const [showRegister, setShowRegister] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
     
-    // Estado para controlar os dados do formulário
     const [formData, setFormData] = useState({
         nome: '',
         email: '',
@@ -19,17 +18,15 @@ export default function Login() {
         departamento: '',
     });
 
-    // Estados para feedback ao usuário
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState(null);
-    const [successMessage, setSuccessMessage] = useState(null); // ✨ 1. Adicionar estado para o sucesso
+    const [successMessage, setSuccessMessage] = useState(null);
 
     // --- FUNÇÕES ---
     const toggleForm = () => {
         setShowRegister(!showRegister);
-        setError(null); // Limpa erros ao trocar de formulário
-        setSuccessMessage(null); // ✨ Limpa a mensagem de sucesso ao trocar
-        // Reseta o formulário ao trocar
+        setError(null);
+        setSuccessMessage(null);
         setFormData({
             nome: '', email: '', senha: '', tipo_usuario: 'aluno',
             numero_matricula: '', departamento: ''
@@ -37,21 +34,17 @@ export default function Login() {
     };
 
     const togglePasswordVisibility = () => setShowPassword(!showPassword);
+    const handleChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
 
-    // Atualiza o estado do formulário a cada mudança nos inputs
-    const handleChange = (e) => {
-        setFormData({ ...formData, [e.target.name]: e.target.value });
-    };
-
-    // Lida com o envio do formulário (Login ou Cadastro)
+    // --- LÓGICA PRINCIPAL DO FORMULÁRIO ---
     const handleSubmit = async (e) => {
-        e.preventDefault(); // Previne o recarregamento da página
+        e.preventDefault();
         setError(null);
-        setSuccessMessage(null); // ✨ Limpa mensagens antigas
+        setSuccessMessage(null);
         setIsLoading(true);
 
         if (showRegister) {
-            // --- LÓGICA DE CADASTRO ---
+            // --- LÓGICA DE CADASTRO (já funcional) ---
             try {
                 const dadosParaEnviar = { ...formData };
                 if (dadosParaEnviar.tipo_usuario === 'aluno') {
@@ -59,29 +52,37 @@ export default function Login() {
                 } else {
                     delete dadosParaEnviar.numero_matricula;
                 }
-
-                // Chama o serviço para criar o usuário
                 const response = await usuarioService.criarUsuario(dadosParaEnviar);
-                
-                // ✨ 2. Substituir o alert() pela definição da mensagem de sucesso
-                setSuccessMessage(response.message);
-                
-                // Adia o toggleForm para que a mensagem de sucesso seja visível
+                setSuccessMessage(response.message + " Agora você já pode fazer o login.");
                 setTimeout(() => {
-                    toggleForm(); // Volta para a tela de login após o sucesso
-                }, 3000); // 3 segundos de delay
-
+                    toggleForm();
+                }, 3000);
             } catch (err) {
-                // Captura o erro da API e exibe para o usuário
                 setError(err.error || 'Não foi possível completar o cadastro.');
             } finally {
                 setIsLoading(false);
             }
         } else {
-            // --- LÓGICA DE LOGIN (A SER IMPLEMENTADA) ---
-            alert('Funcionalidade de Login ainda não implementada.');
-            // TODO: Chamar o service de login aqui
-            setIsLoading(false);
+            // ✨ --- LÓGICA DE LOGIN IMPLEMENTADA --- ✨
+            try {
+                const credenciais = {
+                    email: formData.email,
+                    senha: formData.senha,
+                };
+
+                await usuarioService.login(credenciais);
+
+                // Se o login for bem-sucedido, o cookie é definido automaticamente pelo backend.
+                // Agora, redirecionamos o usuário para a página principal do sistema.
+                // (Você pode criar um alerta de sucesso aqui também se desejar)
+                window.location.href = '/'; // Ou a rota para sua página principal
+
+            } catch (err) {
+                // Captura o erro da API (ex: "Credenciais inválidas.")
+                setError(err.error || 'Falha no login. Verifique seu email e senha.');
+            } finally {
+                setIsLoading(false);
+            }
         }
     };
 
@@ -89,7 +90,6 @@ export default function Login() {
     return (
         <Container fluid className={styles.pageWrapper}>
             <Row className="vh-100">
-                {/* Lado Esquerdo (sem alterações) */}
                 <Col md={6} className={styles.leftPanel}>
                     <div className={styles.leftContent}>
                         <h1>Bem-vindo ao Portal Educacional</h1>
@@ -97,12 +97,12 @@ export default function Login() {
                     </div>
                 </Col>
 
-                {/* Lado Direito */}
                 <Col md={6} className={styles.rightPanel}>
                     <div className={styles.formContainer}>
                         <h3 className="text-center mb-4">{showRegister ? 'Cadastro' : 'Login'}</h3>
 
                         <Form onSubmit={handleSubmit}>
+                            {/* ... (Todo o seu JSX de formulário permanece exatamente o mesmo) ... */}
                             {showRegister && (
                                 <Form.Group className={`mb-3 ${styles.inputWithIcon}`}>
                                     <Form.Label>Nome</Form.Label>
@@ -115,7 +115,6 @@ export default function Login() {
                                     </div>
                                 </Form.Group>
                             )}
-
                             <Form.Group className={`mb-3 ${styles.inputWithIcon}`}>
                                 <Form.Label>Email</Form.Label>
                                 <div className={styles.iconInputWrapper}>
@@ -126,7 +125,6 @@ export default function Login() {
                                     />
                                 </div>
                             </Form.Group>
-
                             <Form.Group className={`mb-3 ${styles.inputWithIcon}`}>
                                 <Form.Label>Senha</Form.Label>
                                 <div className={styles.iconInputWrapper}>
@@ -141,8 +139,6 @@ export default function Login() {
                                     </span>
                                 </div>
                             </Form.Group>
-                            
-                            {/* --- CAMPOS CONDICIONAIS DE CADASTRO --- */}
                             {showRegister && (
                                 <>
                                     <Form.Group className="mb-3">
@@ -152,8 +148,6 @@ export default function Login() {
                                             <option value="professor">Professor</option>
                                         </Form.Select>
                                     </Form.Group>
-
-                                    {/* Campo para Aluno */}
                                     {formData.tipo_usuario === 'aluno' && (
                                         <Form.Group className={`mb-3 ${styles.inputWithIcon}`}>
                                             <Form.Label>Número de Matrícula</Form.Label>
@@ -166,8 +160,6 @@ export default function Login() {
                                             </div>
                                         </Form.Group>
                                     )}
-
-                                    {/* Campo para Professor */}
                                     {formData.tipo_usuario === 'professor' && (
                                         <Form.Group className={`mb-3 ${styles.inputWithIcon}`}>
                                             <Form.Label>Departamento</Form.Label>
@@ -183,9 +175,8 @@ export default function Login() {
                                 </>
                             )}
                             
-                            {/* Exibição de Erro */}
+                            {/* Exibição de Alertas */}
                             {error && <Alert variant="danger">{error}</Alert>}
-                            {/* ✨ 3. Adicionar a renderização do Alert de sucesso */}
                             {successMessage && <Alert variant="success">{successMessage}</Alert>}
 
                             <div className="d-grid">
