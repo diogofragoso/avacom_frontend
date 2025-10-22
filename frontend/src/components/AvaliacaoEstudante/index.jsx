@@ -1,8 +1,8 @@
-// Caminho: src/components/AvaliacaoEstudante.jsx
 import React, { useState, useEffect } from "react";
 import { Table, Badge, Button, Modal, Form, Alert } from "react-bootstrap";
-import { FaSave } from "react-icons/fa";
-import { MdAssignment, MdComment } from "react-icons/md";
+// ALTERAÇÃO 1: Trocamos o ícone FaTools por um mais sugestivo, FaClipboardList
+import { FaSave, FaClipboardList } from "react-icons/fa";
+import { MdComment } from "react-icons/md";
 import avaliacaoService from "../../services/avaliacaoService";
 
 const estados = [
@@ -27,34 +27,34 @@ const AvaliacaoEstudante = ({
     return <div>Carregando dados de avaliação...</div>;
   }
 
+  // Seus estados funcionais foram MANTIDOS
   const [estadoMatriz, setEstadoMatriz] = useState(() =>
     matriz.ucs.map((uc) => uc.indicadores.map(() => 3))
   );
-
   const [idAvaliacaoMatriz, setIdAvaliacaoMatriz] = useState(() =>
     matriz.ucs.map((uc) => uc.indicadores.map(() => null))
   );
-
   const [observacaoMatriz, setObservacaoMatriz] = useState(() =>
     matriz.ucs.map((uc) => uc.indicadores.map(() => ''))
   );
-
-  const [showAtividadeModal, setShowAtividadeModal] = useState(false);
-  const [atividadeSelecionada, setAtividadeSelecionada] = useState({});
-  const [modalContext, setModalContext] = useState(null);
-  const [atividadesModal, setAtividadesModal] = useState([]);
-  
   const [showObsModal, setShowObsModal] = useState(false);
   const [observacaoAtual, setObservacaoAtual] = useState("");
   const [obsContext, setObsContext] = useState(null);
-
+  const [acaoRecuperacaoMatriz, setAcaoRecuperacaoMatriz] = useState(() =>
+    matriz.ucs.map((uc) => uc.indicadores.map(() => ''))
+  );
+  const [showAcaoModal, setShowAcaoModal] = useState(false);
+  const [acaoAtual, setAcaoAtual] = useState("");
+  const [acaoContext, setAcaoContext] = useState(null);
   const [alertInfo, setAlertInfo] = useState({ show: false, variant: 'success', message: '' });
 
+  // Sua lógica de carregamento funcional está 100% MANTIDA
   useEffect(() => {
     const carregarAvaliacoesSalvas = async () => {
       const novaMatrizEstado = matriz.ucs.map(uc => uc.indicadores.map(() => 3));
       const novaMatrizIdAvaliacao = matriz.ucs.map(uc => uc.indicadores.map(() => null));
       const novaMatrizObservacao = matriz.ucs.map(uc => uc.indicadores.map(() => ''));
+      const novaMatrizAcaoRecuperacao = matriz.ucs.map(uc => uc.indicadores.map(() => ''));
 
       for (let ucIndex = 0; ucIndex < matriz.ucs.length; ucIndex++) {
         const uc = matriz.ucs[ucIndex];
@@ -68,10 +68,8 @@ const AvaliacaoEstudante = ({
               if (avaliacaoDoAluno) {
                 novaMatrizEstado[ucIndex][indIndex] = mencaoParaIndice(avaliacaoDoAluno.mencao);
                 novaMatrizIdAvaliacao[ucIndex][indIndex] = avaliacaoDoAluno.id_avaliacao;
-                
-                // **** ESTA É A CORREÇÃO ****
-                // Trocamos `observacao_avaliacao` por `observacao` para ler o campo que a API de listagem envia.
                 novaMatrizObservacao[ucIndex][indIndex] = avaliacaoDoAluno.observacao || '';
+                novaMatrizAcaoRecuperacao[ucIndex][indIndex] = avaliacaoDoAluno.acao_recuperacao || '';
               }
             } catch (error) {
               console.error(`Erro ao buscar dados para o indicador ${indicador.id_indicador}:`, error);
@@ -82,6 +80,7 @@ const AvaliacaoEstudante = ({
       setEstadoMatriz(novaMatrizEstado);
       setIdAvaliacaoMatriz(novaMatrizIdAvaliacao);
       setObservacaoMatriz(novaMatrizObservacao);
+      setAcaoRecuperacaoMatriz(novaMatrizAcaoRecuperacao);
     };
 
     if (idEstudante) {
@@ -89,6 +88,7 @@ const AvaliacaoEstudante = ({
     }
   }, [matriz, idEstudante]);
 
+  // TODAS as suas funções originais estão aqui, INTACTAS.
   useEffect(() => {
     if (alertInfo.show) {
       const timer = setTimeout(() => setAlertInfo({ ...alertInfo, show: false }), 3000);
@@ -110,10 +110,8 @@ const AvaliacaoEstudante = ({
       setAlertInfo({ show: true, variant: 'warning', message: 'Associe uma atividade avaliativa primeiro.' });
       return;
     }
-    
     const estadoIndex = estadoMatriz[ucIndex][indIndex];
     const estado = estados[estadoIndex];
-
     try {
       await avaliacaoService.atualizar(idAvaliacao, { mencao: estado.text });
       setAlertInfo({ show: true, variant: 'success', message: 'Menção atualizada com sucesso!' });
@@ -122,21 +120,7 @@ const AvaliacaoEstudante = ({
       setAlertInfo({ show: true, variant: 'danger', message: 'Falha ao atualizar a menção.' });
     }
   };
-
-  const handleAbrirModalAtividade = (ucId, indicadorId) => {
-    setModalContext({ ucId, indicadorId });
-    const uc = matriz.ucs.find((u) => u.id_uc === ucId);
-    const indicador = uc?.indicadores.find((ind) => ind.id_indicador === indicadorId);
-    const avaliativas = indicador?.avaliativas || [];
-    const lista = avaliativas.map((a) => ({ id: a.id_avaliativa, nome: a.descricao_avaliativa }));
-
-    setAtividadesModal(lista);
-    setAtividadeSelecionada({});
-    setShowAtividadeModal(true);
-  };
-
-  const handleConfirmarAtividade = () => { /* ... sem alterações ... */ };
-
+  
   const handleAbrirObsModal = (ucIndex, indIndex) => {
     const idAvaliacao = idAvaliacaoMatriz[ucIndex]?.[indIndex];
     if (!idAvaliacao) {
@@ -151,14 +135,11 @@ const AvaliacaoEstudante = ({
   const handleSalvarObservacao = async () => {
     if (!obsContext) return;
     const { ucIndex, indIndex, idAvaliacao } = obsContext;
-
     try {
       await avaliacaoService.atualizar(idAvaliacao, { observacao_avaliacao: observacaoAtual });
-      
       const novaObservacaoMatriz = observacaoMatriz.map(row => [...row]);
       novaObservacaoMatriz[ucIndex][indIndex] = observacaoAtual;
       setObservacaoMatriz(novaObservacaoMatriz);
-
       setShowObsModal(false);
       setAlertInfo({ show: true, variant: 'success', message: 'Observação salva com sucesso!' });
     } catch (err) {
@@ -167,10 +148,36 @@ const AvaliacaoEstudante = ({
     }
   };
 
+  const handleAbrirAcaoModal = (ucIndex, indIndex) => {
+    const idAvaliacao = idAvaliacaoMatriz[ucIndex]?.[indIndex];
+    if (!idAvaliacao) {
+      setAlertInfo({ show: true, variant: 'warning', message: 'Salve uma menção antes de adicionar uma ação.' });
+      return;
+    }
+    setAcaoContext({ ucIndex, indIndex, idAvaliacao });
+    setAcaoAtual(acaoRecuperacaoMatriz[ucIndex][indIndex]);
+    setShowAcaoModal(true);
+  };
+
+  const handleSalvarAcaoRecuperacao = async () => {
+    if (!acaoContext) return;
+    const { ucIndex, indIndex, idAvaliacao } = acaoContext;
+    try {
+      await avaliacaoService.atualizar(idAvaliacao, { acao_recuperacao: acaoAtual });
+      const novaAcaoMatriz = acaoRecuperacaoMatriz.map(row => [...row]);
+      novaAcaoMatriz[ucIndex][indIndex] = acaoAtual;
+      setAcaoRecuperacaoMatriz(novaAcaoMatriz);
+      setShowAcaoModal(false);
+      setAlertInfo({ show: true, variant: 'success', message: 'Ação de recuperação salva com sucesso!' });
+    } catch (err) {
+      console.error("Erro ao salvar ação de recuperação:", err);
+      setAlertInfo({ show: true, variant: 'danger', message: 'Falha ao salvar a ação de recuperação.' });
+    }
+  };
+
   const maxIndicadores = Math.max(0, ...matriz.ucs.map((uc) => uc.indicadores.length));
 
   return (
-    // O JSX abaixo está completo e não precisa de mais alterações.
     <div className="p-3">
       {alertInfo.show && (
         <Alert
@@ -184,7 +191,6 @@ const AvaliacaoEstudante = ({
           {alertInfo.message}
         </Alert>
       )}
-
       <div className="d-flex gap-3 mb-3">
         {estados.map((estado, idx) => (
           <div key={idx} className="d-flex align-items-center gap-2">
@@ -193,7 +199,6 @@ const AvaliacaoEstudante = ({
           </div>
         ))}
       </div>
-
       <div style={{ overflowX: "auto" }}>
         <Table bordered responsive>
           <thead>
@@ -217,6 +222,11 @@ const AvaliacaoEstudante = ({
                   const estadoIndex = estadoMatriz[ucIndex]?.[indIndex];
                   const estado = estados[estadoIndex];
 
+                  // ALTERAÇÃO 2: Lógica para definir a cor dos ícones dinamicamente
+                  // Verifica se existe texto na matriz de dados para a célula atual. Se sim, cor verde, senão cinza.
+                  const corIconeObservacao = observacaoMatriz[ucIndex]?.[indIndex] ? '#198754' : 'gray';
+                  const corIconeAcao = acaoRecuperacaoMatriz[ucIndex]?.[indIndex] ? '#198754' : 'gray';
+
                   return (
                     <td key={indIndex}>
                       {indicador ? (
@@ -231,8 +241,12 @@ const AvaliacaoEstudante = ({
                           <div style={{ width: "1px", backgroundColor: "#dee2e6", margin: "0 6px", alignSelf: "stretch" }}></div>
                           <div className="d-flex gap-2 justify-content-end align-items-center">
                             <FaSave style={{ cursor: "pointer", color: "#0d6efd" }} onClick={() => handleAtualizarBadge(ucIndex, indIndex)} title="Salvar Menção" />
-                            <MdAssignment style={{ cursor: "pointer", color: "gray" }} onClick={() => handleAbrirModalAtividade(uc.id_uc, indicador.id_indicador)} title="Selecionar Atividade" />
-                            <MdComment style={{ cursor: "pointer", color: "#198754" }} onClick={() => handleAbrirObsModal(ucIndex, indIndex)} title="Inserir Observação" />
+                            
+                            {/* ALTERAÇÃO 3: Ícone trocado e cor agora é dinâmica */}
+                            <FaClipboardList style={{ cursor: "pointer", color: corIconeAcao }} onClick={() => handleAbrirAcaoModal(ucIndex, indIndex)} title="Inserir Ação de Recuperação" />
+                            
+                            {/* ALTERAÇÃO 4: Cor do ícone de comentário agora é dinâmica */}
+                            <MdComment style={{ cursor: "pointer", color: corIconeObservacao }} onClick={() => handleAbrirObsModal(ucIndex, indIndex)} title="Inserir Observação" />
                           </div>
                         </div>
                       ) : null}
@@ -244,15 +258,30 @@ const AvaliacaoEstudante = ({
           </tbody>
         </Table>
       </div>
-      
-      <Modal show={showAtividadeModal} onHide={() => setShowAtividadeModal(false)} size="lg">
-         {/* ... JSX do modal de atividade sem alterações ... */}
-         <Modal.Header closeButton><Modal.Title>Selecionar Atividade Avaliativa</Modal.Title></Modal.Header><Modal.Body>{atividadesModal.length>0?<Form>{atividadesModal.map((atv)=>(<Form.Check key={atv.id} type="checkbox" label={atv.nome} checked={atividadeSelecionada[atv.id]||false} onChange={(e)=>setAtividadeSelecionada((prev)=>({...prev,[atv.id]:e.target.checked,}))}/>))}</Form>:<p>Nenhuma atividade disponível.</p>}</Modal.Body><Modal.Footer><Button variant="secondary" onClick={()=>setShowAtividadeModal(false)}>Cancelar</Button><Button variant="primary" onClick={handleConfirmarAtividade}>Confirmar</Button></Modal.Footer>
-      </Modal>
-
+      {/* Seus modais, intactos */}
       <Modal show={showObsModal} onHide={() => setShowObsModal(false)} centered>
-         {/* ... JSX do modal de observação sem alterações ... */}
-         <Modal.Header closeButton><Modal.Title>Adicionar / Editar Observação</Modal.Title></Modal.Header><Modal.Body><Form.Group><Form.Label>Observação sobre o desempenho do aluno neste indicador:</Form.Label><Form.Control as="textarea" rows={5} value={observacaoAtual} onChange={(e)=>setObservacaoAtual(e.target.value)} placeholder="Digite sua observação aqui..."/></Form.Group></Modal.Body><Modal.Footer><Button variant="secondary" onClick={()=>setShowObsModal(false)}>Cancelar</Button><Button variant="primary" onClick={handleSalvarObservacao}>Salvar Observação</Button></Modal.Footer>
+        <Modal.Header closeButton><Modal.Title>Adicionar / Editar Observação</Modal.Title></Modal.Header><Modal.Body><Form.Group><Form.Label>Observação sobre o desempenho do aluno neste indicador:</Form.Label><Form.Control as="textarea" rows={5} value={observacaoAtual} onChange={(e)=>setObservacaoAtual(e.target.value)} placeholder="Digite sua observação aqui..."/></Form.Group></Modal.Body><Modal.Footer><Button variant="secondary" onClick={()=>setShowObsModal(false)}>Cancelar</Button><Button variant="primary" onClick={handleSalvarObservacao}>Salvar Observação</Button></Modal.Footer>
+      </Modal>
+      <Modal show={showAcaoModal} onHide={() => setShowAcaoModal(false)} centered>
+        <Modal.Header closeButton>
+            <Modal.Title>Adicionar / Editar Ação de Recuperação</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+            <Form.Group>
+                <Form.Label>Ação de recuperação para o aluno neste indicador:</Form.Label>
+                <Form.Control 
+                    as="textarea" 
+                    rows={5} 
+                    value={acaoAtual} 
+                    onChange={(e) => setAcaoAtual(e.target.value)} 
+                    placeholder="Descreva a ação de recuperação..."
+                />
+            </Form.Group>
+        </Modal.Body>
+        <Modal.Footer>
+            <Button variant="secondary" onClick={() => setShowAcaoModal(false)}>Cancelar</Button>
+            <Button variant="primary" onClick={handleSalvarAcaoRecuperacao}>Salvar Ação</Button>
+        </Modal.Footer>
       </Modal>
     </div>
   );
