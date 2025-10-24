@@ -1,6 +1,9 @@
 import axios from 'axios';
 
-const API_BASE_URL = 'http://localhost:3000/api/atividadeavaliativa';
+import IP from './configIp'
+const publico = IP().address;
+
+const API_BASE_URL = `http://${publico}:3000/api/atividadeavaliativa`;
 const API_INSERIR = `${API_BASE_URL}/inseriravaliativa`;
 const API_LISTAR = `${API_BASE_URL}`;
 const API_DELETAR = (id) => `${API_BASE_URL}/deletaravaliativa/${id}`;

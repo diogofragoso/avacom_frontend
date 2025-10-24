@@ -1,9 +1,14 @@
 import axios from 'axios';
+import IP from './configIp'
+
+
+const publico = IP().address; // condiguração de IP publico local de forma automatizada
+
 
 // URL para a API de usuários (cadastro, etc.)
-const USUARIOS_API_URL = 'http://localhost:3000/api/usuarios';
+const USUARIOS_API_URL = `http://${publico}:3000/api/usuarios`;
 // URL para a API de login
-const LOGIN_API_URL = 'http://localhost:3000/api/login';
+const LOGIN_API_URL = `http://${publico}:3000/api/login`;
 
 const usuarioService = {
   /**

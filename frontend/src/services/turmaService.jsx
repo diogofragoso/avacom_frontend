@@ -1,7 +1,11 @@
 // services/turmaService.js
 import axios from 'axios';
+import IP from './configIp'
 
-const API_BASE_URL = 'http://localhost:3000/api/turmas';
+const publico = IP().address;
+
+
+const API_BASE_URL = `http://${publico}:3000/api/turmas`;
 
 const API_INSERIR_TURMA = `${API_BASE_URL}/inserirturma`;
 const API_LISTAR_TURMAS = `${API_BASE_URL}/listarturmas`;

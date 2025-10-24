@@ -1,6 +1,9 @@
 import axios from 'axios';
+import IP from './configIp'
 
-const API_BASE_URL = 'http://localhost:3000/api/indicadores';
+const publico = IP().address;
+
+const API_BASE_URL = `http://${publico}:3000/api/indicadores`;
 const API_INSERIR = `${API_BASE_URL}/inseririndicador`;
 const API_LISTAR = `${API_BASE_URL}`;
 const API_DELETAR_INDICADOR = (id) => `${API_BASE_URL}/deletarindicador/${id}`;

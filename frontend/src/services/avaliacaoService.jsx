@@ -1,7 +1,10 @@
 // Caminho: src/services/avaliacaoService.js
 import axios from "axios";
 
-const API_URL = "http://localhost:3000/api/avaliacao";
+import IP from './configIp'
+const publico = IP().address;
+
+const API_URL = `http://${publico}:3000/api/avaliacao`;
 
 // 🔹 Buscar a matriz completa de UCs, Indicadores e Atividades Avaliativas
 const getMatriz = async (cursoId) => {

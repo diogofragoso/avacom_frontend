@@ -1,6 +1,9 @@
 import axios from 'axios';
 
-const API_BASE_URL = 'http://localhost:3000/api/ucs';
+import IP from './configIp'
+const publico = IP().address;
+
+const API_BASE_URL = `http://${publico}:3000/api/ucs`;
 const API_INSERIR = `${API_BASE_URL}/ucs`;
 const API_LISTAR = `${API_BASE_URL}/listarucs`;
 // const API_LISTAR = 'http://localhost:3000/api/ucs/listarucs';

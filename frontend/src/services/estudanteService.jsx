@@ -1,6 +1,9 @@
 import axios from 'axios';
 
-const API_URL = 'http://localhost:3000/api/alunos/listaralunos';
+import IP from './configIp'
+const publico = IP().address;
+
+const API_URL = `http://${publico}:3000/api/alunos/listaralunos`;
 
 const estudanteService = {
   createStudent: async (data) => {
