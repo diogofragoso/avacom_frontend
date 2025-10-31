@@ -8,7 +8,7 @@ const API_URL = `http://${publico}:3000/api/alunos/listaralunos`;
 const estudanteService = {
   createStudent: async (data) => {
     try {
-      const response = await axios.post('http://localhost:3000/api/alunos/alunos', data, {
+      const response = await axios.post(`http://${publico}:3000/api/alunos/alunos`, data, {
         headers: { 'Content-Type': 'application/json' },
       });
       return response.data;
