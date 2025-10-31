@@ -4,8 +4,8 @@
   "description": "Scripts para deploy do projeto avacom_frontend",
   "private": true,
   "scripts": {
-    "predeploy": "cd front-end && npm install && npm run build",
-    "deploy": "gh-pages -d front-end/dist"
+    "predeploy": "cd frontend && npm install && npm run build",
+    "deploy": "gh-pages -d frontend/dist"
   },
   "devDependencies": {
     "gh-pages": "^6.3.0"
