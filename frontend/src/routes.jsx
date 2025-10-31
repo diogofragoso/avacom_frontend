@@ -27,7 +27,8 @@ import GerenciarAvaliativa from "./components/GerenciarAvaliativas";
 
 function AppRoutes() {
   return (
-    <BrowserRouter>
+    // <BrowserRouter>
+    <HashRouter>
       <Routes>
         {/* Rota principal com rotas aninhadas */}
         <Route path="/" element={<Home />}>
@@ -75,7 +76,8 @@ function AppRoutes() {
 
         {/* <Route path="*" element={<PageNotFound />} /> */}
       </Routes>
-    </BrowserRouter>
+      </HashRouter>
+    /* </BrowserRouter> */
   );
 }
 
