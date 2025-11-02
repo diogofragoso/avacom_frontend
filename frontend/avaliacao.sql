@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Tempo de geração: 12/10/2025 às 16:52
+-- Tempo de geração: 02/11/2025 às 16:02
 -- Versão do servidor: 10.11.13-MariaDB-0ubuntu0.24.04.1
 -- Versão do PHP: 8.3.6
 
@@ -20,6 +20,8 @@ SET time_zone = "+00:00";
 --
 -- Banco de dados: `avaliacao`
 --
+CREATE DATABASE IF NOT EXISTS `avaliacao` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+USE `avaliacao`;
 
 -- --------------------------------------------------------
 
@@ -57,7 +59,14 @@ INSERT INTO `aluno` (`id_aluno`, `nome_aluno`, `email_aluno`, `senha_aluno`) VAL
 (17, 'Julio', 'julio@gmail.com', '123456'),
 (18, 'Maria Joaquina', 'maria@gmail.com', '123456'),
 (19, 'Marcio Pedreira', 'marcio@gmail.com', '123456'),
-(20, 'Richard', 'richard@gmail.com', 'senac1234');
+(20, 'Richard', 'richard@gmail.com', 'senac1234'),
+(21, 'Thiagão', 'thiagao@senacao.com', '123456'),
+(22, 'Ana', 'ana.hjk@gmail.com', '123'),
+(23, 'Beatriz Das Graças', 'beatrizdasgracas@gmail.com', '123456'),
+(24, 'Flávio', 'flavio@gmail.com', 'Iov159753*'),
+(25, 'Julia', 'juliamacedo@gmail.com', '123456'),
+(26, 'José Da Silva', 'jose@gmail.com', 'senac'),
+(27, 'Rafa Da Silva', 'rafa@gmail.com', 'senac');
 
 -- --------------------------------------------------------
 
@@ -79,10 +88,6 @@ INSERT INTO `atividade_avaliativa` (`id_avaliativa`, `descricao_avaliativa`, `id
 (13, 'Nesta atividade os aluno realizaram uma atividade avaliativa usando os servidores do laboratório 25\n', 2),
 (15, 'Elabore uma atividade  avaliativa sobre configurar servidores linux ', 2),
 (22, 'Atividade avaliativa: Teste prático de instalação e configuração', 2),
-(23, 'Analisa e interpreta receituários de acordo com legislação vigente e sob orientação do farmacêutico.', 12),
-(24, 'Simulação de atendimento com base na Portaria 344/98', 12),
-(25, 'Identificação de resíduos gerados em atendimentos de emergência e classificação para descarte', 43),
-(26, 'Atividae prática. Administrar remédio via intravenosa. ', 36),
 (27, 'O estudante recebe uma bancada com todas as caixas dos componentes necessários para montar um computador desktop funcional. A tarefa é realizar a montagem completa, desde a abertura das embalagens até o primeiro boot bem-sucedido, onde o sistema consegue aceder ao BIOS/UEFI.\n\nO avaliador observará todo o processo, focando nos procedimentos técnicos,', 38),
 (29, 'Teste de avaliativa', 29),
 (30, 'Teste avaliativa - I2', 25),
@@ -91,7 +96,17 @@ INSERT INTO `atividade_avaliativa` (`id_avaliativa`, `descricao_avaliativa`, `id
 (33, 'O estudante recebe um computador recém-montado, com o sistema operacional (ex: Windows 10/11) já instalado, mas sem nenhuma configuração fina ou otimização realizada. A memória RAM está operando em sua velocidade padrão (JEDEC), a ordem de boot pode não estar otimizada e drivers essenciais (como chipset e vídeo) não foram instalados.', 31),
 (34, 'Ao final desta atividade, o estudante deverá ser capaz de:\n\nAcessar a interface de configuração do BIOS/UEFI de forma consistente.\n\nIdentificar e alterar a ordem de prioridade dos dispositivos de boot (Ex: SSD, HDD, Pendrive USB, Rede).\n\nHabilitar ou desabilitar o modo \"Secure Boot\" de acordo com a necessidade do cenário.\n\nAtivar ou desativar opções de inicialização rápida (Fast Boot).\n\nConfigurar a data e a hora do sistema diretamente no BIOS/UEFI.\n\n', 45),
 (35, 'O estudante recebe um computador que acabou de passar por um serviço de montagem ou manutenção. Ele assume o papel do técnico responsável pela \"Liberação de Qualidade\". Sua tarefa é usar um Checklist de Inspeção Final para verificar minuciosamente o equipamento e garantir que não há pendências ou problemas.\n\nO avaliador terá preparado o computador com 2 ou 3 \"erros\" sutis e não-críticos para que o estudante os identifique.', 47),
-(36, 'O estudante deve configurar um roteador stub', 48);
+(36, 'O estudante deve configurar um roteador stub', 48),
+(37, 'Os estudantes fazem uma pesquisa com a turma de RH para o desenvolvimento de um software ERP', 2),
+(38, 'Teste do Thiago', 47),
+(39, 'Teste Thiago', 48),
+(40, 'Elaboração de POP\nFoi proposto aos estudantes, em grupos, a elaboração de um Procedimento Operacional Padrão para drogarias com temas de seções sorteados.\n', 49),
+(41, 'Prepara medicação levando em consideração o que foi prescrito, os recursos e a segurança do paciente.', 51),
+(42, 'Simulação de atendimento à pacientes diabéticos que utilizam glicosímetro.', 52),
+(43, 'Higienização da mãos - dinâmica com tinta para verificar como se lava as mãos e posteriormente a lavagem com protocolo.', 53),
+(44, 'Avaliação prática dos sinais vitais', 54),
+(45, 'Atividade simulada como pacientes manequim', 54),
+(46, 'simulação em estação prática', 55);
 
 -- --------------------------------------------------------
 
@@ -107,94 +122,133 @@ CREATE TABLE `avaliacao` (
   `id_indicador_fk` int(11) NOT NULL,
   `data_avaliacao` date DEFAULT NULL,
   `mencao` varchar(20) DEFAULT NULL,
-  `observacao_avaliacao` varchar(300) DEFAULT NULL
+  `observacao_avaliacao` varchar(300) DEFAULT NULL,
+  `acao_recuperacao` varchar(1000) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Despejando dados para a tabela `avaliacao`
 --
 
-INSERT INTO `avaliacao` (`id_avaliacao`, `id_aluno_fk`, `id_turma_fk`, `id_at_avaliativa_fk`, `id_indicador_fk`, `data_avaliacao`, `mencao`, `observacao_avaliacao`) VALUES
-(34, 2, 1, 13, 2, NULL, NULL, NULL),
-(35, 4, 1, 13, 2, NULL, NULL, NULL),
-(36, 15, 1, 13, 2, NULL, NULL, NULL),
-(37, 16, 1, 13, 2, NULL, NULL, NULL),
-(38, 8, 1, 13, 2, NULL, NULL, NULL),
-(39, 3, 1, 13, 2, NULL, NULL, NULL),
-(58, 2, 1, 15, 2, NULL, 'A', 'oioiiooiuio'),
-(59, 4, 1, 15, 2, NULL, 'NA', 'TESTE OBS'),
-(60, 15, 1, 15, 2, NULL, 'A', NULL),
-(61, 16, 1, 15, 2, NULL, NULL, NULL),
-(62, 8, 1, 15, 2, NULL, NULL, NULL),
-(63, 3, 1, 15, 2, NULL, 'A', 'O estudante foi muito bem nesta atividade'),
-(76, 2, 23, 23, 12, NULL, NULL, NULL),
-(77, 15, 23, 23, 12, NULL, NULL, NULL),
-(111, 2, 23, 24, 12, NULL, NULL, NULL),
-(112, 15, 23, 24, 12, NULL, NULL, NULL),
-(121, 2, 1, 31, 14, NULL, 'A', NULL),
-(122, 4, 1, 31, 14, NULL, 'A', NULL),
-(123, 15, 1, 31, 14, NULL, NULL, NULL),
-(124, 16, 1, 31, 14, NULL, NULL, NULL),
-(125, 8, 1, 31, 14, NULL, NULL, NULL),
-(126, 3, 1, 31, 14, NULL, 'A', NULL),
-(127, 5, 1, 31, 14, NULL, NULL, NULL),
-(128, 6, 1, 31, 14, NULL, NULL, NULL),
-(137, 2, 1, 32, 20, NULL, 'A', NULL),
-(138, 4, 1, 32, 20, NULL, 'A', NULL),
-(139, 15, 1, 32, 20, NULL, NULL, NULL),
-(140, 16, 1, 32, 20, NULL, NULL, NULL),
-(141, 8, 1, 32, 20, NULL, NULL, NULL),
-(142, 3, 1, 32, 20, NULL, 'A', NULL),
-(143, 5, 1, 32, 20, NULL, NULL, NULL),
-(144, 6, 1, 32, 20, NULL, NULL, NULL),
-(145, 2, 1, 33, 31, NULL, 'NA', '´plplp'),
-(146, 4, 1, 33, 31, NULL, 'NA', 'O estudante não entregou a atividade avaliativa'),
-(147, 15, 1, 33, 31, NULL, NULL, NULL),
-(148, 16, 1, 33, 31, NULL, NULL, NULL),
-(149, 8, 1, 33, 31, NULL, NULL, NULL),
-(150, 3, 1, 33, 31, NULL, 'A', NULL),
-(151, 5, 1, 33, 31, NULL, NULL, NULL),
-(152, 6, 1, 33, 31, NULL, NULL, NULL),
-(153, 2, 1, 27, 38, NULL, 'A', NULL),
-(154, 4, 1, 27, 38, NULL, 'A', NULL),
-(155, 15, 1, 27, 38, NULL, NULL, NULL),
-(156, 16, 1, 27, 38, NULL, NULL, NULL),
-(157, 8, 1, 27, 38, NULL, NULL, NULL),
-(158, 3, 1, 27, 38, NULL, NULL, NULL),
-(159, 5, 1, 27, 38, NULL, NULL, NULL),
-(160, 6, 1, 27, 38, NULL, NULL, NULL),
-(185, 2, 1, 34, 45, NULL, 'A', NULL),
-(186, 4, 1, 34, 45, NULL, 'A', 'O estudante demonstrou autonomia '),
-(187, 15, 1, 34, 45, NULL, NULL, NULL),
-(188, 16, 1, 34, 45, NULL, NULL, NULL),
-(189, 8, 1, 34, 45, NULL, NULL, NULL),
-(190, 3, 1, 34, 45, NULL, NULL, NULL),
-(191, 5, 1, 34, 45, NULL, NULL, NULL),
-(192, 6, 1, 34, 45, NULL, NULL, NULL),
-(193, 2, 1, 35, 47, NULL, 'A', 'O estudante foi destaque nesta atividade.'),
-(194, 4, 1, 35, 47, NULL, 'A', NULL),
-(195, 15, 1, 35, 47, NULL, NULL, NULL),
-(196, 16, 1, 35, 47, NULL, NULL, NULL),
-(197, 8, 1, 35, 47, NULL, NULL, NULL),
-(198, 3, 1, 35, 47, NULL, NULL, NULL),
-(199, 5, 1, 35, 47, NULL, NULL, NULL),
-(200, 6, 1, 35, 47, NULL, NULL, NULL),
-(217, 4, 1, 30, 25, NULL, 'A', NULL),
-(218, 15, 1, 30, 25, NULL, NULL, NULL),
-(219, 16, 1, 30, 25, NULL, NULL, NULL),
-(220, 8, 1, 30, 25, NULL, NULL, NULL),
-(221, 3, 1, 30, 25, NULL, NULL, NULL),
-(222, 5, 1, 30, 25, NULL, NULL, NULL),
-(223, 6, 1, 30, 25, NULL, NULL, NULL),
-(251, 4, 1, 29, 29, NULL, 'A', NULL),
-(252, 15, 1, 29, 29, NULL, NULL, NULL),
-(253, 16, 1, 29, 29, NULL, NULL, NULL),
-(254, 8, 1, 29, 29, NULL, NULL, NULL),
-(255, 3, 1, 29, 29, NULL, NULL, NULL),
-(256, 5, 1, 29, 29, NULL, NULL, NULL),
-(257, 6, 1, 29, 29, NULL, NULL, NULL),
-(258, 2, 1, 29, 29, NULL, NULL, NULL),
-(259, 7, 1, 29, 29, NULL, NULL, NULL);
+INSERT INTO `avaliacao` (`id_avaliacao`, `id_aluno_fk`, `id_turma_fk`, `id_at_avaliativa_fk`, `id_indicador_fk`, `data_avaliacao`, `mencao`, `observacao_avaliacao`, `acao_recuperacao`) VALUES
+(58, 2, 1, 15, 2, NULL, 'A', 'oioiiooiuio', ''),
+(59, 4, 1, 15, 2, NULL, 'A', 'TESTE OBS 3', 'T4'),
+(60, 15, 1, 15, 2, NULL, 'A', NULL, ''),
+(61, 16, 1, 15, 2, NULL, NULL, NULL, ''),
+(62, 8, 1, 15, 2, NULL, NULL, NULL, ''),
+(63, 3, 1, 15, 2, NULL, 'A', 'O estudante não entregou atividade', ''),
+(121, 2, 1, 31, 14, NULL, 'A', NULL, ''),
+(122, 4, 1, 31, 14, NULL, 'PA', 'T 1', 'Ação 1 teste\nAção 2 \n'),
+(123, 15, 1, 31, 14, NULL, NULL, NULL, ''),
+(124, 16, 1, 31, 14, NULL, NULL, NULL, ''),
+(125, 8, 1, 31, 14, NULL, NULL, NULL, ''),
+(126, 3, 1, 31, 14, NULL, 'A', NULL, ''),
+(127, 5, 1, 31, 14, NULL, NULL, NULL, ''),
+(128, 6, 1, 31, 14, NULL, NULL, NULL, ''),
+(137, 2, 1, 32, 20, NULL, 'A', NULL, ''),
+(138, 4, 1, 32, 20, NULL, 'A', NULL, ''),
+(139, 15, 1, 32, 20, NULL, NULL, NULL, ''),
+(140, 16, 1, 32, 20, NULL, NULL, NULL, ''),
+(141, 8, 1, 32, 20, NULL, NULL, NULL, ''),
+(142, 3, 1, 32, 20, NULL, 'A', NULL, ''),
+(143, 5, 1, 32, 20, NULL, NULL, NULL, ''),
+(144, 6, 1, 32, 20, NULL, NULL, NULL, ''),
+(145, 2, 1, 33, 31, NULL, 'NA', '´plplp', ''),
+(146, 4, 1, 33, 31, NULL, 'NA', 'O estudante não entregou a atividade avaliativa', ''),
+(147, 15, 1, 33, 31, NULL, NULL, NULL, ''),
+(148, 16, 1, 33, 31, NULL, NULL, NULL, ''),
+(149, 8, 1, 33, 31, NULL, NULL, NULL, ''),
+(150, 3, 1, 33, 31, NULL, 'A', NULL, ''),
+(151, 5, 1, 33, 31, NULL, NULL, NULL, ''),
+(152, 6, 1, 33, 31, NULL, NULL, NULL, ''),
+(153, 2, 1, 27, 38, NULL, 'A', NULL, ''),
+(154, 4, 1, 27, 38, NULL, 'A', NULL, ''),
+(155, 15, 1, 27, 38, NULL, NULL, NULL, ''),
+(156, 16, 1, 27, 38, NULL, NULL, NULL, ''),
+(157, 8, 1, 27, 38, NULL, NULL, NULL, ''),
+(158, 3, 1, 27, 38, NULL, NULL, NULL, ''),
+(159, 5, 1, 27, 38, NULL, NULL, NULL, ''),
+(160, 6, 1, 27, 38, NULL, NULL, NULL, ''),
+(185, 2, 1, 34, 45, NULL, 'A', NULL, ''),
+(186, 4, 1, 34, 45, NULL, 'A', 'O estudante demonstrou autonomia ', ''),
+(187, 15, 1, 34, 45, NULL, NULL, NULL, ''),
+(188, 16, 1, 34, 45, NULL, NULL, NULL, ''),
+(189, 8, 1, 34, 45, NULL, NULL, NULL, ''),
+(190, 3, 1, 34, 45, NULL, NULL, NULL, ''),
+(191, 5, 1, 34, 45, NULL, NULL, NULL, ''),
+(192, 6, 1, 34, 45, NULL, NULL, NULL, ''),
+(193, 2, 1, 35, 47, NULL, 'A', 'O estudante foi destaque nesta atividade.', ''),
+(194, 4, 1, 35, 47, NULL, 'A', NULL, 'Teste'),
+(195, 15, 1, 35, 47, NULL, NULL, NULL, ''),
+(196, 16, 1, 35, 47, NULL, NULL, NULL, ''),
+(197, 8, 1, 35, 47, NULL, NULL, NULL, ''),
+(198, 3, 1, 35, 47, NULL, NULL, NULL, ''),
+(199, 5, 1, 35, 47, NULL, NULL, NULL, ''),
+(200, 6, 1, 35, 47, NULL, NULL, NULL, ''),
+(217, 4, 1, 30, 25, NULL, 'A', NULL, ''),
+(218, 15, 1, 30, 25, NULL, NULL, NULL, ''),
+(219, 16, 1, 30, 25, NULL, NULL, NULL, ''),
+(220, 8, 1, 30, 25, NULL, NULL, NULL, ''),
+(221, 3, 1, 30, 25, NULL, NULL, NULL, ''),
+(222, 5, 1, 30, 25, NULL, NULL, NULL, ''),
+(223, 6, 1, 30, 25, NULL, NULL, NULL, ''),
+(251, 4, 1, 29, 29, NULL, 'A', NULL, ''),
+(252, 15, 1, 29, 29, NULL, NULL, NULL, ''),
+(253, 16, 1, 29, 29, NULL, NULL, NULL, ''),
+(254, 8, 1, 29, 29, NULL, NULL, NULL, ''),
+(255, 3, 1, 29, 29, NULL, NULL, NULL, ''),
+(256, 5, 1, 29, 29, NULL, NULL, NULL, ''),
+(257, 6, 1, 29, 29, NULL, NULL, NULL, ''),
+(258, 2, 1, 29, 29, NULL, NULL, NULL, ''),
+(259, 7, 1, 29, 29, NULL, NULL, NULL, ''),
+(275, 3, 28, 37, 2, NULL, NULL, NULL, ''),
+(276, 5, 28, 37, 2, NULL, NULL, NULL, ''),
+(281, 3, 28, 39, 48, NULL, NULL, NULL, ''),
+(282, 5, 28, 39, 48, NULL, NULL, NULL, ''),
+(283, 21, 28, 39, 48, NULL, 'NA', 'Ruim demais', ''),
+(287, 22, 29, 40, 49, NULL, 'A', 'Obs1', 'Sem ações de recuperação'),
+(288, 23, 30, 41, 51, NULL, 'PA', 'Aluna não conseguiu reunir todos os recursos necessários para a técnica.', ''),
+(289, 4, 1, 13, 2, NULL, 'NA', 'T1', 'T3'),
+(290, 15, 1, 13, 2, NULL, 'A', NULL, ''),
+(291, 16, 1, 13, 2, NULL, NULL, NULL, ''),
+(292, 8, 1, 13, 2, NULL, NULL, NULL, ''),
+(293, 3, 1, 13, 2, NULL, NULL, NULL, ''),
+(294, 5, 1, 13, 2, NULL, NULL, NULL, ''),
+(295, 6, 1, 13, 2, NULL, NULL, NULL, ''),
+(296, 2, 1, 13, 2, NULL, NULL, NULL, ''),
+(297, 7, 1, 13, 2, NULL, NULL, NULL, ''),
+(298, 18, 1, 13, 2, NULL, NULL, NULL, ''),
+(299, 19, 1, 13, 2, NULL, NULL, NULL, ''),
+(300, 20, 1, 13, 2, NULL, NULL, NULL, ''),
+(301, 14, 1, 13, 2, NULL, 'A', 'T2', ''),
+(330, 22, 29, 42, 52, NULL, NULL, NULL, ''),
+(331, 14, 29, 42, 52, NULL, NULL, NULL, ''),
+(332, 24, 29, 42, 52, NULL, NULL, 'Aluno faltou no dia', 'Pesquisa de orientações relacionadas à dispensação de glicosímetro'),
+(336, 22, 29, 43, 53, NULL, NULL, NULL, ''),
+(337, 14, 29, 43, 53, NULL, NULL, NULL, ''),
+(338, 24, 29, 43, 53, NULL, NULL, NULL, ''),
+(339, 25, 29, 43, 53, NULL, NULL, 'aluno faltou', 'prova'),
+(340, 23, 30, 44, 54, NULL, NULL, NULL, ''),
+(341, 10, 30, 44, 54, NULL, 'NA', 'OBS 1', 'Momento para tirar dúvidas e realizar novamente a atividade proposta '),
+(342, 23, 30, 46, 55, NULL, NULL, NULL, ''),
+(343, 10, 30, 46, 55, NULL, NULL, NULL, ''),
+(344, 27, 30, 46, 55, NULL, 'NA', 'A estudante estava de atestado', 'Realizar uma pesquisa .... ');
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura para tabela `avaliacao_final_uc`
+--
+
+CREATE TABLE `avaliacao_final_uc` (
+  `id_avaliacao_final` int(11) NOT NULL,
+  `id_aluno_fk` int(11) NOT NULL,
+  `id_turma_fk` int(11) NOT NULL,
+  `id_uc_fk` int(11) NOT NULL,
+  `mencao_final` varchar(30) DEFAULT NULL,
+  `feedback_final` varchar(600) NOT NULL,
+  `data_fechamento` date NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -214,7 +268,8 @@ CREATE TABLE `curso` (
 
 INSERT INTO `curso` (`id_curso`, `nome_curso`, `descricao_curso`) VALUES
 (1, 'Técnico em Informática', 'Formação técnica'),
-(13, 'Farmácia', 'Técnicoi');
+(15, 'Técnico em Farmácia', 'Atualizado 2025'),
+(16, 'Técnico em Enfermagem', 'Formas auxiliares e técnicos em enfermagem');
 
 -- --------------------------------------------------------
 
@@ -235,10 +290,7 @@ CREATE TABLE `indicador` (
 
 INSERT INTO `indicador` (`id_indicador`, `numero_indicador`, `descricao_indicador`, `id_uc_fk`) VALUES
 (2, '1', 'Descreve as funcionalidades e aplicações da arquitetura de computadores, de acordo com as orientações técnicas do fabricante.', 1),
-(12, '1', 'Atendimentos ao paciente', 18),
 (14, '2', 'Utiliza medidas de prevenção contra descargas eletrostáticas, de acordo com as orientações do fabricante.', 1),
-(15, '1', 'Verificar IMC', 32),
-(17, '1', 'Seleciona o medicamento ', 27),
 (20, '3', 'Testa componentes de computadores e periféricos, de acordo com as recomendações técnicas.', 1),
 (25, '1', '90890898908', 2),
 (27, '2', 'Configurar rede lan', 2),
@@ -249,18 +301,22 @@ INSERT INTO `indicador` (`id_indicador`, `numero_indicador`, `descricao_indicado
 (33, '4', 'Teste 4', 2),
 (34, '5', 'Teste 5', 2),
 (35, '1', 'Teste 1', 30),
-(36, '2', 'Teste 2', 18),
-(37, '3', 'Teste 3', 18),
 (38, '5', 'Monta computadores conforme as recomendações e os procedimentos técnicos de fabricantes.', 1),
 (39, '1', 'Teste 1', 33),
 (40, '2', 'Teste 2', 33),
 (41, '2', 'Teste 2', 30),
 (42, '3', 'Teste 3 ', 30),
-(43, '1', 'Gerencia descarte de resíduos em saúde provenientes de atendimento', 19),
 (45, '6', 'Configura os parâmetros de inicialização da máquina conforme recomendações técnicas.', 1),
 (46, '3', 'Teste 3', 28),
 (47, '7', 'Realiza inspeção final do equipamento conforme recomendações técnicas.', 1),
-(48, '1', 'Configuração de roteador cisco', 35);
+(48, '1', 'Configuração de roteador cisco', 35),
+(49, '1', '1. Verifica a solicitação do cliente e a conformidade da prescrição ou notificação da receita, de acordo com o Procedimento Operacional Padrão (POP) e a legislação vigente.', 53),
+(50, '2', '2. Calcula a quantidade do medicamento a ser dispensado com base na relação entre posologia, tempo de tratamento e legislação vigente', 53),
+(51, '1', 'Seleciona recursos para aplicação de medicamentos considerando as características do cliente e a prescrição medicamentosa.', 54),
+(52, '1', 'Dispensa correlatos de acordo com a legislação vigente', 55),
+(53, '1', 'Realiza paramentação', 56),
+(54, '1', 'Presta assistência ao cliente de forma humanizada, considerando suas necessidades e a política nacional de humaniização', 57),
+(55, '1', 'Atendimento humanizado ao paciente', 58);
 
 -- --------------------------------------------------------
 
@@ -281,9 +337,7 @@ CREATE TABLE `matricula` (
 INSERT INTO `matricula` (`id_matricula`, `id_aluno_fk`, `id_turma_fk`) VALUES
 (10, 3, 21),
 (11, 5, 21),
-(20, 2, 23),
 (42, 4, 1),
-(44, 15, 23),
 (45, 15, 1),
 (46, 16, 1),
 (48, 8, 1),
@@ -296,7 +350,18 @@ INSERT INTO `matricula` (`id_matricula`, `id_aluno_fk`, `id_turma_fk`) VALUES
 (55, 7, 1),
 (56, 18, 1),
 (57, 19, 1),
-(58, 20, 1);
+(59, 3, 28),
+(60, 5, 28),
+(61, 21, 28),
+(62, 22, 29),
+(63, 23, 30),
+(64, 3, 27),
+(65, 14, 1),
+(66, 14, 29),
+(67, 24, 29),
+(68, 25, 29),
+(69, 10, 30),
+(70, 27, 30);
 
 -- --------------------------------------------------------
 
@@ -316,7 +381,24 @@ CREATE TABLE `professor` (
 INSERT INTO `professor` (`id_usuario_fk`, `departamento`) VALUES
 (2, 'Ciência da computação'),
 (3, 'Administração'),
-(4, 'Administração');
+(4, 'Administração'),
+(6, 'Administração'),
+(7, 'Administração'),
+(8, 'Administração'),
+(9, 'kkk'),
+(10, 'Administração'),
+(11, 'Administração'),
+(12, 'Administração'),
+(13, 'Administração'),
+(14, 'Administração'),
+(15, 'Ciência da computação'),
+(16, 'TI'),
+(17, 'Farmácia'),
+(19, 'Ciência da computação'),
+(20, 'Beleza'),
+(21, 'Farmácia'),
+(22, 'Farmácia'),
+(23, 'Ciência da computação');
 
 -- --------------------------------------------------------
 
@@ -359,8 +441,10 @@ CREATE TABLE `turma` (
 INSERT INTO `turma` (`id_turma`, `nome_turma`, `periodo_turma`, `max_aluno_turma`, `data_inicio_turma`, `id_curso_fk`) VALUES
 (1, 'Técnico em informática - T1', 'Manhã', 30, '2024-11-11', 1),
 (21, 'Técnico em informática - T2', 'Manhã', 40, '2025-08-14', 1),
-(23, 'Farmácia - T1', 'Manhã', 30, '2025-09-07', 13),
-(27, 'Técnico em informática - T3', 'Tarde', 30, '2025-09-04', 1);
+(27, 'Técnico em informática - T3', 'Tarde', 30, '2025-09-04', 1),
+(28, 'Técnico em informática - T13', 'Noite', 40, '2025-10-15', 1),
+(29, 'Técnico em  Farmácia T1', 'Tarde', 30, '2026-02-10', 15),
+(30, 'Técnico em Enfermagem 16', 'Tarde', 36, '2026-08-03', 16);
 
 -- --------------------------------------------------------
 
@@ -382,12 +466,8 @@ CREATE TABLE `uc` (
 INSERT INTO `uc` (`id_uc`, `nome_uc`, `numero_uc`, `id_curso_fk`) VALUES
 (1, 'Planejar e executar a montagem de computadores.', 1, 1),
 (2, 'Planejar e executar a instalação de hardware e software para computadores.', 2, 1),
-(18, 'Atendimento ao cliente', 1, 13),
-(19, 'Primeiro socorros', 2, 13),
-(27, 'Aplicar injeção no bumbum', 4, 13),
 (28, 'Planejar e executar a manutenção de computadores.', 3, 1),
 (30, '4: Projeto Integrador Assistente de Suporte e Manutenção de Computadores', 4, 1),
-(32, 'pesa paciente', 5, 13),
 (33, 'Planejar e executar a instalação de redes locais de computadores.', 5, 1),
 (35, 'Planejar e executar a manutenção de redes locais de computadores.', 6, 1),
 (43, 'Planejar e executar a instalação, a configuração e o monitoramento de sistemas operacionais de redes locais (servidores).', 7, 1),
@@ -399,7 +479,13 @@ INSERT INTO `uc` (`id_uc`, `nome_uc`, `numero_uc`, `id_curso_fk`) VALUES
 (49, 'Executar os processos de codificação, manutenção e documentação de aplicativos computacionais para internet.', 13, 1),
 (50, 'Manipular e otimizar imagens vetoriais, bitmaps gráficos e elementos visuais de navegação para web.', 14, 1),
 (51, 'Desenvolver e organizar elementos estruturais de sites.', 15, 1),
-(52, 'Projeto Integrador Assistente de Desenvolvimento de Aplicativos Computacionais', 16, 1);
+(52, 'Projeto Integrador Assistente de Desenvolvimento de Aplicativos Computacionais', 16, 1),
+(53, 'UC1: Auxiliar no fornecimento de medicamentos em farmácias.', 1, 15),
+(54, 'Administrar medicamentos, soluções e imunobiológicos.', 3, 16),
+(55, 'Auxiliar no fornecimento de correlatos', 2, 15),
+(56, 'Manipulação de semi solidos', 3, 15),
+(57, 'Executar ações de prevenção, promoção, proteção, reabilitação e recuperação da saúde ', 1, 16),
+(58, 'Prestar assistência de enfermagem ', 2, 16);
 
 -- --------------------------------------------------------
 
@@ -424,7 +510,24 @@ CREATE TABLE `usuario` (
 INSERT INTO `usuario` (`id_usuario`, `nome_usuario`, `email_usuario`, `senha_usuario`, `tipo_usuario_fk`, `data_cadastro_usuario`, `ativo_usuario`) VALUES
 (2, 'Diogo Fragoso da Silva', 'diogofragoso@yahoo.com.br', '$2b$10$ucqi6qGyHHmSzUYik.uwNOoFPlxrho3rKz4l7S80Ps9O5qrcB7bnq', 2, '2025-10-12 16:27:54', 1),
 (3, 'Maria Joaquina', 'mariajoaquina@gmail.com', '$2b$10$qKuTNFey2Z9fDVQyySTFDev5NO8rVaAGnPyra6bacriB8tXKLPNuO', 2, '2025-10-12 16:39:46', 1),
-(4, 'Zequinha ', 'zeca@gmail.com', '$2b$10$ENexrmGSlm/pGQI9S0tH5eww5TYB8YVmbdKm8hDmmP3RlDV7OppNa', 2, '2025-10-12 16:49:18', 1);
+(4, 'Zequinha ', 'zeca@gmail.com', '$2b$10$ENexrmGSlm/pGQI9S0tH5eww5TYB8YVmbdKm8hDmmP3RlDV7OppNa', 2, '2025-10-12 16:49:18', 1),
+(6, 'Natalia Lourenço', 'nat@gmail.com', '$2b$10$po1iCgGRvHP.HlBS9t8En.Mdb/.rb.EVy.o8joJNOS3EGUo8POez6', 2, '2025-10-12 18:46:28', 1),
+(7, 'Raimunda', 'mundinha@gmail.com', '$2b$10$Cw/9DY7FO0ZY3fGbUO80guNtbbRJwOxZxnLSQaaNdcQ8F6hz9bLO2', 2, '2025-10-12 18:59:42', 1),
+(8, 'Abelhinha', 'fragoso23rln@gmail.com', '$2b$10$uVh09DF3.2mkik/VJ8zl1.0mCER6jmQkQzvWmXtWANyPWopeln1aq', 2, '2025-10-12 19:04:28', 1),
+(9, 'Diogo Fragoso da Silva', 'diogo@gmail.com', '$2b$10$rKnWKLZxFaZdjiQyCROILOWlqtV8Fg0xyMjc/i1ceKqpWerQg99Hq', 2, '2025-10-12 19:12:21', 1),
+(10, 'Joao Da Silva', 'joao@gmail.com', '$2b$10$P2zxBNTSRs9gCsFnDUsMwODMGDjzRnmkjlrLFpHtjcNZ2ORzag8Zq', 2, '2025-10-13 17:39:34', 1),
+(11, 'Julio Silva', 'julio@gmail.com', '$2b$10$SurRHPUIXCdSJYneIVE4hOf2hmHCuMHI0tgK0Q60e6FNMgddL4Quq', 2, '2025-10-13 18:05:14', 1),
+(12, 'professor1', 'prof1@gmail.com', '$2b$10$PgU6d90YyOLmiHx/YlFsbuD2TnyJNrgndPrXlEfj4qaxVK14ilDiS', 2, '2025-10-15 23:53:42', 1),
+(13, 'professor2', 'prof2@gmail.com', '$2b$10$rr2voku93LCixExwfotUx.RPNJi5jj2uLI4I09WTbZYH.M1D.ZU9a', 2, '2025-10-15 23:57:20', 1),
+(14, 'professor3', 'prof3@gmail.com', '$2b$10$HsbT71.AsTLCXOiYT5N5dOwbRf9mOYhFVrvZdm/dZlJpXuTG69Y06', 2, '2025-10-15 23:59:07', 1),
+(15, 'professor4', 'prof4@gmail.com', '$2b$10$CZ/UaBE0sVzkzogPsMZdi./xz2m8e.WCJDSBvk7TdiHelsY2a00yG', 2, '2025-10-16 19:58:08', 1),
+(16, 'Thiago Mendonça', 'thiago@email.com', '$2b$10$3c10X6AwECltP8De55eJm.V1HJWJVrVgbaRXzKkDbORqaJLq4Z3dW', 2, '2025-10-16 19:59:34', 1),
+(17, 'Natália Lourenço', 'natalia.clourenco@sp.senac.br', '$2b$10$2qgOi498JFxWgLOuNCeFsueTY3inOo0PD7Y7QRGq8Qk87sogcl1rC', 2, '2025-10-21 15:33:33', 1),
+(19, 'Diogo', 'diogo1@gmail.com', '$2b$10$XFR1XS8dcvCdJjGpvU9Zg.fQdWWdjsJdQwPTVtF65Q5XVSnV7sSaS', 2, '2025-10-22 16:29:04', 1),
+(20, 'Silmarinha', 'sil@gmail.com', '$2b$10$/mwDnZKxjd1WKKMCIDybq.J5cOy.nV9EBeRpTlsxMDIpYbg1syKSi', 2, '2025-10-22 18:05:11', 1),
+(21, 'Emília Camargo', 'emiilia.camargo@gmail.com', '$2b$10$wfkMxXH0KKFcDoHE45eliOrIhc1.zdEr36AWPXhmpjQQOgqgL5kaK', 2, '2025-10-23 17:07:51', 1),
+(22, 'Gisele Macedo', 'giselemac@gmail.com', '$2b$10$LbrafhLNEbwZ4XhZNAhERuK5x3Tu55KK1pGmQcL2BuJjLBgv683aW', 2, '2025-10-23 17:42:36', 1),
+(23, 'Diogo Fragoso', 'prof0@gmail.com', '$2b$10$9I1AvELBB6V3WNwNFCOqyeRS9PtfMloTbiolhvcDM7/SnhVXbgoLO', 2, '2025-10-24 18:33:20', 1);
 
 --
 -- Índices para tabelas despejadas
@@ -453,6 +556,12 @@ ALTER TABLE `avaliacao`
   ADD KEY `id_turma` (`id_turma_fk`),
   ADD KEY `id_at_avaliativa_fk` (`id_at_avaliativa_fk`),
   ADD KEY `id_at_indicador_fk` (`id_indicador_fk`);
+
+--
+-- Índices de tabela `avaliacao_final_uc`
+--
+ALTER TABLE `avaliacao_final_uc`
+  ADD PRIMARY KEY (`id_avaliacao_final`);
 
 --
 -- Índices de tabela `curso`
@@ -516,37 +625,43 @@ ALTER TABLE `usuario`
 -- AUTO_INCREMENT de tabela `aluno`
 --
 ALTER TABLE `aluno`
-  MODIFY `id_aluno` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
+  MODIFY `id_aluno` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
 
 --
 -- AUTO_INCREMENT de tabela `atividade_avaliativa`
 --
 ALTER TABLE `atividade_avaliativa`
-  MODIFY `id_avaliativa` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=37;
+  MODIFY `id_avaliativa` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=47;
 
 --
 -- AUTO_INCREMENT de tabela `avaliacao`
 --
 ALTER TABLE `avaliacao`
-  MODIFY `id_avaliacao` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=273;
+  MODIFY `id_avaliacao` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=345;
+
+--
+-- AUTO_INCREMENT de tabela `avaliacao_final_uc`
+--
+ALTER TABLE `avaliacao_final_uc`
+  MODIFY `id_avaliacao_final` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de tabela `curso`
 --
 ALTER TABLE `curso`
-  MODIFY `id_curso` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+  MODIFY `id_curso` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
 
 --
 -- AUTO_INCREMENT de tabela `indicador`
 --
 ALTER TABLE `indicador`
-  MODIFY `id_indicador` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=49;
+  MODIFY `id_indicador` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=56;
 
 --
 -- AUTO_INCREMENT de tabela `matricula`
 --
 ALTER TABLE `matricula`
-  MODIFY `id_matricula` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=59;
+  MODIFY `id_matricula` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=71;
 
 --
 -- AUTO_INCREMENT de tabela `tipo_usuario`
@@ -558,19 +673,19 @@ ALTER TABLE `tipo_usuario`
 -- AUTO_INCREMENT de tabela `turma`
 --
 ALTER TABLE `turma`
-  MODIFY `id_turma` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
+  MODIFY `id_turma` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
 
 --
 -- AUTO_INCREMENT de tabela `uc`
 --
 ALTER TABLE `uc`
-  MODIFY `id_uc` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=53;
+  MODIFY `id_uc` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=59;
 
 --
 -- AUTO_INCREMENT de tabela `usuario`
 --
 ALTER TABLE `usuario`
-  MODIFY `id_usuario` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id_usuario` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
 
 --
 -- Restrições para tabelas despejadas
@@ -620,6 +735,457 @@ ALTER TABLE `turma`
 --
 ALTER TABLE `uc`
   ADD CONSTRAINT `id_curso_fk` FOREIGN KEY (`id_curso_fk`) REFERENCES `curso` (`id_curso`);
+--
+-- Banco de dados: `phpmyadmin`
+--
+CREATE DATABASE IF NOT EXISTS `phpmyadmin` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+USE `phpmyadmin`;
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura para tabela `pma__bookmark`
+--
+
+CREATE TABLE `pma__bookmark` (
+  `id` int(10) UNSIGNED NOT NULL,
+  `dbase` varchar(255) NOT NULL DEFAULT '',
+  `user` varchar(255) NOT NULL DEFAULT '',
+  `label` varchar(255) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL DEFAULT '',
+  `query` text NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_bin COMMENT='Bookmarks';
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura para tabela `pma__central_columns`
+--
+
+CREATE TABLE `pma__central_columns` (
+  `db_name` varchar(64) NOT NULL,
+  `col_name` varchar(64) NOT NULL,
+  `col_type` varchar(64) NOT NULL,
+  `col_length` text DEFAULT NULL,
+  `col_collation` varchar(64) NOT NULL,
+  `col_isNull` tinyint(1) NOT NULL,
+  `col_extra` varchar(255) DEFAULT '',
+  `col_default` text DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_bin COMMENT='Central list of columns';
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura para tabela `pma__column_info`
+--
+
+CREATE TABLE `pma__column_info` (
+  `id` int(5) UNSIGNED NOT NULL,
+  `db_name` varchar(64) NOT NULL DEFAULT '',
+  `table_name` varchar(64) NOT NULL DEFAULT '',
+  `column_name` varchar(64) NOT NULL DEFAULT '',
+  `comment` varchar(255) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL DEFAULT '',
+  `mimetype` varchar(255) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL DEFAULT '',
+  `transformation` varchar(255) NOT NULL DEFAULT '',
+  `transformation_options` varchar(255) NOT NULL DEFAULT '',
+  `input_transformation` varchar(255) NOT NULL DEFAULT '',
+  `input_transformation_options` varchar(255) NOT NULL DEFAULT ''
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_bin COMMENT='Column information for phpMyAdmin';
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura para tabela `pma__designer_settings`
+--
+
+CREATE TABLE `pma__designer_settings` (
+  `username` varchar(64) NOT NULL,
+  `settings_data` text NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_bin COMMENT='Settings related to Designer';
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura para tabela `pma__export_templates`
+--
+
+CREATE TABLE `pma__export_templates` (
+  `id` int(5) UNSIGNED NOT NULL,
+  `username` varchar(64) NOT NULL,
+  `export_type` varchar(10) NOT NULL,
+  `template_name` varchar(64) NOT NULL,
+  `template_data` text NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_bin COMMENT='Saved export templates';
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura para tabela `pma__favorite`
+--
+
+CREATE TABLE `pma__favorite` (
+  `username` varchar(64) NOT NULL,
+  `tables` text NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_bin COMMENT='Favorite tables';
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura para tabela `pma__history`
+--
+
+CREATE TABLE `pma__history` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `username` varchar(64) NOT NULL DEFAULT '',
+  `db` varchar(64) NOT NULL DEFAULT '',
+  `table` varchar(64) NOT NULL DEFAULT '',
+  `timevalue` timestamp NOT NULL DEFAULT current_timestamp(),
+  `sqlquery` text NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_bin COMMENT='SQL history for phpMyAdmin';
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura para tabela `pma__navigationhiding`
+--
+
+CREATE TABLE `pma__navigationhiding` (
+  `username` varchar(64) NOT NULL,
+  `item_name` varchar(64) NOT NULL,
+  `item_type` varchar(64) NOT NULL,
+  `db_name` varchar(64) NOT NULL,
+  `table_name` varchar(64) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_bin COMMENT='Hidden items of navigation tree';
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura para tabela `pma__pdf_pages`
+--
+
+CREATE TABLE `pma__pdf_pages` (
+  `db_name` varchar(64) NOT NULL DEFAULT '',
+  `page_nr` int(10) UNSIGNED NOT NULL,
+  `page_descr` varchar(50) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL DEFAULT ''
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_bin COMMENT='PDF relation pages for phpMyAdmin';
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura para tabela `pma__recent`
+--
+
+CREATE TABLE `pma__recent` (
+  `username` varchar(64) NOT NULL,
+  `tables` text NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_bin COMMENT='Recently accessed tables';
+
+--
+-- Despejando dados para a tabela `pma__recent`
+--
+
+INSERT INTO `pma__recent` (`username`, `tables`) VALUES
+('diogo', '[{\"db\":\"avaliacao\",\"table\":\"avaliacao\"},{\"db\":\"avaliacao\",\"table\":\"aluno\"},{\"db\":\"avaliacao\",\"table\":\"curso\"},{\"db\":\"avaliacao\",\"table\":\"uc\"},{\"db\":\"avaliacao\",\"table\":\"avaliacao_final_uc\"},{\"db\":\"avaliacao\",\"table\":\"turma\"},{\"db\":\"avaliacao\",\"table\":\"usuario\"},{\"db\":\"avaliacao\",\"table\":\"professor\"},{\"db\":\"avaliacao\",\"table\":\"tipo_usuario\"},{\"db\":\"avaliacao\",\"table\":\"atividade_avaliativa\"}]');
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura para tabela `pma__relation`
+--
+
+CREATE TABLE `pma__relation` (
+  `master_db` varchar(64) NOT NULL DEFAULT '',
+  `master_table` varchar(64) NOT NULL DEFAULT '',
+  `master_field` varchar(64) NOT NULL DEFAULT '',
+  `foreign_db` varchar(64) NOT NULL DEFAULT '',
+  `foreign_table` varchar(64) NOT NULL DEFAULT '',
+  `foreign_field` varchar(64) NOT NULL DEFAULT ''
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_bin COMMENT='Relation table';
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura para tabela `pma__savedsearches`
+--
+
+CREATE TABLE `pma__savedsearches` (
+  `id` int(5) UNSIGNED NOT NULL,
+  `username` varchar(64) NOT NULL DEFAULT '',
+  `db_name` varchar(64) NOT NULL DEFAULT '',
+  `search_name` varchar(64) NOT NULL DEFAULT '',
+  `search_data` text NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_bin COMMENT='Saved searches';
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura para tabela `pma__table_coords`
+--
+
+CREATE TABLE `pma__table_coords` (
+  `db_name` varchar(64) NOT NULL DEFAULT '',
+  `table_name` varchar(64) NOT NULL DEFAULT '',
+  `pdf_page_number` int(11) NOT NULL DEFAULT 0,
+  `x` float UNSIGNED NOT NULL DEFAULT 0,
+  `y` float UNSIGNED NOT NULL DEFAULT 0
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_bin COMMENT='Table coordinates for phpMyAdmin PDF output';
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura para tabela `pma__table_info`
+--
+
+CREATE TABLE `pma__table_info` (
+  `db_name` varchar(64) NOT NULL DEFAULT '',
+  `table_name` varchar(64) NOT NULL DEFAULT '',
+  `display_field` varchar(64) NOT NULL DEFAULT ''
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_bin COMMENT='Table information for phpMyAdmin';
+
+--
+-- Despejando dados para a tabela `pma__table_info`
+--
+
+INSERT INTO `pma__table_info` (`db_name`, `table_name`, `display_field`) VALUES
+('avaliacao', 'avaliacao', 'mencao');
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura para tabela `pma__table_uiprefs`
+--
+
+CREATE TABLE `pma__table_uiprefs` (
+  `username` varchar(64) NOT NULL,
+  `db_name` varchar(64) NOT NULL,
+  `table_name` varchar(64) NOT NULL,
+  `prefs` text NOT NULL,
+  `last_update` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_bin COMMENT='Tables'' UI preferences';
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura para tabela `pma__tracking`
+--
+
+CREATE TABLE `pma__tracking` (
+  `db_name` varchar(64) NOT NULL,
+  `table_name` varchar(64) NOT NULL,
+  `version` int(10) UNSIGNED NOT NULL,
+  `date_created` datetime NOT NULL,
+  `date_updated` datetime NOT NULL,
+  `schema_snapshot` text NOT NULL,
+  `schema_sql` text DEFAULT NULL,
+  `data_sql` longtext DEFAULT NULL,
+  `tracking` set('UPDATE','REPLACE','INSERT','DELETE','TRUNCATE','CREATE DATABASE','ALTER DATABASE','DROP DATABASE','CREATE TABLE','ALTER TABLE','RENAME TABLE','DROP TABLE','CREATE INDEX','DROP INDEX','CREATE VIEW','ALTER VIEW','DROP VIEW') DEFAULT NULL,
+  `tracking_active` int(1) UNSIGNED NOT NULL DEFAULT 1
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_bin COMMENT='Database changes tracking for phpMyAdmin';
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura para tabela `pma__userconfig`
+--
+
+CREATE TABLE `pma__userconfig` (
+  `username` varchar(64) NOT NULL,
+  `timevalue` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `config_data` text NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_bin COMMENT='User preferences storage for phpMyAdmin';
+
+--
+-- Despejando dados para a tabela `pma__userconfig`
+--
+
+INSERT INTO `pma__userconfig` (`username`, `timevalue`, `config_data`) VALUES
+('diogo', '2025-11-02 16:02:35', '{\"lang\":\"pt_BR\",\"Console\\/Mode\":\"collapse\"}');
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura para tabela `pma__usergroups`
+--
+
+CREATE TABLE `pma__usergroups` (
+  `usergroup` varchar(64) NOT NULL,
+  `tab` varchar(64) NOT NULL,
+  `allowed` enum('Y','N') NOT NULL DEFAULT 'N'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_bin COMMENT='User groups with configured menu items';
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura para tabela `pma__users`
+--
+
+CREATE TABLE `pma__users` (
+  `username` varchar(64) NOT NULL,
+  `usergroup` varchar(64) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_bin COMMENT='Users and their assignments to user groups';
+
+--
+-- Índices para tabelas despejadas
+--
+
+--
+-- Índices de tabela `pma__bookmark`
+--
+ALTER TABLE `pma__bookmark`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Índices de tabela `pma__central_columns`
+--
+ALTER TABLE `pma__central_columns`
+  ADD PRIMARY KEY (`db_name`,`col_name`);
+
+--
+-- Índices de tabela `pma__column_info`
+--
+ALTER TABLE `pma__column_info`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `db_name` (`db_name`,`table_name`,`column_name`);
+
+--
+-- Índices de tabela `pma__designer_settings`
+--
+ALTER TABLE `pma__designer_settings`
+  ADD PRIMARY KEY (`username`);
+
+--
+-- Índices de tabela `pma__export_templates`
+--
+ALTER TABLE `pma__export_templates`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `u_user_type_template` (`username`,`export_type`,`template_name`);
+
+--
+-- Índices de tabela `pma__favorite`
+--
+ALTER TABLE `pma__favorite`
+  ADD PRIMARY KEY (`username`);
+
+--
+-- Índices de tabela `pma__history`
+--
+ALTER TABLE `pma__history`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `username` (`username`,`db`,`table`,`timevalue`);
+
+--
+-- Índices de tabela `pma__navigationhiding`
+--
+ALTER TABLE `pma__navigationhiding`
+  ADD PRIMARY KEY (`username`,`item_name`,`item_type`,`db_name`,`table_name`);
+
+--
+-- Índices de tabela `pma__pdf_pages`
+--
+ALTER TABLE `pma__pdf_pages`
+  ADD PRIMARY KEY (`page_nr`),
+  ADD KEY `db_name` (`db_name`);
+
+--
+-- Índices de tabela `pma__recent`
+--
+ALTER TABLE `pma__recent`
+  ADD PRIMARY KEY (`username`);
+
+--
+-- Índices de tabela `pma__relation`
+--
+ALTER TABLE `pma__relation`
+  ADD PRIMARY KEY (`master_db`,`master_table`,`master_field`),
+  ADD KEY `foreign_field` (`foreign_db`,`foreign_table`);
+
+--
+-- Índices de tabela `pma__savedsearches`
+--
+ALTER TABLE `pma__savedsearches`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `u_savedsearches_username_dbname` (`username`,`db_name`,`search_name`);
+
+--
+-- Índices de tabela `pma__table_coords`
+--
+ALTER TABLE `pma__table_coords`
+  ADD PRIMARY KEY (`db_name`,`table_name`,`pdf_page_number`);
+
+--
+-- Índices de tabela `pma__table_info`
+--
+ALTER TABLE `pma__table_info`
+  ADD PRIMARY KEY (`db_name`,`table_name`);
+
+--
+-- Índices de tabela `pma__table_uiprefs`
+--
+ALTER TABLE `pma__table_uiprefs`
+  ADD PRIMARY KEY (`username`,`db_name`,`table_name`);
+
+--
+-- Índices de tabela `pma__tracking`
+--
+ALTER TABLE `pma__tracking`
+  ADD PRIMARY KEY (`db_name`,`table_name`,`version`);
+
+--
+-- Índices de tabela `pma__userconfig`
+--
+ALTER TABLE `pma__userconfig`
+  ADD PRIMARY KEY (`username`);
+
+--
+-- Índices de tabela `pma__usergroups`
+--
+ALTER TABLE `pma__usergroups`
+  ADD PRIMARY KEY (`usergroup`,`tab`,`allowed`);
+
+--
+-- Índices de tabela `pma__users`
+--
+ALTER TABLE `pma__users`
+  ADD PRIMARY KEY (`username`,`usergroup`);
+
+--
+-- AUTO_INCREMENT para tabelas despejadas
+--
+
+--
+-- AUTO_INCREMENT de tabela `pma__bookmark`
+--
+ALTER TABLE `pma__bookmark`
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT de tabela `pma__column_info`
+--
+ALTER TABLE `pma__column_info`
+  MODIFY `id` int(5) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT de tabela `pma__export_templates`
+--
+ALTER TABLE `pma__export_templates`
+  MODIFY `id` int(5) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT de tabela `pma__history`
+--
+ALTER TABLE `pma__history`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT de tabela `pma__pdf_pages`
+--
+ALTER TABLE `pma__pdf_pages`
+  MODIFY `page_nr` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT de tabela `pma__savedsearches`
+--
+ALTER TABLE `pma__savedsearches`
+  MODIFY `id` int(5) UNSIGNED NOT NULL AUTO_INCREMENT;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
