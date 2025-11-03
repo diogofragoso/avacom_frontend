@@ -2,8 +2,6 @@ import React, { useState, useEffect } from "react";
 import { Table, Badge, Button, Modal, Form, Alert } from "react-bootstrap";
 import { FaSave, FaClipboardList } from "react-icons/fa";
 import { MdOutlineFeedback } from "react-icons/md";
-
-
 import { MdComment } from "react-icons/md";
 import avaliacaoService from "../../services/avaliacaoService";
 
@@ -22,7 +20,7 @@ const mencaoParaIndice = (mencao) => {
 const AvaliacaoEstudante = ({ matriz, idEstudante, idTurma, onSelecionarAtividade }) => {
   if (!matriz || !matriz.ucs) return <div>Carregando dados de avaliação...</div>;
 
-  // Estados originais mantidos
+  // Estados originais mantidos (sem alteração)
   const [estadoMatriz, setEstadoMatriz] = useState(() => matriz.ucs.map(uc => uc.indicadores.map(() => 3)));
   const [idAvaliacaoMatriz, setIdAvaliacaoMatriz] = useState(() => matriz.ucs.map(uc => uc.indicadores.map(() => null)));
   const [observacaoMatriz, setObservacaoMatriz] = useState(() => matriz.ucs.map(uc => uc.indicadores.map(() => "")));
@@ -30,7 +28,7 @@ const AvaliacaoEstudante = ({ matriz, idEstudante, idTurma, onSelecionarAtividad
   const [avaliacaoFinalPorUC, setAvaliacaoFinalPorUC] = useState(() => matriz.ucs.map(() => 3));
   const [feedbackPorUC, setFeedbackPorUC] = useState(() => matriz.ucs.map(() => ""));
 
-  // Modais e contextos
+  // Modais e contextos (sem alteração)
   const [showObsModal, setShowObsModal] = useState(false);
   const [observacaoAtual, setObservacaoAtual] = useState("");
   const [obsContext, setObsContext] = useState(null);
@@ -45,15 +43,13 @@ const AvaliacaoEstudante = ({ matriz, idEstudante, idTurma, onSelecionarAtividad
 
   const [alertInfo, setAlertInfo] = useState({ show: false, variant: "success", message: "" });
 
-  // Carregar avaliações existentes
+  // 1. useEffect focado em carregar DADOS DOS INDICADORES
   useEffect(() => {
-    const carregarAvaliacoesSalvas = async () => {
+    const carregarAvaliacoesIndicadores = async () => {
       const novaMatrizEstado = matriz.ucs.map(uc => uc.indicadores.map(() => 3));
       const novaMatrizId = matriz.ucs.map(uc => uc.indicadores.map(() => null));
       const novaObservacao = matriz.ucs.map(uc => uc.indicadores.map(() => ""));
       const novaAcao = matriz.ucs.map(uc => uc.indicadores.map(() => ""));
-      const novaMenFinal = matriz.ucs.map(() => 3);
-      const novaFeedback = matriz.ucs.map(() => "");
 
       for (let ucIndex = 0; ucIndex < matriz.ucs.length; ucIndex++) {
         const uc = matriz.ucs[ucIndex];
@@ -68,25 +64,52 @@ const AvaliacaoEstudante = ({ matriz, idEstudante, idTurma, onSelecionarAtividad
                 novaMatrizId[ucIndex][indIndex] = avaliacaoDoAluno.id_avaliacao;
                 novaObservacao[ucIndex][indIndex] = avaliacaoDoAluno.observacao || "";
                 novaAcao[ucIndex][indIndex] = avaliacaoDoAluno.acao_recuperacao || "";
-                if (avaliacaoDoAluno.mencao_final) novaMenFinal[ucIndex] = mencaoParaIndice(avaliacaoDoAluno.mencao_final);
-                if (avaliacaoDoAluno.feedback) novaFeedback[ucIndex] = avaliacaoDoAluno.feedback;
               }
             } catch (err) { console.error(err); }
           }
         }
       }
-
       setEstadoMatriz(novaMatrizEstado);
       setIdAvaliacaoMatriz(novaMatrizId);
       setObservacaoMatriz(novaObservacao);
       setAcaoRecuperacaoMatriz(novaAcao);
-      setAvaliacaoFinalPorUC(novaMenFinal);
-      setFeedbackPorUC(novaFeedback);
     };
 
-    if (idEstudante) carregarAvaliacoesSalvas();
+    if (idEstudante) carregarAvaliacoesIndicadores();
   }, [matriz, idEstudante]);
 
+  // 2. useEffect focado em carregar DADOS DA AVALIAÇÃO FINAL (Menção Final e Feedback)
+  useEffect(() => {
+    const carregarAvaliacoesFinais = async () => {
+      try {
+        const avaliacoesFinaisSalvas = await avaliacaoService.getAvaliacoesFinais(idEstudante, idTurma);
+        
+        const novaMenFinal = matriz.ucs.map(() => 3);
+        const novaFeedback = matriz.ucs.map(() => "");
+
+        avaliacoesFinaisSalvas.forEach(av => {
+          const ucIndex = matriz.ucs.findIndex(uc => uc.id_uc === av.id_uc_fk);
+          if (ucIndex !== -1) {
+            if (av.mencao_final !== null && av.mencao_final !== undefined) {
+              novaMenFinal[ucIndex] = mencaoParaIndice(av.mencao_final);
+            }
+            if (av.feedback_final) {
+              novaFeedback[ucIndex] = av.feedback_final;
+            }
+          }
+        });
+
+        setAvaliacaoFinalPorUC(novaMenFinal);
+        setFeedbackPorUC(novaFeedback);
+      } catch (error) {
+        console.error("Erro ao carregar avaliações finais:", error);
+      }
+    };
+
+    if (idEstudante && idTurma) carregarAvaliacoesFinais();
+  }, [matriz.ucs, idEstudante, idTurma]);
+
+  // useEffect para o alerta (sem alteração)
   useEffect(() => {
     if (alertInfo.show) {
       const timer = setTimeout(() => setAlertInfo({ ...alertInfo, show: false }), 3000);
@@ -94,7 +117,7 @@ const AvaliacaoEstudante = ({ matriz, idEstudante, idTurma, onSelecionarAtividad
     }
   }, [alertInfo]);
 
-  // Funções originais para indicadores
+  // Funções originais para indicadores (INTACTAS)
   const handleClick = (ucIndex, indIndex) => {
     setEstadoMatriz(prev => {
       const nova = prev.map(r => [...r]);
@@ -155,7 +178,7 @@ const AvaliacaoEstudante = ({ matriz, idEstudante, idTurma, onSelecionarAtividad
     } catch { setAlertInfo({ show: true, variant: "danger", message: "Erro ao salvar ação de recuperação." }); }
   };
 
-  // NOVAS FUNÇÕES FEEDBACK
+  // Funções de Feedback (sem alteração)
   const handleAbrirFeedbackModal = (ucIndex) => {
     setFeedbackContext({ ucIndex });
     setFeedbackAtual(feedbackPorUC[ucIndex]);
@@ -165,17 +188,25 @@ const AvaliacaoEstudante = ({ matriz, idEstudante, idTurma, onSelecionarAtividad
   const handleSalvarFeedback = async () => {
     if (!feedbackContext) return;
     const { ucIndex } = feedbackContext;
+    const uc = matriz.ucs[ucIndex];
     try {
-      await avaliacaoService.atualizarFeedback(idEstudante, idTurma, { uc_index: ucIndex, feedback: feedbackAtual });
+      await avaliacaoService.salvarAvaliacaoFinal({
+        id_aluno_fk: idEstudante,
+        id_turma_fk: idTurma,
+        id_uc_fk: uc.id_uc,
+        feedback_final: feedbackAtual,
+      });
       const nova = [...feedbackPorUC];
       nova[ucIndex] = feedbackAtual;
       setFeedbackPorUC(nova);
       setShowFeedbackModal(false);
-      setAlertInfo({ show: true, variant: "success", message: "Feedback salvo!" });
-    } catch { setAlertInfo({ show: true, variant: "danger", message: "Erro ao salvar feedback." }); }
+      setAlertInfo({ show: true, variant: "success", message: "Feedback salvo com sucesso!" });
+    } catch { 
+      setAlertInfo({ show: true, variant: "danger", message: "Erro ao salvar feedback." }); 
+    }
   };
 
-  // NOVAS FUNÇÕES MENÇÃO FINAL
+  // Funções de Menção Final (sem alteração)
   const handleClickMenFinal = (ucIndex) => {
     setAvaliacaoFinalPorUC(prev => {
       const nova = [...prev];
@@ -186,14 +217,23 @@ const AvaliacaoEstudante = ({ matriz, idEstudante, idTurma, onSelecionarAtividad
 
   const handleSalvarMenFinal = async (ucIndex) => {
     const estado = estados[avaliacaoFinalPorUC[ucIndex]];
+    const uc = matriz.ucs[ucIndex];
     try {
-      await avaliacaoService.atualizarMencaoFinal(idEstudante, idTurma, { uc_index: ucIndex, mencao_final: estado.text });
-      setAlertInfo({ show: true, variant: "success", message: "Menção final salva!" });
-    } catch { setAlertInfo({ show: true, variant: "danger", message: "Erro ao salvar menção final." }); }
+      await avaliacaoService.salvarAvaliacaoFinal({
+        id_aluno_fk: idEstudante,
+        id_turma_fk: idTurma,
+        id_uc_fk: uc.id_uc,
+        mencao_final: estado.text,
+      });
+      setAlertInfo({ show: true, variant: "success", message: "Menção final salva com sucesso!" });
+    } catch { 
+      setAlertInfo({ show: true, variant: "danger", message: "Erro ao salvar menção final." }); 
+    }
   };
 
   const maxIndicadores = Math.max(0, ...matriz.ucs.map(uc => uc.indicadores.length));
 
+  // --- RENDERIZAÇÃO (JSX) 100% INTACTA ---
   return (
     <div className="p-3">
       {alertInfo.show && (
@@ -278,7 +318,6 @@ const AvaliacaoEstudante = ({ matriz, idEstudante, idTurma, onSelecionarAtividad
                     />
                   </div>
                 </td>
-
               </tr>
             ))}
           </tbody>

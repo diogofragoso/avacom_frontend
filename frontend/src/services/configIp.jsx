@@ -1,7 +1,7 @@
 // config.jsx - Corrigido, mas ainda não recomendado
 function IP() {
-    const ip = "137.131.204.142";
-    // const ip = "localhost";
+    // const ip = "137.131.204.142";
+    const ip = "localhost";
     return {
         address: ip // Retornando o IP em uma propriedade
     };
