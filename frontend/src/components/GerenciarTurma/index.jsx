@@ -10,11 +10,12 @@ import {
   Spinner,
   Alert,
   Row,
-  Col
+  Col,
 } from 'react-bootstrap';
 import { motion } from 'framer-motion';
 import { MdAddCircle } from 'react-icons/md';
-import { FaTrash, FaCheckCircle } from 'react-icons/fa';
+// 1. Importar o ícone de métricas
+import { FaTrash, FaCheckCircle, FaChartBar } from 'react-icons/fa';
 
 import matriculaService from '../../services/matriculaService';
 import avaliacaoService from '../../services/avaliacaoService';
@@ -115,6 +116,12 @@ function GerenciarTurma() {
     navigate('/PainelTurma/GerenciarAvaliativa', { state: { turma } });
   };
 
+  // 2. Adicionar a função de navegação para métricas
+  const handleVerMetricas = () => {
+    // Usamos a rota que definimos para o MetricasTurma, passando o ID da turma
+    navigate(`/PainelDashBoard/PainelTurma/Metricas/${turma.id_turma}`);
+  };
+
   if (!turma) {
     return (
       <Container className="mt-4">
@@ -172,48 +179,41 @@ function GerenciarTurma() {
                       idEstudante={alunoSelecionado.id_aluno}
                       turmaId={turma.id_turma}
                       avaliacaoId={alunoSelecionado.avaliacaoId || null}
+                      onSalvar={async (dados) => {
+                        try {
+                          if (!dados.avaliacaoId) {
+                            const payload = {
+                              id_estudante_fk: dados.estudanteId,
+                              id_turma_fk: dados.turmaId,
+                              id_uc_fk: dados.ucId,
+                              id_indicador_fk: dados.indicadorId,
+                              mencao: dados.estado,
+                            };
+                            const nova = await avaliacaoService.salvar(payload);
+                            console.log('Avaliação criada:', nova);
 
-                    onSalvar={async (dados) => {
-  try {
-    if (!dados.avaliacaoId) {
-      const payload = {
-        id_estudante_fk: dados.estudanteId,
-        id_turma_fk: dados.turmaId,
-        id_uc_fk: dados.ucId,
-        id_indicador_fk: dados.indicadorId,
-        mencao: dados.estado
-      };
-      const nova = await avaliacaoService.salvar(payload);
-      console.log('Avaliação criada:', nova);
-
-      if (nova?.id_avaliacao) {
-        // Atualiza no estado do componente AvaliacaoEstudante
-        setAlunoSelecionado((prev) => ({
-          ...prev,
-          avaliacaoId: nova.id_avaliacao
-        }));
-        return nova.id_avaliacao;
-      }
-    } else {
-      const payload = { mencao: dados.estado };
-      await avaliacaoService.atualizar(dados.avaliacaoId, payload);
-      console.log('Avaliação atualizada!');
-      return dados.avaliacaoId;
-    }
-  } catch (err) {
-    console.error('Erro ao salvar avaliação:', err);
-    alert('Erro ao salvar avaliação!');
-  }
-}}
-
-
-
-                      
-
-
-
-
-
+                            if (nova?.id_avaliacao) {
+                              // Atualiza no estado do componente AvaliacaoEstudante
+                              setAlunoSelecionado((prev) => ({
+                                ...prev,
+                                avaliacaoId: nova.id_avaliacao,
+                              }));
+                              return nova.id_avaliacao;
+                            }
+                          } else {
+                            const payload = { mencao: dados.estado };
+                            await avaliacaoService.atualizar(
+                              dados.avaliacaoId,
+                              payload
+                            );
+                            console.log('Avaliação atualizada!');
+                            return dados.avaliacaoId;
+                          }
+                        } catch (err) {
+                          console.error('Erro ao salvar avaliação:', err);
+                          alert('Erro ao salvar avaliação!');
+                        }
+                      }}
                       onObservacao={async (obs) => {
                         console.log('Salvar observação:', obs);
                         try {
@@ -224,7 +224,7 @@ function GerenciarTurma() {
                             return;
                           }
                           const payload = {
-                            observacao_avaliacao: obs.observacao
+                            observacao_avaliacao: obs.observacao,
                           };
                           await avaliacaoService.atualizar(
                             obs.avaliacaoId,
@@ -252,6 +252,17 @@ function GerenciarTurma() {
                 <div className="d-flex justify-content-between align-items-center mb-3">
                   <h5>Estudantes Matriculados</h5>
                   <div>
+                    {/* 3. Adicionar o botão de métricas */}
+                    <Button
+                      variant="outline-primary"
+                      className="me-2"
+                      title="Ver Métricas da Turma"
+                      onClick={handleVerMetricas}
+                    >
+                      <FaChartBar className="me-1" />
+                      Métricas
+                    </Button>
+
                     <Button
                       variant="secondary"
                       className="me-2"
@@ -302,7 +313,9 @@ function GerenciarTurma() {
                             <Button
                               variant="danger"
                               size="sm"
-                              onClick={() => handleExcluir(estudante.id_matricula)}
+                              onClick={() =>
+                                handleExcluir(estudante.id_matricula)
+                              }
                             >
                               <FaTrash />
                             </Button>

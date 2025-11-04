@@ -1,0 +1,76 @@
+/* MetricasTurma.module.css */
+
+/* Fundo principal do dashboard */
+.dashboardMetricas {
+    background-color: #f4f7fa;
+  }
+  
+  /* --- Cartões KPI --- */
+  .kpiCard {
+    border-radius: 8px;
+  }
+  .kpiTitle {
+    font-size: 0.9rem;
+    color: #6c757d;
+    margin-bottom: 0.5rem;
+  }
+  .kpiValue {
+    font-size: 2.2rem;
+    font-weight: 600;
+    line-height: 1.1;
+  }
+  
+  /* Cores de texto para KPIs */
+  .textAtingiu { color: #00B894; }
+  .textParcial { color: #FFB84C; }
+  .textNaoAtingiu { color: #F7685B; }
+  .textNaoAvaliado { color: #6c757d; }
+  
+  
+  /* --- ProgressBar (Distribuição) --- */
+  
+  /* Usamos :global() para estilizar as classes que o 
+    React-Bootstrap vai aplicar, já que elas não 
+    fazem parte deste módulo CSS.
+  */
+  :global(.progress-bar-custom) {
+    height: 20px;
+    font-size: 12px;
+    border-radius: 4px;
+    background-color: #e9ecef; /* Fundo da barra */
+  }
+  :global(.progress-bar-custom .progress-bar) {
+    transition: none; /* Remove animação */
+  }
+  
+  /* Variantes de cor personalizadas para o ProgressBar */
+  :global(.progress-bar.bg-atingiu) { background-color: #00B894; }
+  :global(.progress-bar.bg-parcial) { background-color: #FFB84C; }
+  :global(.progress-bar.bg-naoAtingiu) { background-color: #F7685B; }
+  :global(.progress-bar.bg-naoAvaliado) { background-color: #6c757d; }
+  
+  
+  /* --- Badges (Indicadores) --- */
+  
+  /* Para os Badges, é mais fácil criar nossas próprias classes
+    do que tentar forçar o componente <Badge> do Bootstrap.
+  */
+  .badgeCustom {
+    display: inline-block;
+    font-size: 0.85rem;
+    font-weight: 600;
+    padding: 0.4em 0.8em;
+    color: #fff;
+    border-radius: 50rem; /* pill */
+    margin-right: 0.5rem; /* me-2 */
+  }
+  
+  /* Classes de variantes que vamos aplicar dinamicamente */
+  .atingiu { background-color: #00B894; }
+  .parcial { background-color: #FFB84C; }
+  .naoAtingiu { background-color: #F7685B; }
+  .naoAvaliado { background-color: #6c757d; }
+  
+  .indicadorItem {
+    background-color: #fdfdfd;
+  }

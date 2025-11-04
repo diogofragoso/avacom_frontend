@@ -23,6 +23,7 @@ import PainelDashBoard from "../src/pages/PainelDashBoard";
 import GerenciarTurma from "./components/GerenciarTurma";
 import AvaliacaoEstudante from "./components/AvaliacaoEstudante";
 import GerenciarAvaliativa from "./components/GerenciarAvaliativas";
+import MetricasTurma from "./components/MetricasTurmas";
 
 
 function AppRoutes() {
@@ -69,6 +70,7 @@ function AppRoutes() {
 
           <Route path="PainelDashBoard" element={<PainelDashBoard />} >
             <Route path="NavPainel" element={<NavPainel />} />
+            <Route path="MetricasTurmas" element={<MetricasTurma />} />
           </Route>
         </Route>
 
