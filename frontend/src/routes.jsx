@@ -64,13 +64,13 @@ function AppRoutes() {
             {/* GerenciarTurma e GerenciarAvaliativa no mesmo nível */}
             <Route path="GerenciarTurma" element={<GerenciarTurma />} />
             <Route path="GerenciarAvaliativa" element={<GerenciarAvaliativa />} />
-
+            <Route path="MetricasTurmas" element={<MetricasTurma />} />
             <Route path="AvaliacaoEstudante" element={<AvaliacaoEstudante />} />
           </Route>
 
           <Route path="PainelDashBoard" element={<PainelDashBoard />} >
             <Route path="NavPainel" element={<NavPainel />} />
-            <Route path="MetricasTurmas" element={<MetricasTurma />} />
+            
           </Route>
         </Route>
 

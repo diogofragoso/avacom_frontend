@@ -2,6 +2,7 @@
 
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import React, { useEffect, useState } from 'react';
+
 import {
   Card,
   Button,
@@ -43,6 +44,8 @@ function GerenciarTurma() {
   const [matrizAvaliacao, setMatrizAvaliacao] = useState(null);
   const [carregandoAvaliacao, setCarregandoAvaliacao] = useState(false);
   const [atividadeSelecionada, setAtividadeSelecionada] = useState(null);
+
+ 
 
   // 🔹 Buscar estudantes da turma
   const carregarEstudantes = async () => {
@@ -118,8 +121,9 @@ function GerenciarTurma() {
 
   // 2. Adicionar a função de navegação para métricas
   const handleVerMetricas = () => {
-    // Usamos a rota que definimos para o MetricasTurma, passando o ID da turma
-    navigate(`/PainelDashBoard/PainelTurma/Metricas/${turma.id_turma}`);
+    // === AJUSTE AQUI ===
+    // O caminho agora aponta para a rota "irmã" dentro do PainelTurma
+    navigate('/PainelTurma/MetricasTurmas', { state: { turma: turma } });
   };
 
   if (!turma) {
