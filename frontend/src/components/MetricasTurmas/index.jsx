@@ -1,12 +1,12 @@
 import React from 'react';
 import { Container, Row, Col, Card, ProgressBar } from 'react-bootstrap';
 // 1. Importar o CSS Module
-import styles from './MetricasTurma.module.css';
+import styles from './MetricasTurmas.module.css';
 
 // --- DADOS ESTÁTICOS (MOCK) ---
 // Note que as 'variants' estão em camelCase para bater com as classes do CSS Module
 const dadosTurma = {
-  nome: 'Turma A - Matemática',
+  nome: 'Técnico em informática - T1',
   totalEstudantes: 32,
   totalIndicadores: 4,
   taxaAprovacao: 85,
