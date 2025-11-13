@@ -4,7 +4,8 @@ import react from '@vitejs/plugin-react-swc'
 export default defineConfig({
   plugins: [react()],
   
-  base: "/avacom_frontend/", // <--- VERIFIQUE ESTA LINHA COM MUITA ATENÇÃO
+  // base: "/avacom_frontend/", 
+  base: "/", 
 
   server: {
     host: '127.0.0.1',
