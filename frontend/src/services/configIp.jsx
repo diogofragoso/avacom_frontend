@@ -1,6 +1,7 @@
 // config.jsx - Corrigido, mas ainda não recomendado
 function IP() {
-    const ip = "137.131.204.142";
+    // const ip = "137.131.204.142";
+    const ip = "https://api.avacom.space";
     // const ip = "localhost";
     return {
         address: ip // Retornando o IP em uma propriedade
