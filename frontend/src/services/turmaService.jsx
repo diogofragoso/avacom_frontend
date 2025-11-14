@@ -5,7 +5,7 @@ import IP from './configIp'
 const publico = IP().address;
 
 
-const API_BASE_URL = `${publico}:3000/api/turmas`;
+const API_BASE_URL = `${publico}/api/turmas`;
 
 const API_INSERIR_TURMA = `${API_BASE_URL}/inserirturma`;
 const API_LISTAR_TURMAS = `${API_BASE_URL}/listarturmas`;
