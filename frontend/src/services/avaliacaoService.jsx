@@ -3,7 +3,7 @@ import axios from "axios";
 import IP from './configIp';
 
 const publico = IP().address;
-const API_URL = `http://${publico}:3000/api/avaliacao`;
+const API_URL = `${publico}/api/avaliacao`;
 
 // 🔹 Buscar a matriz completa de UCs, Indicadores e Atividades Avaliativas
 const getMatriz = async (cursoId) => {

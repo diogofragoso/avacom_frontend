@@ -6,9 +6,9 @@ const publico = IP().address; // condiguração de IP publico local de forma aut
 
 
 // URL para a API de usuários (cadastro, etc.)
-const USUARIOS_API_URL = `http://${publico}:3000/api/usuarios`;
+const USUARIOS_API_URL = `${publico}/api/usuarios`;
 // URL para a API de login
-const LOGIN_API_URL = `http://${publico}:3000/api/login`;
+const LOGIN_API_URL = `${publico}/api/login`;
 
 const usuarioService = {
   /**

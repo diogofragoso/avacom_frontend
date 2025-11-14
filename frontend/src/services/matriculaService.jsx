@@ -3,7 +3,7 @@ import axios from 'axios';
 import IP from './configIp'
 const publico = IP().address;
 
-const API_BASE_URL = `http://${publico}:3000/api/matricula`;
+const API_BASE_URL = `${publico}/api/matricula`;
 const API_MATRICULAR_ESTUDANTE = `${API_BASE_URL}/matricularestudante`;
 
 // Retorna a URL para listar alunos matriculados de uma turma

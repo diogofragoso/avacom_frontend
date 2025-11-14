@@ -3,8 +3,10 @@ import axios from 'axios';
 import IP from './configIp'
 const publico = IP().address;
 
-const API_INSERIR = `http://${publico}:3000/api/cursos/cursos`;
-// const API_LISTAR = `http://${publico}:3000/api/cursos/listarcursos`;
+// const API_INSERIR = `http://${publico}:8080/api/cursos/cursos`;
+const API_INSERIR = `${publico}/api/cursos/cursos`;
+
+// const API_LISTAR = `http://${publico}:8080/api/cursos/listarcursos`;
 const API_LISTAR = `${publico}/api/cursos/listarcursos`;
 // const API_LISTAR = '/api/cursos/listarcursos';
 

@@ -3,12 +3,12 @@ import axios from 'axios';
 import IP from './configIp'
 const publico = IP().address;
 
-const API_BASE_URL = `http://${publico}:3000/api/atividadeavaliativa`;
+const API_BASE_URL = `${publico}/api/atividadeavaliativa`;
 const API_INSERIR = `${API_BASE_URL}/inseriravaliativa`;
 const API_LISTAR = `${API_BASE_URL}`;
 const API_DELETAR = (id) => `${API_BASE_URL}/deletaravaliativa/${id}`;
 const API_EDITAR = (id) => `${API_BASE_URL}/editaravaliativa/${id}`;
-const API_GPT = 'http://localhost:3000/api/chatgpt';
+const API_GPT = 'http://localhost/api/chatgpt';
 
 const avaliativaService = {
   createAvaliativa: async (data) => {
