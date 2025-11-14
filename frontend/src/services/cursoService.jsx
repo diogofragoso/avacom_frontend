@@ -5,7 +5,7 @@ const publico = IP().address;
 
 const API_INSERIR = `http://${publico}:3000/api/cursos/cursos`;
 // const API_LISTAR = `http://${publico}:3000/api/cursos/listarcursos`;
-const API_LISTAR = `${publico}:/api/cursos/listarcursos`;
+const API_LISTAR = `${publico}/api/cursos/listarcursos`;
 // const API_LISTAR = '/api/cursos/listarcursos';
 
 const cursoService = {
