@@ -32,7 +32,7 @@ function AppRoutes() {
     <HashRouter>
       <Routes>
         {/* Rota principal com rotas aninhadas */}
-        <Route path="/" element={<Home />}>
+        <Route path="/" element={<Login />}>
           <Route path="Board" element={<Board />} />
           <Route path="Tarefas" element={<Tarefas />} />
           <Route path="Contador" element={<Contador />} />

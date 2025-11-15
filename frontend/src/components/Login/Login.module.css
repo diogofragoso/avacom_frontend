@@ -1,18 +1,30 @@
 .pageWrapper {
-  height: 100vh;
+  height: vh;
   display: flex;
   flex-direction: column;
 }
 
 .leftPanel {
-  background: linear-gradient(135deg, #007bff, #0056b3);
+
+  background-color: #0c0d0e; 
+  
+  box-shadow: 
+    inset 40px 0 0 #FF6B00,     
+    10px 0 20px -5px rgba(0, 0, 0, 0.8),    
+    inset 0 0 10px rgba(0, 0, 0, 0.5); 
+
+  /* Cores e Layout */
   color: white;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 40px;
   text-align: center;
+  /* Garantindo que a capa ocupe metade da tela ou um tamanho fixo, se for o caso */
+  /* Se estiver em um layout flex, considere definir uma largura (ex: width: 50vw;) */
 }
+
+
 
 .leftContent {
   max-width: 500px;
@@ -71,7 +83,7 @@
 }
 
 .customButton {
-  background-color: #007bff;
+ background-color: #00070e;
   border: none;
   padding: 10px;
   font-weight: bold;
@@ -80,11 +92,12 @@
 }
 
 .customButton:hover {
-  background-color: #0056b3;
+  background-color: #FF6B00;
+  
 }
 
 .toggleLink {
-  color: #007bff;
+  color: #00070e;
   cursor: pointer;
   font-weight: 500;
 }
