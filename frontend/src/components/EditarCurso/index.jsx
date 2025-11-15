@@ -13,7 +13,7 @@ const EditarCurso = ({ cursos }) => {
           {cursos.map((curso) => (
             <Col key={curso.id_curso} md={4} className="mb-4">
               <NavLink2
-                to="/PainelUc/RegistroUc"
+                to="/Home/PainelUc/RegistroUc"
                 state={{ curso }}
                 className="text-decoration-none"
               >

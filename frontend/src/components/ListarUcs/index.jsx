@@ -69,7 +69,7 @@ const ListarUcs = ({ ucs, feedback, setFeedback, onDeleteSuccess, onEditSuccess,
                         >
                            <Card className={`${styles.customCard} w-100`}>
                                 <NavLink2
-                                    to="/PainelIndicadores"
+                                    to="/Home/PainelIndicadores"
                                     state={{ uc, curso }}  // Passando o estado de 'curso' junto com a UC
                                     className="text-decoration-none text-dark"
                                 >

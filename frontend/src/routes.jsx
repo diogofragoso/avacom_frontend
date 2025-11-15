@@ -29,53 +29,56 @@ function AppRoutes() {
   return (
     <HashRouter>
       <Routes>
-
-        {/* Login sozinho */}
+        
+        {/* Login */}
         <Route path="/" element={<Login />} />
 
-        {/* Home no nível raiz */}
-        <Route path="/Home" element={<Home />} />
+        {/* --------------------- */}
+        {/*   ROTA PAI: /Home    */}
+        {/* --------------------- */}
 
-        {/* Outras rotas no nível raiz */}
-        <Route path="Board" element={<Board />} />
-        <Route path="Tarefas" element={<Tarefas />} />
-        <Route path="Contador" element={<Contador />} />
+        <Route path="/Home" element={<Home />}>
 
-        <Route path="PainelEstudante" element={<PainelEstudante />}>
-          <Route path="RegistroEstudante" element={<RegistroEstudante />} />
+          {/* páginas dentro do Home */}
+          <Route path="Board" element={<Board />} />
+          <Route path="Tarefas" element={<Tarefas />} />
+          <Route path="Contador" element={<Contador />} />
+
+          <Route path="PainelEstudante" element={<PainelEstudante />}>
+            <Route path="RegistroEstudante" element={<RegistroEstudante />} />
+          </Route>
+
+          <Route path="PainelCurso" element={<PainelCurso />}>
+            <Route path="RegistroCurso" element={<RegistroCurso />} />
+            <Route path="EditarCurso" element={<EditarCurso />} />
+          </Route>
+
+          <Route path="PainelUc" element={<PainelUc />}>
+            <Route path="RegistroUc" element={<RegistroUc />} />
+            <Route path="InserirEstudanteCurso" element={<InserirEstudanteCurso />} />
+          </Route>
+
+          <Route path="PainelIndicadores" element={<PainelIndicadores />}>
+            <Route path="ListarIndicadores" element={<ListarIndicadores />} />
+          </Route>
+
+          <Route path="PainelAvaliativa" element={<PainelAvaliativa />}>
+            <Route path="ListarAvaliativa" element={<ListarAvaliativa />} />
+          </Route>
+
+          <Route path="PainelTurma" element={<PainelTurma />}>
+            <Route path="ListarTurma" element={<ListarTurmas />} />
+            <Route path="GerenciarTurma" element={<GerenciarTurma />} />
+            <Route path="GerenciarAvaliativa" element={<GerenciarAvaliativa />} />
+            <Route path="MetricasTurmas" element={<MetricasTurma />} />
+            <Route path="AvaliacaoEstudante" element={<AvaliacaoEstudante />} />
+          </Route>
+
+          <Route path="PainelDashBoard" element={<PainelDashBoard />}>
+            <Route path="NavPainel" element={<NavPainel />} />
+          </Route>
+
         </Route>
-
-        <Route path="PainelCurso" element={<PainelCurso />}>
-          <Route path="RegistroCurso" element={<RegistroCurso />} />
-          <Route path="EditarCurso" element={<EditarCurso />} />
-        </Route>
-
-        <Route path="PainelUc" element={<PainelUc />}>
-          <Route path="RegistroUc" element={<RegistroUc />} />
-          <Route path="InserirEstudanteCurso" element={<InserirEstudanteCurso />} />
-        </Route>
-
-        <Route path="PainelIndicadores" element={<PainelIndicadores />}>
-          <Route path="ListarIndicadores" element={<ListarIndicadores />} />
-        </Route>
-
-        <Route path="PainelAvaliativa" element={<PainelAvaliativa />}>
-          <Route path="ListarAvaliativa" element={<ListarAvaliativa />} />
-        </Route>
-
-        <Route path="PainelTurma" element={<PainelTurma />}>
-          <Route path="ListarTurma" element={<ListarTurmas />} />
-          <Route path="GerenciarTurma" element={<GerenciarTurma />} />
-          <Route path="GerenciarAvaliativa" element={<GerenciarAvaliativa />} />
-          <Route path="MetricasTurmas" element={<MetricasTurma />} />
-          <Route path="AvaliacaoEstudante" element={<AvaliacaoEstudante />} />
-        </Route>
-
-        <Route path="PainelDashBoard" element={<PainelDashBoard />} >
-          <Route path="NavPainel" element={<NavPainel />} />
-        </Route>
-
-        <Route path="/Login" element={<Login />} />
 
       </Routes>
     </HashRouter>

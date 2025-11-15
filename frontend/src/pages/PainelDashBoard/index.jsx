@@ -17,7 +17,7 @@ function PainelDashBoard() {
     <div>
       <Container fluid className='px-0 mt-0'>
         <div className='row'>
-          <NavPainel navegacao={navegacao} />
+          <p>&nbsp;</p>
         </div>
       </Container>
       <Outlet />
