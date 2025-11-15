@@ -3,6 +3,7 @@ import { Container, Row, Col, Form, Button, Alert } from 'react-bootstrap';
 import { FaEye, FaEyeSlash, FaEnvelope, FaLock, FaUser, FaIdCard, FaBuilding } from 'react-icons/fa';
 import styles from './Login.module.css';
 import usuarioService from '../../services/usuarioService';
+import Home from "../../pages/Home";
 
 export default function Login() {
     // --- ESTADOS ---
@@ -75,7 +76,7 @@ export default function Login() {
                 // Se o login for bem-sucedido, o cookie é definido automaticamente pelo backend.
                 // Agora, redirecionamos o usuário para a página principal do sistema.
                 // (Você pode criar um alerta de sucesso aqui também se desejar)
-                window.location.href = '/'; // Ou a rota para sua página principal
+                window.location.href = '/Home'; // Ou a rota para sua página principal
 
             } catch (err) {
                 // Captura o erro da API (ex: "Credenciais inválidas.")
