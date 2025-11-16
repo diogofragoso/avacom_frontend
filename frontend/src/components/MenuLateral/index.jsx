@@ -24,7 +24,7 @@ function MenuLateral() {
 
         {/* CURSOS */}
         <NavLink 
-          to="/Home/PainelCurso"
+          to="/PainelCurso"
           className={({ isActive }) => (isActive ? styles.active : '')}
         >
           <GiTeacher className={styles.icon} />
@@ -34,7 +34,7 @@ function MenuLateral() {
         {/* ESTUDANTE */}
         <NavItem>
           <NavLink 
-            to="/Home/PainelEstudante"
+            to="/PainelEstudante"
             className={({ isActive }) => (isActive ? styles.active : '')}
           >
             <PiStudentBold className={styles.icon} />
@@ -45,7 +45,7 @@ function MenuLateral() {
         {/* TURMA */}
         <NavItem>
           <NavLink 
-            to="/Home/PainelTurma"
+            to="/PainelTurma"
             className={({ isActive }) => (isActive ? styles.active : '')}
           >
             <GrGroup className={styles.icon} />
@@ -56,7 +56,7 @@ function MenuLateral() {
         {/* DASHBOARD */}
         <NavItem>
           <NavLink 
-            to="/Home/PainelDashBoard"
+            to="/PainelDashBoard"
             className={({ isActive }) => (isActive ? styles.active : '')}
           >
             <GrDashboard className={styles.icon} />

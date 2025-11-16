@@ -14,7 +14,7 @@ function PainelTurma() {
 
   // Mostra a lista de turmas apenas na raiz do painel ou na rota ListarTurma
   const deveMostrarLista =
-    path === '/Home/PainelTurma' || path === '/PainelTurma/ListarTurma';
+    path === '/PainelTurma' || path === '/PainelTurma/ListarTurma';
 
   return (
     <Container fluid className="px-0">

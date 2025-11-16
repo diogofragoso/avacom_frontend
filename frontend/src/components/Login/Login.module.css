@@ -1,5 +1,11 @@
+html,body{
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+
 .pageWrapper {
-  height: vh;
+  height: 100vh; 
   display: flex;
   flex-direction: column;
 }
@@ -94,6 +100,11 @@
 .customButton:hover {
   background-color: #FF6B00;
   
+}
+
+.customButton:active {
+  background-color: #e06c00; 
+  transform: translateY(1px); 
 }
 
 .toggleLink {

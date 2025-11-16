@@ -78,20 +78,32 @@ export default function Login() {
             }
 
         } else {
-            // --- LÓGICA DE LOGIN ---
+            // --- LÓGICA DE LOGIN (CORRIGIDA) ---
             try {
                 const credenciais = {
                     email: formData.email,
                     senha: formData.senha,
                 };
 
-                await usuarioService.login(credenciais);
+                // 1. Chame o login e PEGUE A RESPOSTA
+                const response = await usuarioService.login(credenciais);
 
-                // Redirecionamento correto no Vite + React Router
-                navigate('/Home');
+                // 2. SALVE A SESSÃO (IMPORTANTE!)
+                //    (Assumindo que sua API retorna { usuario, token })
+                if (response.usuario && response.token) {
+                    usuarioService.salvarSessao(response.usuario, response.token);
+                } else {
+                    // Caso a API não retorne o esperado
+                    throw new Error("Resposta inesperada da API durante o login.");
+                }
+
+                // 3. Redirecione para o local CORRETO
+                // (Use /Board, /PainelDashBoard ou sua página inicial)
+                navigate('/PainelDashBoard'); 
 
             } catch (err) {
-                setError(err.error || 'Falha no login. Verifique seu email e senha.');
+                // Use err.message ou err.error dependendo do que sua API retorna
+                setError(err.error || err.message || 'Falha no login. Verifique seu email e senha.');
             } finally {
                 setIsLoading(false);
             }
