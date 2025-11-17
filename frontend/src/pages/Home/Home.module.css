@@ -1,56 +1,37 @@
+/* Define a estrutura base da página */
 .home {
-    height: 100vh;
+    display: flex;    
+    /* min-height: 100vh; */
+    background-color: #f8f9fa; /* Cor de fundo leve para o fundo da aplicação */
+}
 
-  }
-  body, .home {
+/* Garante que não haja margens indesejadas no corpo */
+body {
     margin: 0;
     padding: 0;
-  }
-  
-  .menuLateralCol {
-    transition: all 0.3s ease-in-out;
-  }
-  
-  .contentCol {
-    padding: 1px;
-    background-color: #fff;
-  }
-  
-  .contentWrapper {
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
-  }
-  
-  /* Quando o menu estiver colapsado */
-  .MenuLateral.collapsed {
-    width: 50px; /* Ajuste de largura para quando estiver colapsado */
-  }
-  
-  /* Quando o menu estiver expandido */
-  .MenuLateral {
-    display: flex;
-    justify-content: center;
-    margin: 0;
-    width: 200px; /* Largura normal do menu */
-  }
-  
-  .container {
-    margin: 0;
-  } 
+}
 
-  .navegacao {
+/* --- CLASSE PRINCIPAL DO CONTEÚDO ---
+   Esta é a parte mais importante. Ela cria o espaço seguro
+   para que o texto não fique escondido atrás do Header ou do Menu.
+*/
+.mainContent {
+    margin-top: 40px;           /* Compensa a altura do Header Fixo */   
+  width: calc(100% - 170px); /* Compensa a largura do Menu Lateral Fixo */
+    min-height: calc(100vh - 60px); 
+    padding: 15px;               
+    box-sizing: border-box;      /* Garante que o padding não quebre o layout */
+    transition: margin-left 0.5s ease, width 0.5s ease; /* Animação suave caso o menu mude de tamanho */
+}
+
+/* --- Classes Utilitárias --- */
+
+/* Mantive sua classe de navegação caso use breadcrumbs ou títulos */
+.navegacao {
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 1px;
-
-  }
-
-  .container,
-.row {
-  padding-left: 0;
-  padding-right: 0;
-  margin-left: 0;
-  margin-right: 0;
+    margin-bottom: 1px
 }
+

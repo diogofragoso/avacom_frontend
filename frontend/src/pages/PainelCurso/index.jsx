@@ -54,9 +54,9 @@ function PainelCurso() {
 
   return (
    
-    <div className={styles.painelcurso}>
+    <div className={styles.painelcurso}>  
       <div className="row">
-        <Container fluid>
+        <Container fluid className="p-0">
         <Navbar bg="dark" data-bs-theme="dark" expand="lg" className="bg-body-tertiary navbar-custom">
           <Nav tabs>
             <NavItem>

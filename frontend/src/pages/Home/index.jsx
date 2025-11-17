@@ -1,47 +1,34 @@
 import React, { useState } from 'react';
-import { Container, Row, Col } from 'react-bootstrap'; // Importando componentes do React-Bootstrap
 import HeaderComponent from '../../components/Header';
 import MenuLateral from '../../components/MenuLateral';
 import { Outlet } from 'react-router-dom';
-import 'bootstrap/dist/css/bootstrap.min.css'; // Importando o CSS do Bootstrap
-import styles from './Home.module.css'; // Importando o CSS Module
+import 'bootstrap/dist/css/bootstrap.min.css';
+import styles from './Home.module.css';
 
 function Home() {
-    // Estado para controlar o menu lateral
     const [collapsed, setCollapsed] = useState(false);
-
-    // Função para alternar o estado de collapsed
-    const toggleCollapsed = () => {
-        setCollapsed(!collapsed);
-    };
+    const toggleCollapsed = () => setCollapsed(!collapsed);
 
     return (
-        <div className={styles.home}>
-            {/* Usando o Container do React-Bootstrap */}
-            <Container fluid className={styles.container}>
-                {/* Header */}
-                <Row>
-                    <Col className={styles.navegacao}>
-                        <HeaderComponent />
-                    </Col>
-                </Row>
+        <>
+            {/* Header continua Fixo (ele está "fora" do flex da home) */}
+            <HeaderComponent />
 
-                {/* Conteúdo principal */}
-                <Row>
-                    <Col xs="auto" className={styles.menuLateralCol}>
-                        {/* Passando estado e função de alternância para o MenuLateral */}
-                        <MenuLateral collapsed={collapsed} toggleCollapsed={toggleCollapsed} />
-                    </Col>
+            {/* Container FLEX que começa 60px abaixo do topo */}
+            <div className={styles.home}>
+                
+                {/* Coluna 1: O Menu (ele empurra o conteúdo naturalmente) */}
+                <MenuLateral 
+                    collapsed={collapsed} 
+                    toggleCollapsed={toggleCollapsed} 
+                />
 
-                    {/* Conteúdo dinâmico (Outlet) */}
-                    <Col className={styles.contentCol}>
-                        <div className={styles.contentWrapper}>
-                            <Outlet />
-                        </div>
-                    </Col>
-                </Row>
-            </Container>
-        </div>
+                {/* Coluna 2: O Conteúdo (ocupa o espaço que sobra) */}
+                <div className={styles.mainContent}>
+                    <Outlet />
+                </div>
+            </div>
+        </>
     );
 }
 

@@ -116,14 +116,14 @@ function GerenciarTurma() {
 
   // 🔹 Navegar para gerenciar atividades
   const handleGerenciarAtividades = () => {
-    navigate('/Home/PainelTurma/GerenciarAvaliativa', { state: { turma } });
+    navigate('/PainelTurma/GerenciarAvaliativa', { state: { turma } });
   };
 
   // 2. Adicionar a função de navegação para métricas
   const handleVerMetricas = () => {
     // === AJUSTE AQUI ===
     // O caminho agora aponta para a rota "irmã" dentro do PainelTurma
-    navigate('/Home/PainelTurma/MetricasTurmas', { state: { turma: turma } });
+    navigate('/PainelTurma/MetricasTurmas', { state: { turma: turma } });
   };
 
   if (!turma) {

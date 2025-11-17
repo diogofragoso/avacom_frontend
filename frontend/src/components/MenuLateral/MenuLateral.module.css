@@ -1,6 +1,9 @@
 .MenuLateral {
+    position: relative;
+    top: 60px; /* Altura do Header fixo */
     width: 170px;
     max-width: 170px;
+    margin-right: 0px;
     background-color: #343a40;
     color: rgb(245, 10, 10);
     height: 91.5vh;
@@ -110,4 +113,14 @@
     padding: 0;
     background-color: #343a40;
     color: #FF6347;
+}
+
+
+.externalLink {
+    text-decoration: none;
+    color: #a71d2a;
+    font-weight: bold;
+    margin-right: 15px;
+    font-size: 16px;
+    text-transform: capitalize;
 }

@@ -5,6 +5,7 @@ import { GiTeacher } from "react-icons/gi";
 import { GrDashboard, GrGroup } from "react-icons/gr";
 import { PiStudentBold } from "react-icons/pi";
 import styles from './MenuLateral.module.css';
+import { MdAssessment } from "react-icons/md";
 import { useState } from 'react';
 
 function MenuLateral() {
@@ -61,6 +62,16 @@ function MenuLateral() {
           >
             <GrDashboard className={styles.icon} />
             {!isCollapsed && 'Dashboard'}
+          </NavLink>
+        </NavItem>
+
+        <NavItem>
+          <NavLink 
+            to="https://forms.gle/zg65KtQRLJoj4LMB9"
+            className={({ isActive }) => (isActive ? styles.active : '') + ' ' + styles.externalLink}
+          >
+            <MdAssessment className={styles.icon} />
+            {!isCollapsed && 'AVALIAR '}
           </NavLink>
         </NavItem>
 
