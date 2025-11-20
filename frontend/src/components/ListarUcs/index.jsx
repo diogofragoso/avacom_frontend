@@ -1,11 +1,12 @@
 // Componente ListarUcs
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Container, Row, Col, Card, Button, Modal, Form } from 'react-bootstrap';
+import { Container, Row, Col, Card, Button, Modal, Form, InputGroup, ListGroup } from 'react-bootstrap';
 import ucService from '../../services/ucService';
 import { RiDeleteBin6Line } from "react-icons/ri";
 import { GrEdit } from "react-icons/gr";
-import { NavLink as NavLink2 } from 'react-router-dom'; // Importação corrigida
+import { FaTasks, FaPlus, FaTrash } from "react-icons/fa"; // Novos ícones
+import { NavLink as NavLink2 } from 'react-router-dom';
 import styles from './ListarUcs.module.css';
 
 const ListarUcs = ({ ucs, feedback, setFeedback, onDeleteSuccess, onEditSuccess, curso }) => {
@@ -13,7 +14,13 @@ const ListarUcs = ({ ucs, feedback, setFeedback, onDeleteSuccess, onEditSuccess,
     const [nomeUc, setNomeUc] = useState('');
     const [numeroUc, setNumeroUc] = useState('');
     const [showModal, setShowModal] = useState(false);
-    
+
+    // --- NOVOS ESTADOS PARA O MODAL DE HAV (Habilidades, Atitudes e Valores) ---
+    const [showHavModal, setShowHavModal] = useState(false);
+    const [currentUcHav, setCurrentUcHav] = useState(null); // A UC que está sendo editada
+    const [havList, setHavList] = useState([]); // Lista de HAVs dessa UC
+    const [newHavText, setNewHavText] = useState(""); // Texto do input
+    // ---------------------------------------------------------------------------
 
     const handleDelete = async (id_uc) => {
         if (window.confirm('Tem certeza que deseja excluir esta UC?')) {
@@ -55,6 +62,44 @@ const ListarUcs = ({ ucs, feedback, setFeedback, onDeleteSuccess, onEditSuccess,
         setShowModal(false);
     };
 
+    // --- NOVAS FUNÇÕES PARA GERENCIAR HAV ---
+
+    const handleOpenHavModal = (uc) => {
+        setCurrentUcHav(uc);
+        // AQUI: Idealmente você faria um fetch para buscar as HAVs já salvas no banco para esta UC
+        // Por enquanto, iniciamos vazio ou com dados mockados se existirem no objeto 'uc'
+        setHavList(uc.habilidades || []); 
+        setNewHavText("");
+        setShowHavModal(true);
+    };
+
+    const handleAddHav = () => {
+        if (!newHavText.trim()) return;
+        setHavList([...havList, newHavText.trim()]);
+        setNewHavText("");
+    };
+
+    const handleRemoveHav = (index) => {
+        const newList = havList.filter((_, i) => i !== index);
+        setHavList(newList);
+    };
+
+    const handleSaveHav = async () => {
+        try {
+            // AQUI: Você chamaria o serviço para salvar no banco de dados
+            // Exemplo: await ucService.saveHavs(currentUcHav.id_uc, havList);
+            
+            console.log("Salvando HAVs para a UC:", currentUcHav.nome_uc, havList);
+            
+            setFeedback({ type: 'success', message: 'Competências definidas com sucesso!' });
+            setShowHavModal(false);
+            // onEditSuccess(); // Se necessário recarregar a lista
+        } catch (error) {
+            setFeedback({ type: 'danger', message: 'Erro ao salvar competências.' });
+        }
+    };
+    // ----------------------------------------
+
     return (
         <Container fluid className="mt-5">
             <h2 className="mb-4">Unidades Curriculares</h2>
@@ -70,7 +115,7 @@ const ListarUcs = ({ ucs, feedback, setFeedback, onDeleteSuccess, onEditSuccess,
                            <Card className={`${styles.customCard} w-100`}>
                                 <NavLink2
                                     to="/PainelIndicadores"
-                                    state={{ uc, curso }}  // Passando o estado de 'curso' junto com a UC
+                                    state={{ uc, curso }}
                                     className="text-decoration-none text-dark"
                                 >
                                     <Card.Body>
@@ -79,24 +124,37 @@ const ListarUcs = ({ ucs, feedback, setFeedback, onDeleteSuccess, onEditSuccess,
                                     </Card.Body>
                                 </NavLink2>
 
-                                <Card.Footer>
+                                <Card.Footer className="d-flex justify-content-between align-items-center">
+                                    {/* Botão de Competências (NOVO) */}
                                     <Button
-                                        variant="primary"
+                                        variant="info"
                                         size="sm"
-                                        title="Editar UC"
-                                        onClick={() => handleEdit(uc)}
+                                        className="text-white"
+                                        title="Definir Habilidades, Atitudes e Valores"
+                                        onClick={() => handleOpenHavModal(uc)}
                                     >
-                                        <GrEdit />
+                                        <FaTasks className="me-1" /> Competências
                                     </Button>
-                                    <Button
-                                        className="ms-2"
-                                        variant="danger"
-                                        size="sm"
-                                        title="Excluir UC"
-                                        onClick={() => handleDelete(uc.id_uc)}
-                                    >
-                                        <RiDeleteBin6Line />
-                                    </Button>
+
+                                    <div>
+                                        <Button
+                                            variant="primary"
+                                            size="sm"
+                                            title="Editar UC"
+                                            onClick={() => handleEdit(uc)}
+                                        >
+                                            <GrEdit />
+                                        </Button>
+                                        <Button
+                                            className="ms-2"
+                                            variant="danger"
+                                            size="sm"
+                                            title="Excluir UC"
+                                            onClick={() => handleDelete(uc.id_uc)}
+                                        >
+                                            <RiDeleteBin6Line />
+                                        </Button>
+                                    </div>
                                 </Card.Footer>
                             </Card>
                         </motion.div>
@@ -104,7 +162,7 @@ const ListarUcs = ({ ucs, feedback, setFeedback, onDeleteSuccess, onEditSuccess,
                 ))}
             </Row>
 
-            {/* Modal de Edição */}
+            {/* Modal de Edição da UC (Original) */}
             <Modal show={showModal} onHide={handleCloseModal}>
                 <Modal.Header closeButton>
                     <Modal.Title>Editar UC</Modal.Title>
@@ -133,6 +191,46 @@ const ListarUcs = ({ ucs, feedback, setFeedback, onDeleteSuccess, onEditSuccess,
                         <Button variant="secondary" className="ms-2" onClick={handleCloseModal}>Cancelar</Button>
                     </Form>
                 </Modal.Body>
+            </Modal>
+
+            {/* --- NOVO MODAL: Gerenciar HAV --- */}
+            <Modal show={showHavModal} onHide={() => setShowHavModal(false)} centered>
+                <Modal.Header closeButton>
+                    <Modal.Title>Competências da UC</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <p className="text-muted small">
+                        Cadastre abaixo as Habilidades, Atitudes e Valores que serão observados nesta UC.
+                    </p>
+                    
+                    <InputGroup className="mb-3">
+                        <Form.Control
+                            placeholder="Ex: Trabalho em equipe, Proatividade..."
+                            value={newHavText}
+                            onChange={(e) => setNewHavText(e.target.value)}
+                            onKeyPress={(e) => e.key === 'Enter' && handleAddHav()}
+                        />
+                        <Button variant="success" onClick={handleAddHav}>
+                            <FaPlus /> Adicionar
+                        </Button>
+                    </InputGroup>
+
+                    <ListGroup variant="flush" className="mb-3">
+                        {havList.length === 0 && <div className="text-center text-muted fst-italic">Nenhuma competência cadastrada ainda.</div>}
+                        {havList.map((item, index) => (
+                            <ListGroup.Item key={index} className="d-flex justify-content-between align-items-center">
+                                {item}
+                                <Button variant="outline-danger" size="sm" onClick={() => handleRemoveHav(index)}>
+                                    <FaTrash />
+                                </Button>
+                            </ListGroup.Item>
+                        ))}
+                    </ListGroup>
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={() => setShowHavModal(false)}>Fechar</Button>
+                    <Button variant="primary" onClick={handleSaveHav}>Salvar Lista</Button>
+                </Modal.Footer>
             </Modal>
         </Container>
     );

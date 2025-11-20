@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { Table, Badge, Button, Modal, Form, Alert } from "react-bootstrap";
-import { FaSave, FaClipboardList } from "react-icons/fa";
-import { MdOutlineFeedback } from "react-icons/md";
-import { MdComment } from "react-icons/md";
+import { Table, Badge, Button, Modal, Form, Alert, Spinner } from "react-bootstrap";
+import { FaSave, FaClipboardList, FaMagic } from "react-icons/fa"; // Adicionado FaMagic
+import { MdOutlineFeedback, MdComment } from "react-icons/md";
 import avaliacaoService from "../../services/avaliacaoService";
+import { gerarSugestaoFeedback } from "../../services/geminiService"; // Importação do serviço IA
 
 const estados = [
   { label: "Atendido", text: "A", variant: "success" },
@@ -20,7 +20,7 @@ const mencaoParaIndice = (mencao) => {
 const AvaliacaoEstudante = ({ matriz, idEstudante, idTurma, onSelecionarAtividade }) => {
   if (!matriz || !matriz.ucs) return <div>Carregando dados de avaliação...</div>;
 
-  // Estados originais mantidos (sem alteração)
+  // Estados originais
   const [estadoMatriz, setEstadoMatriz] = useState(() => matriz.ucs.map(uc => uc.indicadores.map(() => 3)));
   const [idAvaliacaoMatriz, setIdAvaliacaoMatriz] = useState(() => matriz.ucs.map(uc => uc.indicadores.map(() => null)));
   const [observacaoMatriz, setObservacaoMatriz] = useState(() => matriz.ucs.map(uc => uc.indicadores.map(() => "")));
@@ -28,7 +28,7 @@ const AvaliacaoEstudante = ({ matriz, idEstudante, idTurma, onSelecionarAtividad
   const [avaliacaoFinalPorUC, setAvaliacaoFinalPorUC] = useState(() => matriz.ucs.map(() => 3));
   const [feedbackPorUC, setFeedbackPorUC] = useState(() => matriz.ucs.map(() => ""));
 
-  // Modais e contextos (sem alteração)
+  // Modais e contextos
   const [showObsModal, setShowObsModal] = useState(false);
   const [observacaoAtual, setObservacaoAtual] = useState("");
   const [obsContext, setObsContext] = useState(null);
@@ -40,6 +40,9 @@ const AvaliacaoEstudante = ({ matriz, idEstudante, idTurma, onSelecionarAtividad
   const [showFeedbackModal, setShowFeedbackModal] = useState(false);
   const [feedbackAtual, setFeedbackAtual] = useState("");
   const [feedbackContext, setFeedbackContext] = useState(null);
+  
+  // Novo estado para controle de carregamento da IA
+  const [isLoadingIA, setIsLoadingIA] = useState(false);
 
   const [alertInfo, setAlertInfo] = useState({ show: false, variant: "success", message: "" });
 
@@ -78,7 +81,7 @@ const AvaliacaoEstudante = ({ matriz, idEstudante, idTurma, onSelecionarAtividad
     if (idEstudante) carregarAvaliacoesIndicadores();
   }, [matriz, idEstudante]);
 
-  // 2. useEffect focado em carregar DADOS DA AVALIAÇÃO FINAL (Menção Final e Feedback)
+  // 2. useEffect focado em carregar DADOS DA AVALIAÇÃO FINAL
   useEffect(() => {
     const carregarAvaliacoesFinais = async () => {
       try {
@@ -109,7 +112,7 @@ const AvaliacaoEstudante = ({ matriz, idEstudante, idTurma, onSelecionarAtividad
     if (idEstudante && idTurma) carregarAvaliacoesFinais();
   }, [matriz.ucs, idEstudante, idTurma]);
 
-  // useEffect para o alerta (sem alteração)
+  // useEffect para o alerta
   useEffect(() => {
     if (alertInfo.show) {
       const timer = setTimeout(() => setAlertInfo({ ...alertInfo, show: false }), 3000);
@@ -117,7 +120,34 @@ const AvaliacaoEstudante = ({ matriz, idEstudante, idTurma, onSelecionarAtividad
     }
   }, [alertInfo]);
 
-  // Funções originais para indicadores (INTACTAS)
+  // --- NOVA FUNÇÃO: Integração com Gemini ---
+  const handleMelhorarComIA = async () => {
+    if (!feedbackAtual || feedbackAtual.trim().length < 5) {
+      setAlertInfo({ 
+        show: true, 
+        variant: "warning", 
+        message: "Digite um rascunho de pelo menos 5 caracteres para a IA melhorar." 
+      });
+      return;
+    }
+
+    setIsLoadingIA(true);
+    try {
+      const textoMelhorado = await gerarSugestaoFeedback(feedbackAtual);
+      setFeedbackAtual(textoMelhorado);
+      setAlertInfo({ show: true, variant: "success", message: "Sugestão gerada com sucesso!" });
+    } catch (error) {
+      setAlertInfo({ 
+        show: true, 
+        variant: "danger", 
+        message: "Erro ao conectar com a IA. Verifique sua conexão ou a chave API." 
+      });
+    } finally {
+      setIsLoadingIA(false);
+    }
+  };
+  // ------------------------------------------
+
   const handleClick = (ucIndex, indIndex) => {
     setEstadoMatriz(prev => {
       const nova = prev.map(r => [...r]);
@@ -178,7 +208,6 @@ const AvaliacaoEstudante = ({ matriz, idEstudante, idTurma, onSelecionarAtividad
     } catch { setAlertInfo({ show: true, variant: "danger", message: "Erro ao salvar ação de recuperação." }); }
   };
 
-  // Funções de Feedback (sem alteração)
   const handleAbrirFeedbackModal = (ucIndex) => {
     setFeedbackContext({ ucIndex });
     setFeedbackAtual(feedbackPorUC[ucIndex]);
@@ -206,7 +235,6 @@ const AvaliacaoEstudante = ({ matriz, idEstudante, idTurma, onSelecionarAtividad
     }
   };
 
-  // Funções de Menção Final (sem alteração)
   const handleClickMenFinal = (ucIndex) => {
     setAvaliacaoFinalPorUC(prev => {
       const nova = [...prev];
@@ -233,7 +261,6 @@ const AvaliacaoEstudante = ({ matriz, idEstudante, idTurma, onSelecionarAtividad
 
   const maxIndicadores = Math.max(0, ...matriz.ucs.map(uc => uc.indicadores.length));
 
-  // --- RENDERIZAÇÃO (JSX) 100% INTACTA ---
   return (
     <div className="p-3">
       {alertInfo.show && (
@@ -286,7 +313,6 @@ const AvaliacaoEstudante = ({ matriz, idEstudante, idTurma, onSelecionarAtividad
                     </td>
                   );
                 })}
-                {/* Coluna Feedback */}
                 <td>
                   <div className="d-flex justify-content-center">
                     <MdOutlineFeedback
@@ -300,8 +326,6 @@ const AvaliacaoEstudante = ({ matriz, idEstudante, idTurma, onSelecionarAtividad
                     />
                   </div>
                 </td>
-
-                {/* Coluna Menção Final */}
                 <td>
                   <div className="d-flex align-items-center justify-content-center gap-2">
                     <Badge
@@ -324,7 +348,6 @@ const AvaliacaoEstudante = ({ matriz, idEstudante, idTurma, onSelecionarAtividad
         </Table>
       </div>
 
-      {/* Modais */}
       <Modal show={showObsModal} onHide={() => setShowObsModal(false)} centered>
         <Modal.Header closeButton><Modal.Title>Adicionar / Editar Observação</Modal.Title></Modal.Header>
         <Modal.Body>
@@ -347,10 +370,38 @@ const AvaliacaoEstudante = ({ matriz, idEstudante, idTurma, onSelecionarAtividad
         </Modal.Footer>
       </Modal>
 
+      {/* MODAL DE FEEDBACK ATUALIZADO COM IA */}
       <Modal show={showFeedbackModal} onHide={() => setShowFeedbackModal(false)} centered>
         <Modal.Header closeButton><Modal.Title>Adicionar / Editar Feedback</Modal.Title></Modal.Header>
         <Modal.Body>
-          <Form.Control as="textarea" rows={4} value={feedbackAtual} onChange={e => setFeedbackAtual(e.target.value)} placeholder="Digite o feedback para a UC..." />
+          <Form.Group>
+            <Form.Label className="fw-bold text-secondary" style={{fontSize: "0.9rem"}}>
+              Escreva seu feedback ou rascunho abaixo:
+            </Form.Label>
+            <Form.Control 
+              as="textarea" 
+              rows={5} 
+              value={feedbackAtual} 
+              onChange={e => setFeedbackAtual(e.target.value)} 
+              placeholder="Ex: O aluno foi bem, mas precisa melhorar na entrega dos prazos..." 
+            />
+            <div className="d-flex justify-content-end mt-2">
+               <Button 
+                 variant="outline-primary" 
+                 size="sm" 
+                 onClick={handleMelhorarComIA}
+                 disabled={isLoadingIA}
+                 title="Melhorar redação com Inteligência Artificial"
+                 className="d-flex align-items-center gap-2"
+               >
+                 {isLoadingIA ? (
+                   <><Spinner animation="border" size="sm" /> Gerando...</>
+                 ) : (
+                   <><FaMagic /> Melhorar com IA</>
+                 )}
+               </Button>
+            </div>
+          </Form.Group>
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={() => setShowFeedbackModal(false)}>Cancelar</Button>
