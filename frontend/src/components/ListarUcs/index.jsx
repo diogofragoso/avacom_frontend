@@ -5,7 +5,7 @@ import { Container, Row, Col, Card, Button, Modal, Form, InputGroup, ListGroup }
 import ucService from '../../services/ucService';
 import { RiDeleteBin6Line } from "react-icons/ri";
 import { GrEdit } from "react-icons/gr";
-import { FaTasks, FaPlus, FaTrash } from "react-icons/fa"; // Novos ícones
+import { FaTasks, FaPlus, FaTrash } from "react-icons/fa"; 
 import { NavLink as NavLink2 } from 'react-router-dom';
 import styles from './ListarUcs.module.css';
 
@@ -15,11 +15,11 @@ const ListarUcs = ({ ucs, feedback, setFeedback, onDeleteSuccess, onEditSuccess,
     const [numeroUc, setNumeroUc] = useState('');
     const [showModal, setShowModal] = useState(false);
 
-    // --- NOVOS ESTADOS PARA O MODAL DE HAV (Habilidades, Atitudes e Valores) ---
+    // --- ESTADOS PARA O MODAL DE CHAV (Habilidades, Atitudes e Valores) ---
     const [showHavModal, setShowHavModal] = useState(false);
-    const [currentUcHav, setCurrentUcHav] = useState(null); // A UC que está sendo editada
-    const [havList, setHavList] = useState([]); // Lista de HAVs dessa UC
-    const [newHavText, setNewHavText] = useState(""); // Texto do input
+    const [currentUcHav, setCurrentUcHav] = useState(null); 
+    const [havList, setHavList] = useState([]); 
+    const [newHavText, setNewHavText] = useState(""); 
     // ---------------------------------------------------------------------------
 
     const handleDelete = async (id_uc) => {
@@ -54,7 +54,7 @@ const ListarUcs = ({ ucs, feedback, setFeedback, onDeleteSuccess, onEditSuccess,
         } catch (error) {
             console.error("Erro ao editar UC:", error);
             const msg = error.response?.data?.error || 'Erro ao editar a UC.';
-            setFeedback({ type: 'danger', message: msg });
+            setFeedback({ type: 'danger', message: 'Erro ao editar a UC.' });
         }
     };
 
@@ -62,22 +62,48 @@ const ListarUcs = ({ ucs, feedback, setFeedback, onDeleteSuccess, onEditSuccess,
         setShowModal(false);
     };
 
-    // --- NOVAS FUNÇÕES PARA GERENCIAR HAV ---
+    // --- FUNÇÕES PARA GERENCIAR CHAV (INTEGRADO COM BACKEND) ---
 
-    const handleOpenHavModal = (uc) => {
+    const handleOpenHavModal = async (uc) => {
         setCurrentUcHav(uc);
-        // AQUI: Idealmente você faria um fetch para buscar as HAVs já salvas no banco para esta UC
-        // Por enquanto, iniciamos vazio ou com dados mockados se existirem no objeto 'uc'
-        setHavList(uc.habilidades || []); 
         setNewHavText("");
+        setHavList([]); // Limpa a lista visualmente enquanto carrega
         setShowHavModal(true);
+
+        try {
+            // Busca as competências salvas no banco de dados
+            const dadosBanco = await ucService.getChavs(uc.id_uc);
+            
+            // O banco retorna objetos [{id_chav: 1, descricao_chav: "..."}]
+            // Convertemos apenas para um array de strings para exibir na lista simples
+            if (dadosBanco && Array.isArray(dadosBanco)) {
+                const listaFormatada = dadosBanco.map(item => item.descricao_chav);
+                setHavList(listaFormatada);
+            }
+        } catch (error) {
+            console.error("Erro ao buscar CHAVs:", error);
+            setFeedback({ type: 'warning', message: 'Não foi possível carregar as competências salvas.' });
+        }
     };
 
+    // --- ATUALIZADO: Lógica para separar por vírgula ---
     const handleAddHav = () => {
         if (!newHavText.trim()) return;
-        setHavList([...havList, newHavText.trim()]);
-        setNewHavText("");
+
+        // 1. Separa o texto pela vírgula
+        // 2. Remove espaços em branco de cada item (trim)
+        // 3. Remove itens vazios (caso o usuário digite "a, , b")
+        const novosItens = newHavText
+            .split(',')
+            .map(item => item.trim())
+            .filter(item => item !== "");
+
+        if (novosItens.length > 0) {
+            setHavList(prev => [...prev, ...novosItens]);
+            setNewHavText("");
+        }
     };
+    // ---------------------------------------------------
 
     const handleRemoveHav = (index) => {
         const newList = havList.filter((_, i) => i !== index);
@@ -85,16 +111,17 @@ const ListarUcs = ({ ucs, feedback, setFeedback, onDeleteSuccess, onEditSuccess,
     };
 
     const handleSaveHav = async () => {
+        if (!currentUcHav) return;
+
         try {
-            // AQUI: Você chamaria o serviço para salvar no banco de dados
-            // Exemplo: await ucService.saveHavs(currentUcHav.id_uc, havList);
+            // Chama o serviço para salvar no banco
+            // O backend vai apagar as antigas e salvar essa nova lista
+            await ucService.saveChavs(currentUcHav.id_uc, havList);
             
-            console.log("Salvando HAVs para a UC:", currentUcHav.nome_uc, havList);
-            
-            setFeedback({ type: 'success', message: 'Competências definidas com sucesso!' });
+            setFeedback({ type: 'success', message: 'Competências atualizadas com sucesso!' });
             setShowHavModal(false);
-            // onEditSuccess(); // Se necessário recarregar a lista
         } catch (error) {
+            console.error(error);
             setFeedback({ type: 'danger', message: 'Erro ao salvar competências.' });
         }
     };
@@ -125,7 +152,7 @@ const ListarUcs = ({ ucs, feedback, setFeedback, onDeleteSuccess, onEditSuccess,
                                 </NavLink2>
 
                                 <Card.Footer className="d-flex justify-content-between align-items-center">
-                                    {/* Botão de Competências (NOVO) */}
+                                    {/* Botão de Competências */}
                                     <Button
                                         variant="info"
                                         size="sm"
@@ -162,7 +189,7 @@ const ListarUcs = ({ ucs, feedback, setFeedback, onDeleteSuccess, onEditSuccess,
                 ))}
             </Row>
 
-            {/* Modal de Edição da UC (Original) */}
+            {/* Modal de Edição da UC */}
             <Modal show={showModal} onHide={handleCloseModal}>
                 <Modal.Header closeButton>
                     <Modal.Title>Editar UC</Modal.Title>
@@ -193,19 +220,20 @@ const ListarUcs = ({ ucs, feedback, setFeedback, onDeleteSuccess, onEditSuccess,
                 </Modal.Body>
             </Modal>
 
-            {/* --- NOVO MODAL: Gerenciar HAV --- */}
+            {/* --- MODAL: Gerenciar CHAV --- */}
             <Modal show={showHavModal} onHide={() => setShowHavModal(false)} centered>
                 <Modal.Header closeButton>
-                    <Modal.Title>Competências da UC</Modal.Title>
+                    <Modal.Title>Competências (CHAV)</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                     <p className="text-muted small">
-                        Cadastre abaixo as Habilidades, Atitudes e Valores que serão observados nesta UC.
+                        Defina os Conhecimentos, Habilidades, Atitudes e Valores para esta UC.
+                        Você pode colar múltiplos itens separados por <strong>vírgula</strong>.
                     </p>
                     
                     <InputGroup className="mb-3">
                         <Form.Control
-                            placeholder="Ex: Trabalho em equipe, Proatividade..."
+                            placeholder="Ex: Proatividade, Trabalho em Equipe, Pontualidade..."
                             value={newHavText}
                             onChange={(e) => setNewHavText(e.target.value)}
                             onKeyPress={(e) => e.key === 'Enter' && handleAddHav()}
@@ -215,12 +243,12 @@ const ListarUcs = ({ ucs, feedback, setFeedback, onDeleteSuccess, onEditSuccess,
                         </Button>
                     </InputGroup>
 
-                    <ListGroup variant="flush" className="mb-3">
-                        {havList.length === 0 && <div className="text-center text-muted fst-italic">Nenhuma competência cadastrada ainda.</div>}
+                    <ListGroup variant="flush" className="mb-3" style={{ maxHeight: '300px', overflowY: 'auto' }}>
+                        {havList.length === 0 && <div className="text-center text-muted fst-italic mt-3">Nenhuma competência cadastrada ainda.</div>}
                         {havList.map((item, index) => (
                             <ListGroup.Item key={index} className="d-flex justify-content-between align-items-center">
-                                {item}
-                                <Button variant="outline-danger" size="sm" onClick={() => handleRemoveHav(index)}>
+                                <span>{item}</span>
+                                <Button variant="outline-danger" size="sm" onClick={() => handleRemoveHav(index)} title="Remover">
                                     <FaTrash />
                                 </Button>
                             </ListGroup.Item>

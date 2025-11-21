@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { Table, Badge, Button, Modal, Form, Alert, Spinner } from "react-bootstrap";
-import { FaSave, FaClipboardList, FaMagic } from "react-icons/fa"; // Adicionado FaMagic
+import { FaSave, FaClipboardList, FaMagic } from "react-icons/fa";
 import { MdOutlineFeedback, MdComment } from "react-icons/md";
 import avaliacaoService from "../../services/avaliacaoService";
-import { gerarSugestaoFeedback } from "../../services/geminiService"; // Importação do serviço IA
+import ucService from "../../services/ucService"; // Importando serviço para buscar CHAVs
+import { gerarSugestaoFeedback } from "../../services/geminiService";
 
 const estados = [
   { label: "Atendido", text: "A", variant: "success" },
@@ -17,10 +18,10 @@ const mencaoParaIndice = (mencao) => {
   return idx >= 0 ? idx : 3;
 };
 
-const AvaliacaoEstudante = ({ matriz, idEstudante, idTurma, onSelecionarAtividade }) => {
+const AvaliacaoEstudante = ({ matriz, idEstudante, idTurma }) => {
   if (!matriz || !matriz.ucs) return <div>Carregando dados de avaliação...</div>;
 
-  // Estados originais
+  // --- Estados Originais ---
   const [estadoMatriz, setEstadoMatriz] = useState(() => matriz.ucs.map(uc => uc.indicadores.map(() => 3)));
   const [idAvaliacaoMatriz, setIdAvaliacaoMatriz] = useState(() => matriz.ucs.map(uc => uc.indicadores.map(() => null)));
   const [observacaoMatriz, setObservacaoMatriz] = useState(() => matriz.ucs.map(uc => uc.indicadores.map(() => "")));
@@ -28,7 +29,7 @@ const AvaliacaoEstudante = ({ matriz, idEstudante, idTurma, onSelecionarAtividad
   const [avaliacaoFinalPorUC, setAvaliacaoFinalPorUC] = useState(() => matriz.ucs.map(() => 3));
   const [feedbackPorUC, setFeedbackPorUC] = useState(() => matriz.ucs.map(() => ""));
 
-  // Modais e contextos
+  // --- Estados dos Modais ---
   const [showObsModal, setShowObsModal] = useState(false);
   const [observacaoAtual, setObservacaoAtual] = useState("");
   const [obsContext, setObsContext] = useState(null);
@@ -41,12 +42,16 @@ const AvaliacaoEstudante = ({ matriz, idEstudante, idTurma, onSelecionarAtividad
   const [feedbackAtual, setFeedbackAtual] = useState("");
   const [feedbackContext, setFeedbackContext] = useState(null);
   
-  // Novo estado para controle de carregamento da IA
+  // --- NOVOS ESTADOS PARA INTEGRAÇÃO CHAV + IA ---
   const [isLoadingIA, setIsLoadingIA] = useState(false);
+  const [isLoadingHav, setIsLoadingHav] = useState(false); // Carregando lista do banco
+  const [listaHavDinamica, setListaHavDinamica] = useState([]); // Lista vinda do banco
+  const [havSelecionados, setHavSelecionados] = useState([]); // Itens marcados pelo prof
+  // ------------------------------------------------
 
   const [alertInfo, setAlertInfo] = useState({ show: false, variant: "success", message: "" });
 
-  // 1. useEffect focado em carregar DADOS DOS INDICADORES
+  // 1. Carregar Dados dos Indicadores
   useEffect(() => {
     const carregarAvaliacoesIndicadores = async () => {
       const novaMatrizEstado = matriz.ucs.map(uc => uc.indicadores.map(() => 3));
@@ -81,7 +86,7 @@ const AvaliacaoEstudante = ({ matriz, idEstudante, idTurma, onSelecionarAtividad
     if (idEstudante) carregarAvaliacoesIndicadores();
   }, [matriz, idEstudante]);
 
-  // 2. useEffect focado em carregar DADOS DA AVALIAÇÃO FINAL
+  // 2. Carregar Dados da Avaliação Final
   useEffect(() => {
     const carregarAvaliacoesFinais = async () => {
       try {
@@ -112,7 +117,6 @@ const AvaliacaoEstudante = ({ matriz, idEstudante, idTurma, onSelecionarAtividad
     if (idEstudante && idTurma) carregarAvaliacoesFinais();
   }, [matriz.ucs, idEstudante, idTurma]);
 
-  // useEffect para o alerta
   useEffect(() => {
     if (alertInfo.show) {
       const timer = setTimeout(() => setAlertInfo({ ...alertInfo, show: false }), 3000);
@@ -120,33 +124,43 @@ const AvaliacaoEstudante = ({ matriz, idEstudante, idTurma, onSelecionarAtividad
     }
   }, [alertInfo]);
 
-  // --- NOVA FUNÇÃO: Integração com Gemini ---
+  // --- LÓGICA IA + CHAV ---
+  
+  // Manipula a seleção dos checkboxes
+  const toggleHav = (item) => {
+    setHavSelecionados(prev => 
+      prev.includes(item) ? prev.filter(i => i !== item) : [...prev, item]
+    );
+  };
+
   const handleMelhorarComIA = async () => {
-    if (!feedbackAtual || feedbackAtual.trim().length < 5) {
+    // Validação: precisa ter algo escrito OU algo selecionado
+    if ((!feedbackAtual || feedbackAtual.trim().length < 3) && havSelecionados.length === 0) {
       setAlertInfo({ 
         show: true, 
         variant: "warning", 
-        message: "Digite um rascunho de pelo menos 5 caracteres para a IA melhorar." 
+        message: "Escreva um rascunho ou selecione pelo menos uma competência para a IA trabalhar." 
       });
       return;
     }
 
     setIsLoadingIA(true);
     try {
-      const textoMelhorado = await gerarSugestaoFeedback(feedbackAtual);
+      // Chama o serviço passando o Texto + a Lista de Selecionados
+      const textoMelhorado = await gerarSugestaoFeedback(feedbackAtual, havSelecionados);
       setFeedbackAtual(textoMelhorado);
       setAlertInfo({ show: true, variant: "success", message: "Sugestão gerada com sucesso!" });
     } catch (error) {
       setAlertInfo({ 
         show: true, 
         variant: "danger", 
-        message: "Erro ao conectar com a IA. Verifique sua conexão ou a chave API." 
+        message: "Erro ao conectar com a IA." 
       });
     } finally {
       setIsLoadingIA(false);
     }
   };
-  // ------------------------------------------
+  // ------------------------
 
   const handleClick = (ucIndex, indIndex) => {
     setEstadoMatriz(prev => {
@@ -208,10 +222,33 @@ const AvaliacaoEstudante = ({ matriz, idEstudante, idTurma, onSelecionarAtividad
     } catch { setAlertInfo({ show: true, variant: "danger", message: "Erro ao salvar ação de recuperação." }); }
   };
 
-  const handleAbrirFeedbackModal = (ucIndex) => {
+  // --- MODAL FEEDBACK ATUALIZADO (Busca dados da API) ---
+  const handleAbrirFeedbackModal = async (ucIndex) => {
     setFeedbackContext({ ucIndex });
     setFeedbackAtual(feedbackPorUC[ucIndex]);
+    
+    // Resetar estados da lista
+    setListaHavDinamica([]);
+    setHavSelecionados([]);
+    setIsLoadingHav(true);
     setShowFeedbackModal(true);
+
+    try {
+        const idUc = matriz.ucs[ucIndex].id_uc;
+        // Busca as competências cadastradas para esta UC no banco
+        const dados = await ucService.getChavs(idUc);
+        
+        // Se vier array de objetos, extraímos a descrição. Se for array de strings, usamos direto.
+        if (dados && Array.isArray(dados)) {
+            const listaFormatada = dados.map(item => item.descricao_chav || item);
+            setListaHavDinamica(listaFormatada);
+        }
+    } catch (error) {
+        console.error("Erro ao buscar CHAVs:", error);
+        setAlertInfo({ show: true, variant: "warning", message: "Não foi possível carregar a lista de competências." });
+    } finally {
+        setIsLoadingHav(false);
+    }
   };
 
   const handleSalvarFeedback = async () => {
@@ -370,20 +407,49 @@ const AvaliacaoEstudante = ({ matriz, idEstudante, idTurma, onSelecionarAtividad
         </Modal.Footer>
       </Modal>
 
-      {/* MODAL DE FEEDBACK ATUALIZADO COM IA */}
-      <Modal show={showFeedbackModal} onHide={() => setShowFeedbackModal(false)} centered>
-        <Modal.Header closeButton><Modal.Title>Adicionar / Editar Feedback</Modal.Title></Modal.Header>
+      {/* --- MODAL DE FEEDBACK COM IA + CHAV --- */}
+      <Modal show={showFeedbackModal} onHide={() => setShowFeedbackModal(false)} size="lg" centered>
+        <Modal.Header closeButton><Modal.Title>Feedback da Unidade Curricular</Modal.Title></Modal.Header>
         <Modal.Body>
+          
+          {/* Seção de Seleção de Competências */}
+          <Form.Group className="mb-3">
+            <Form.Label className="fw-bold text-secondary" style={{fontSize: "0.9rem"}}>
+              Competências Observadas (CHAV):
+              {isLoadingHav && <Spinner animation="border" size="sm" className="ms-2 text-primary" />}
+            </Form.Label>
+            
+            <div className="d-flex flex-wrap gap-2 p-2 border rounded bg-light" style={{ minHeight: '50px' }}>
+              {!isLoadingHav && listaHavDinamica.length === 0 && (
+                  <span className="text-muted fst-italic small">
+                    Nenhuma competência cadastrada para esta UC.
+                  </span>
+              )}
+
+              {listaHavDinamica.map((item, idx) => (
+                <Form.Check 
+                  key={idx}
+                  type="checkbox"
+                  id={`hav-${idx}`}
+                  label={item}
+                  checked={havSelecionados.includes(item)}
+                  onChange={() => toggleHav(item)}
+                  className="me-3"
+                />
+              ))}
+            </div>
+          </Form.Group>
+
           <Form.Group>
             <Form.Label className="fw-bold text-secondary" style={{fontSize: "0.9rem"}}>
-              Escreva seu feedback ou rascunho abaixo:
+              Rascunho / Feedback Final:
             </Form.Label>
             <Form.Control 
               as="textarea" 
               rows={5} 
               value={feedbackAtual} 
               onChange={e => setFeedbackAtual(e.target.value)} 
-              placeholder="Ex: O aluno foi bem, mas precisa melhorar na entrega dos prazos..." 
+              placeholder="Escreva suas observações aqui ou deixe a IA criar baseada nos itens acima..." 
             />
             <div className="d-flex justify-content-end mt-2">
                <Button 
