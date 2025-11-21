@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { Table, Badge, Button, Modal, Form, Alert, Spinner } from "react-bootstrap";
-import { FaSave, FaClipboardList, FaMagic } from "react-icons/fa";
+import { FaSave, FaClipboardList, FaMagic, FaCheck } from "react-icons/fa";
 import { MdOutlineFeedback, MdComment } from "react-icons/md";
 import avaliacaoService from "../../services/avaliacaoService";
-import ucService from "../../services/ucService"; // Importando serviço para buscar CHAVs
+import ucService from "../../services/ucService"; 
 import { gerarSugestaoFeedback } from "../../services/geminiService";
 
 const estados = [
@@ -44,9 +44,9 @@ const AvaliacaoEstudante = ({ matriz, idEstudante, idTurma }) => {
   
   // --- NOVOS ESTADOS PARA INTEGRAÇÃO CHAV + IA ---
   const [isLoadingIA, setIsLoadingIA] = useState(false);
-  const [isLoadingHav, setIsLoadingHav] = useState(false); // Carregando lista do banco
-  const [listaHavDinamica, setListaHavDinamica] = useState([]); // Lista vinda do banco
-  const [havSelecionados, setHavSelecionados] = useState([]); // Itens marcados pelo prof
+  const [isLoadingHav, setIsLoadingHav] = useState(false); 
+  const [listaHavDinamica, setListaHavDinamica] = useState([]); 
+  const [havSelecionados, setHavSelecionados] = useState([]); 
   // ------------------------------------------------
 
   const [alertInfo, setAlertInfo] = useState({ show: false, variant: "success", message: "" });
@@ -126,7 +126,6 @@ const AvaliacaoEstudante = ({ matriz, idEstudante, idTurma }) => {
 
   // --- LÓGICA IA + CHAV ---
   
-  // Manipula a seleção dos checkboxes
   const toggleHav = (item) => {
     setHavSelecionados(prev => 
       prev.includes(item) ? prev.filter(i => i !== item) : [...prev, item]
@@ -134,7 +133,6 @@ const AvaliacaoEstudante = ({ matriz, idEstudante, idTurma }) => {
   };
 
   const handleMelhorarComIA = async () => {
-    // Validação: precisa ter algo escrito OU algo selecionado
     if ((!feedbackAtual || feedbackAtual.trim().length < 3) && havSelecionados.length === 0) {
       setAlertInfo({ 
         show: true, 
@@ -146,7 +144,6 @@ const AvaliacaoEstudante = ({ matriz, idEstudante, idTurma }) => {
 
     setIsLoadingIA(true);
     try {
-      // Chama o serviço passando o Texto + a Lista de Selecionados
       const textoMelhorado = await gerarSugestaoFeedback(feedbackAtual, havSelecionados);
       setFeedbackAtual(textoMelhorado);
       setAlertInfo({ show: true, variant: "success", message: "Sugestão gerada com sucesso!" });
@@ -222,12 +219,9 @@ const AvaliacaoEstudante = ({ matriz, idEstudante, idTurma }) => {
     } catch { setAlertInfo({ show: true, variant: "danger", message: "Erro ao salvar ação de recuperação." }); }
   };
 
-  // --- MODAL FEEDBACK ATUALIZADO (Busca dados da API) ---
   const handleAbrirFeedbackModal = async (ucIndex) => {
     setFeedbackContext({ ucIndex });
     setFeedbackAtual(feedbackPorUC[ucIndex]);
-    
-    // Resetar estados da lista
     setListaHavDinamica([]);
     setHavSelecionados([]);
     setIsLoadingHav(true);
@@ -235,10 +229,8 @@ const AvaliacaoEstudante = ({ matriz, idEstudante, idTurma }) => {
 
     try {
         const idUc = matriz.ucs[ucIndex].id_uc;
-        // Busca as competências cadastradas para esta UC no banco
         const dados = await ucService.getChavs(idUc);
         
-        // Se vier array de objetos, extraímos a descrição. Se for array de strings, usamos direto.
         if (dados && Array.isArray(dados)) {
             const listaFormatada = dados.map(item => item.descricao_chav || item);
             setListaHavDinamica(listaFormatada);
@@ -385,58 +377,64 @@ const AvaliacaoEstudante = ({ matriz, idEstudante, idTurma }) => {
         </Table>
       </div>
 
+      {/* Modais Simples */}
       <Modal show={showObsModal} onHide={() => setShowObsModal(false)} centered>
-        <Modal.Header closeButton><Modal.Title>Adicionar / Editar Observação</Modal.Title></Modal.Header>
+        <Modal.Header closeButton><Modal.Title>Observação</Modal.Title></Modal.Header>
         <Modal.Body>
           <Form.Control as="textarea" rows={4} value={observacaoAtual} onChange={e => setObservacaoAtual(e.target.value)} placeholder="Digite sua observação aqui..." />
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={() => setShowObsModal(false)}>Cancelar</Button>
-          <Button variant="primary" onClick={handleSalvarObservacao}>Salvar Observação</Button>
+          <Button variant="primary" onClick={handleSalvarObservacao}>Salvar</Button>
         </Modal.Footer>
       </Modal>
 
       <Modal show={showAcaoModal} onHide={() => setShowAcaoModal(false)} centered>
-        <Modal.Header closeButton><Modal.Title>Adicionar / Editar Ação de Recuperação</Modal.Title></Modal.Header>
+        <Modal.Header closeButton><Modal.Title>Ação de Recuperação</Modal.Title></Modal.Header>
         <Modal.Body>
-          <Form.Control as="textarea" rows={4} value={acaoAtual} onChange={e => setAcaoAtual(e.target.value)} placeholder="Descreva a ação de recuperação..." />
+          <Form.Control as="textarea" rows={4} value={acaoAtual} onChange={e => setAcaoAtual(e.target.value)} placeholder="Descreva a ação..." />
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={() => setShowAcaoModal(false)}>Cancelar</Button>
-          <Button variant="primary" onClick={handleSalvarAcaoRecuperacao}>Salvar Ação</Button>
+          <Button variant="primary" onClick={handleSalvarAcaoRecuperacao}>Salvar</Button>
         </Modal.Footer>
       </Modal>
 
-      {/* --- MODAL DE FEEDBACK COM IA + CHAV --- */}
+      {/* --- MODAL DE FEEDBACK COM IA E TAGS INTERATIVAS --- */}
       <Modal show={showFeedbackModal} onHide={() => setShowFeedbackModal(false)} size="lg" centered>
         <Modal.Header closeButton><Modal.Title>Feedback da Unidade Curricular</Modal.Title></Modal.Header>
         <Modal.Body>
           
-          {/* Seção de Seleção de Competências */}
+          {/* Seção de Seleção de Competências com BOTÕES (Tags) */}
           <Form.Group className="mb-3">
             <Form.Label className="fw-bold text-secondary" style={{fontSize: "0.9rem"}}>
               Competências Observadas (CHAV):
               {isLoadingHav && <Spinner animation="border" size="sm" className="ms-2 text-primary" />}
             </Form.Label>
             
-            <div className="d-flex flex-wrap gap-2 p-2 border rounded bg-light" style={{ minHeight: '50px' }}>
+            <div className="d-flex flex-wrap gap-2 p-3 border rounded bg-light" style={{ minHeight: '60px' }}>
               {!isLoadingHav && listaHavDinamica.length === 0 && (
-                  <span className="text-muted fst-italic small">
+                  <span className="text-muted fst-italic small w-100 text-center">
                     Nenhuma competência cadastrada para esta UC.
                   </span>
               )}
 
-              {listaHavDinamica.map((item, idx) => (
-                <Form.Check 
-                  key={idx}
-                  type="checkbox"
-                  id={`hav-${idx}`}
-                  label={item}
-                  checked={havSelecionados.includes(item)}
-                  onChange={() => toggleHav(item)}
-                  className="me-3"
-                />
-              ))}
+              {listaHavDinamica.map((item, idx) => {
+                const isSelected = havSelecionados.includes(item);
+                return (
+                  <Button
+                    key={idx}
+                    variant={isSelected ? "primary" : "outline-secondary"}
+                    size="sm"
+                    className="rounded-pill d-flex align-items-center gap-1"
+                    onClick={() => toggleHav(item)}
+                    style={{ transition: 'all 0.2s' }}
+                  >
+                    {isSelected && <FaCheck size={10} />} 
+                    {item}
+                  </Button>
+                );
+              })}
             </div>
           </Form.Group>
 
@@ -449,7 +447,7 @@ const AvaliacaoEstudante = ({ matriz, idEstudante, idTurma }) => {
               rows={5} 
               value={feedbackAtual} 
               onChange={e => setFeedbackAtual(e.target.value)} 
-              placeholder="Escreva suas observações aqui ou deixe a IA criar baseada nos itens acima..." 
+              placeholder="Escreva suas observações aqui ou deixe a IA criar baseada nas tags selecionadas..." 
             />
             <div className="d-flex justify-content-end mt-2">
                <Button 
