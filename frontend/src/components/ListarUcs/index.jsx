@@ -160,7 +160,7 @@ const ListarUcs = ({ ucs, feedback, setFeedback, onDeleteSuccess, onEditSuccess,
                                         title="Definir Habilidades, Atitudes e Valores"
                                         onClick={() => handleOpenHavModal(uc)}
                                     >
-                                        <FaTasks className="me-1" /> Competências
+                                        <FaTasks className="me-1" /> CHAV
                                     </Button>
 
                                     <div>
