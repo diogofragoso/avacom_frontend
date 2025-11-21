@@ -7,10 +7,10 @@ import ucService from "../../services/ucService";
 import { gerarSugestaoFeedback } from "../../services/geminiService";
 
 const estados = [
-  { label: "Atendido", text: "A", variant: "success" },
-  { label: "Não Atendido", text: "NA", variant: "danger" },
-  { label: "Parcialmente", text: "PA", variant: "warning" },
-  { label: "Não Avaliado", text: "", variant: "secondary" },
+  { label: "Atendido", text: "A", variant: "success" },      // Index 0
+  { label: "Não Atendido", text: "NA", variant: "danger" },  // Index 1
+  { label: "Parcialmente", text: "PA", variant: "warning" }, // Index 2
+  { label: "Não Avaliado", text: "", variant: "secondary" }, // Index 3
 ];
 
 const mencaoParaIndice = (mencao) => {
@@ -42,16 +42,14 @@ const AvaliacaoEstudante = ({ matriz, idEstudante, idTurma }) => {
   const [feedbackAtual, setFeedbackAtual] = useState("");
   const [feedbackContext, setFeedbackContext] = useState(null);
   
-  // --- NOVOS ESTADOS PARA INTEGRAÇÃO CHAV + IA ---
+  // --- Estados IA + CHAV ---
   const [isLoadingIA, setIsLoadingIA] = useState(false);
   const [isLoadingHav, setIsLoadingHav] = useState(false); 
   const [listaHavDinamica, setListaHavDinamica] = useState([]); 
   const [havSelecionados, setHavSelecionados] = useState([]); 
-  // ------------------------------------------------
-
   const [alertInfo, setAlertInfo] = useState({ show: false, variant: "success", message: "" });
 
-  // 1. Carregar Dados dos Indicadores
+  // 1. Carregar Indicadores
   useEffect(() => {
     const carregarAvaliacoesIndicadores = async () => {
       const novaMatrizEstado = matriz.ucs.map(uc => uc.indicadores.map(() => 3));
@@ -86,7 +84,7 @@ const AvaliacaoEstudante = ({ matriz, idEstudante, idTurma }) => {
     if (idEstudante) carregarAvaliacoesIndicadores();
   }, [matriz, idEstudante]);
 
-  // 2. Carregar Dados da Avaliação Final
+  // 2. Carregar Avaliação Final
   useEffect(() => {
     const carregarAvaliacoesFinais = async () => {
       try {
@@ -124,8 +122,7 @@ const AvaliacaoEstudante = ({ matriz, idEstudante, idTurma }) => {
     }
   }, [alertInfo]);
 
-  // --- LÓGICA IA + CHAV ---
-  
+  // --- Lógica IA ---
   const toggleHav = (item) => {
     setHavSelecionados(prev => 
       prev.includes(item) ? prev.filter(i => i !== item) : [...prev, item]
@@ -148,17 +145,13 @@ const AvaliacaoEstudante = ({ matriz, idEstudante, idTurma }) => {
       setFeedbackAtual(textoMelhorado);
       setAlertInfo({ show: true, variant: "success", message: "Sugestão gerada com sucesso!" });
     } catch (error) {
-      setAlertInfo({ 
-        show: true, 
-        variant: "danger", 
-        message: "Erro ao conectar com a IA." 
-      });
+      setAlertInfo({ show: true, variant: "danger", message: "Erro ao conectar com a IA." });
     } finally {
       setIsLoadingIA(false);
     }
   };
-  // ------------------------
 
+  // --- Handlers ---
   const handleClick = (ucIndex, indIndex) => {
     setEstadoMatriz(prev => {
       const nova = prev.map(r => [...r]);
@@ -264,10 +257,22 @@ const AvaliacaoEstudante = ({ matriz, idEstudante, idTurma }) => {
     }
   };
 
+  // --- NOVA LÓGICA DE MENÇÃO FINAL (Sem PA) ---
   const handleClickMenFinal = (ucIndex) => {
     setAvaliacaoFinalPorUC(prev => {
       const nova = [...prev];
-      nova[ucIndex] = (nova[ucIndex] + 1) % estados.length;
+      const currentIdx = nova[ucIndex];
+      
+      // Ciclo desejado: Vazio (3) -> A (0) -> NA (1) -> Vazio (3)...
+      // Se estiver em qualquer outra coisa (como PA - 2), joga para Vazio.
+      if (currentIdx === 3) {
+        nova[ucIndex] = 0; // Vazio -> A
+      } else if (currentIdx === 0) {
+        nova[ucIndex] = 1; // A -> NA
+      } else {
+        nova[ucIndex] = 3; // NA (ou PA) -> Vazio
+      }
+      
       return nova;
     });
   };
@@ -377,7 +382,6 @@ const AvaliacaoEstudante = ({ matriz, idEstudante, idTurma }) => {
         </Table>
       </div>
 
-      {/* Modais Simples */}
       <Modal show={showObsModal} onHide={() => setShowObsModal(false)} centered>
         <Modal.Header closeButton><Modal.Title>Observação</Modal.Title></Modal.Header>
         <Modal.Body>
@@ -400,12 +404,9 @@ const AvaliacaoEstudante = ({ matriz, idEstudante, idTurma }) => {
         </Modal.Footer>
       </Modal>
 
-      {/* --- MODAL DE FEEDBACK COM IA E TAGS INTERATIVAS --- */}
       <Modal show={showFeedbackModal} onHide={() => setShowFeedbackModal(false)} size="lg" centered>
         <Modal.Header closeButton><Modal.Title>Feedback da Unidade Curricular</Modal.Title></Modal.Header>
         <Modal.Body>
-          
-          {/* Seção de Seleção de Competências com BOTÕES (Tags) */}
           <Form.Group className="mb-3">
             <Form.Label className="fw-bold text-secondary" style={{fontSize: "0.9rem"}}>
               Competências Observadas (CHAV):
